@@ -3,22 +3,37 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Imports\CadastralImport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ImportController extends Controller
 {
-    
     public function showForm()
     {
-        // СОЗДАЕМ ФЕЙКОВЫЙ МАССИВ с ID
-        $order = [
-            'id' => 1,                       // добавили ID
-            'incoming_number' => 'ВХ-123/2025',
-            'incoming_date' => '17.02.2025'
-        ];
         
-        // Превращаем массив в объект
-        $order = (object) $order;
+        return view('import.form');
+    }
+    
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv|max:10240'
+        ]);
         
-        return view('import.form', compact('order'));
+        try {
+            // Импортируем файл
+            Excel::import(new \App\Imports\CadastralItemsImport, $request->file('file'));
+            
+            return redirect()->back()->with('success', 'Импорт выполнен успешно!');
+            
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Ошибка импорта: ' . $e->getMessage());
+        }
+    }
+    
+    public function downloadTemplate()
+    {
+        // Пока заглушка
+        return "Здесь будет скачивание шаблона";
     }
 }

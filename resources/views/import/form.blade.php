@@ -28,7 +28,7 @@
                     </div>
 
                     {{-- Форма загрузки --}}
-                    <form action="{{ route('orders.import', $order->id) }}"
+                    <form action="" 
                           method="POST" 
                           enctype="multipart/form-data">
                         
