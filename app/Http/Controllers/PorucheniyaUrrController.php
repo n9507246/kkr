@@ -13,30 +13,8 @@ class PorucheniyaUrrController extends Controller
      */
     public function index()
     {
-        // Получаем все распоряжения с подсчетом количества связанных работ
-        /**/
-        $orders = ExternalOrder::all();
-
-        //return view('orders.index', compact('orders'));
-
-        // $orders = [[
-        //     'incoming_number' => 'ВХ-123/2025',
-        //     'incoming_date' => '17.02.2025',
-
-        //     'urr_number' => '12-3456/25',
-        //     'urr_date' => '10.02.2025',
-
-        //     'outgoing_number' => '',
-        //     'outgoing_date' => '',
-
-        //     'description' => '',
-
-        //     'works_count' => 23
-        // ]];
-
-        return view('porucheniya-urr.index', compact('orders'));
-
-
+        $spisok_porucheniy = ExternalOrder::all();
+        return view('porucheniya-urr.index', compact('spisok_porucheniy'));
     }
 
     /**
@@ -109,8 +87,8 @@ class PorucheniyaUrrController extends Controller
      */
     public function edit(string $id)
     {
-        $order = ExternalOrder::findOrFail($id);
-        return view('porucheniya-urr.edit', compact('order'));
+        $poruchenie = ExternalOrder::findOrFail($id);
+        return view('porucheniya-urr.edit', compact('poruchenie'));
     }
 
     /**

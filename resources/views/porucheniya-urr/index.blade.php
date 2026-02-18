@@ -28,18 +28,18 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($porucheniya ?? [] as $poruchenie)
+                        @forelse($spisok_porucheniy ?? [] as $poruchenie)
                         <tr>
                             <td>
                                 <a href="{{ route('porucheniya-urr.edit', $poruchenie->id ?? 1) }}" title="Редактировать">
                                     {{ $poruchenie->incoming_number ?? 'Б/Н' }}
                                 </a>
                             </td>
-                            <td>{{ $poruchenie->incoming_date ? $poruchenie->incoming_date->format('d.m.Y') : '' }}</td>
+                            <td>{{ $poruchenie->incoming_date ?? '' }}</td>
                             <td>{{ $poruchenie->urr_number ?? '' }}</td>
-                            <td>{{ $poruchenie->urr_date ? $poruchenie->urr_date->format('d.m.Y') : '' }}</td>
+                            <td>{{ $poruchenie->urr_date ??  '' }}</td>
                             <td>{{ $poruchenie->outgoing_number ?? '' }}</td>
-                            <td>{{ $poruchenie->outgoing_date ? $poruchenie->outgoing_date->format('d.m.Y') : '' }}</td>
+                            <td>{{ $poruchenie->outgoing_date ??  '' }}</td>
                             <td>{{ $poruchenie->description ?? '' }}</td>
                             <td class="text-center">{{ $poruchenie->works_count ?? 0 }}</td>
                             <td>

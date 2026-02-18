@@ -8,6 +8,18 @@ use App\Http\Controllers\PorucheniyaUrrController;
 Route::get('/', [ObektyNedvizhimostiController::class, 'index'])->name('home');
 Route::resource('porucheniya-urr', PorucheniyaUrrController::class);
 
+Route::group([ 'prefix' => 'porucheniya-urr', 'as' => 'porucheniya-urr.' ], function () {
+
+    Route::get('/', [PorucheniyaUrrController::class, 'index'])->name('index');
+    Route::get('/create', [PorucheniyaUrrController::class, 'create'])->name('create');
+    Route::get('/{poruchenie-urr}', [PorucheniyaUrrController::class, 'show'])->name('show');
+
+});
+
+// Route::resource('obekty-nedvizhimosti', ObektyNedvizhimostiController::class);
+Route::prefix('porucheniya-urr')->name('porucheniya-urr.')->group(function () {
+    Route::get('/', [PorucheniyaUrrController::class, 'index'])->name('index');
+});
 // // Главная страница
 // Route::get('/', [KkrReportController::class, 'index'])->name('home');
 
