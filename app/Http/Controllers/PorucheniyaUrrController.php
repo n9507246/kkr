@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
+
 use App\Models\ExternalOrder;
 use Illuminate\Http\Request;
 
-class OrderController extends Controller
+class PorucheniyaUrrController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,13 +16,13 @@ class OrderController extends Controller
         // Получаем все распоряжения с подсчетом количества связанных работ
         /**/
         $orders = ExternalOrder::all();
-        
+
         //return view('orders.index', compact('orders'));
 
         // $orders = [[
         //     'incoming_number' => 'ВХ-123/2025',
         //     'incoming_date' => '17.02.2025',
-            
+
         //     'urr_number' => '12-3456/25',
         //     'urr_date' => '10.02.2025',
 
@@ -62,9 +63,9 @@ class OrderController extends Controller
         //     'outgoing_number' => 'nullable|string|max:50',
         //     'outgoing_date' => 'nullable|date',
         // ]);
-        
+
         // $validated['created_by'] = auth()->id();
-        
+
         $order = ExternalOrder::create([
             "incoming_number" => $request['incoming_number'],
             "incoming_date" => $request['incoming_date'],
@@ -74,7 +75,7 @@ class OrderController extends Controller
             "outgoing_number" => null,
             "outgoing_date" => null,
         ]);
-        
+
         return redirect()
             ->route('orders.edit', $order)
             ->with('success', 'Распоряжение успешно создано');
@@ -91,7 +92,7 @@ class OrderController extends Controller
     //     $order = ExternalOrder::with('cadastralItems', 'cadastralItems.executor')
     //         ->withCount('cadastralItems')
     //         ->findOrFail($id);
-            
+
     //     // Статистика по статусам
     //     $stats = [
     //         'total' => $order->cadastral_items_count,
@@ -99,7 +100,7 @@ class OrderController extends Controller
     //         'in_progress' => $order->cadastralItems()->where('status', 'in_progress')->count(),
     //         'problem' => $order->cadastralItems()->where('status', 'problem')->count(),
     //     ];
-        
+
     //     return view('orders.show', compact('order', 'stats'));
     // }
 
@@ -118,7 +119,7 @@ class OrderController extends Controller
     public function update(Request $request, string $id)
     {
         $order = ExternalOrder::findOrFail($id);
-        
+
         $validated = $request->validate([
             'incoming_number' => 'required|string|max:50|unique:external_orders,incoming_number,' . $id,
             'incoming_date' => 'required|date',
@@ -128,9 +129,9 @@ class OrderController extends Controller
             'outgoing_number' => 'nullable|string|max:50',
             'outgoing_date' => 'nullable|date',
         ]);
-        
+
         $order->update($validated);
-        
+
         return redirect()
             ->route('orders.show', $order)
             ->with('success', 'Распоряжение успешно обновлено');
@@ -143,31 +144,31 @@ class OrderController extends Controller
     {
         $order = ExternalOrder::findOrFail($id);
         $order->delete();
-        
+
         return redirect()
             ->route('orders.index')
             ->with('success', 'Распоряжение удалено');
     }
-    
+
     /**
      * Send response for the order.
      */
     public function sendResponse(Request $request, string $id)
     {
         $order = ExternalOrder::findOrFail($id);
-        
+
         $validated = $request->validate([
             'outgoing_number' => 'required|string|max:50',
             'outgoing_date' => 'required|date',
         ]);
-        
+
         $order->update($validated);
-        
+
         return redirect()
             ->route('orders.show', $order)
             ->with('success', 'Ответ зарегистрирован');
     }
-    
+
     /**
      * Export orders to Excel.
      */

@@ -3,9 +3,9 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\KkrReportController;
 use App\Http\Controllers\ImportController;
-use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PorucheniyaUrrController;
 
-Route::resource('orders', OrderController::class);
+Route::resource('orders', PorucheniyaUrrController::class);
 
 // // Главная страница
 Route::get('/', [KkrReportController::class, 'index'])->name('home');
@@ -14,35 +14,35 @@ Route::get('/', [KkrReportController::class, 'index'])->name('home');
 Route::prefix('orders')->name('orders.')->group(function () {
 
 //     // Список всех распоряжений
-//     Route::get('/', [OrderController::class, 'index'])->name('index');
+//     Route::get('/', [PorucheniyaUrrController::class, 'index'])->name('index');
 
 //     // Форма создания нового
-//     Route::get('/create', [OrderController::class, 'create'])->name('create');
+//     Route::get('/create', [PorucheniyaUrrController::class, 'create'])->name('create');
 
 //     // Сохранение нового
-//     Route::post('/store', [OrderController::class, 'store'])->name('store');
+//     Route::post('/store', [PorucheniyaUrrController::class, 'store'])->name('store');
 
 //     // Просмотр одного распоряжения
-//     Route::get('/{order}', [OrderController::class, 'show'])->name('show');
+//     Route::get('/{order}', [PorucheniyaUrrController::class, 'show'])->name('show');
 
 //     // Форма редактирования
-//     Route::get('/{order}/edit', [OrderController::class, 'edit'])->name('edit');
+//     Route::get('/{order}/edit', [PorucheniyaUrrController::class, 'edit'])->name('edit');
 
 //     // Обновление
-//     Route::put('/{order}', [OrderController::class, 'update'])->name('update');
+//     Route::put('/{order}', [PorucheniyaUrrController::class, 'update'])->name('update');
 
 //     // Удаление
-//     Route::delete('/{order}', [OrderController::class, 'destroy'])->name('destroy');
+//     Route::delete('/{order}', [PorucheniyaUrrController::class, 'destroy'])->name('destroy');
 
 //     // ИМПОРТ (отдельно, не относится к конкретному распоряжению)
     Route::get('/import', [ImportController::class, 'showForm'])->name('import.form');
     Route::post('/import', [ImportController::class, 'import'])->name('import');
 
 //     // ЭКСПОРТ (на будущее)
-    Route::get('/export', [OrderController::class, 'export'])->name('export');
+    Route::get('/export', [PorucheniyaUrrController::class, 'export'])->name('export');
 
 //     // ОТПРАВКА ОТВЕТА (для конкретного распоряжения)
-//     Route::post('/{order}/send-response', [OrderController::class, 'sendResponse'])->name('send-response');
+//     Route::post('/{order}/send-response', [PorucheniyaUrrController::class, 'sendResponse'])->name('send-response');
 });
 
 // // Шаблон для импорта (если нужен)
@@ -50,6 +50,6 @@ Route::prefix('orders')->name('orders.')->group(function () {
 
 // // Можно также добавить API маршруты (если нужны)
 // Route::prefix('api/orders')->name('api.orders.')->group(function () {
-//     Route::get('/', [OrderController::class, 'apiIndex']);
-//     Route::get('/{order}', [OrderController::class, 'apiShow']);
+//     Route::get('/', [PorucheniyaUrrController::class, 'apiIndex']);
+//     Route::get('/{order}', [PorucheniyaUrrController::class, 'apiShow']);
 // });
