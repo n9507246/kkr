@@ -7,33 +7,36 @@
             <div class="card">
                 <div class="card-header bg-primary text-white">
                     <h4 class="mb-0">
-                        @if(isset($order))
-                            <i class="bi bi-pencil"></i> Редактирование распоряжения
-                        @else
-                            <i class="bi bi-plus-circle"></i> Новое распоряжение УРР
-                        @endif
+                        <i class="bi bi-pencil"></i> Редактирование поручение
                     </h4>
                 </div>
 
                 <div class="card-body">
                     <!-- Табы -->
-                    <ul class="nav nav-tabs mb-4" >
-                        <li class="nav-item" >
-                            <a href="{{ route('porucheniya-urr.edit', ['poruchenie_urr' => $poruchenie_urr_id]) }}" class="nav-link" >
-                                <i class="bi bi-file-text"></i> Основные данные
-                            </a>
-                        </li>
-                        <li class="nav-item" >
-                            <a href="{{ route('porucheniya-urr.nedvizhimosti.create', ['poruchenie_urr' => $poruchenie_urr_id]) }}" class="nav-link active" >
-                                <i class="bi bi-grid"></i> Объекты
-                            </a>
-                        </li>
-                        <li class="nav-item" >
-                            <button class="nav-link" >
-                                <i class="bi bi-file-excel"></i> Импорт из Excel
-                            </button>
-                        </li>
-                    </ul>
+                    <x-porucheniya-urr.nav-tabs>
+                        <x-porucheniya-urr.tab-item
+                            :route="route('porucheniya-urr.edit', ['poruchenie_urr' => $id_poruchenie])"
+                            :active="request()->routeIs('porucheniya-urr.edit')"
+                            icon="bi-file-text"
+                        >
+                            Основные данные
+                        </x-porucheniya-urr.tab-item>
+
+                        <x-porucheniya-urr.tab-item
+                            :route="route('porucheniya-urr.nedvizhimosti.create', ['poruchenie_urr' => $id_poruchenie])"
+                            :active="request()->routeIs('porucheniya-urr.nedvizhimosti.*')"
+                            icon="bi-grid"
+                        >
+                            Объекты
+                        </x-porucheniya-urr.tab-item>
+
+                        <x-porucheniya-urr.tab-item
+                            icon="bi-file-excel"
+                            :disabled="true"
+                        >
+                            Импорт из Excel
+                        </x-porucheniya-urr.tab-item>
+                    </x-porucheniya-urr.nav-tabs>
 
                     <!-- ФОРМА СОЗДАНИЯ ПОРУЧЕНИЯ -->
                     <form method="POST" action="{{ route('porucheniya-urr.store') }}">

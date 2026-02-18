@@ -62,9 +62,9 @@ class ObektyNedvizhimostiController extends Controller
         //
     }
 
-    public function forma_obekta_privyazkoy_k_porucheniyu(string $poruchenie_urr_id)
+    public function forma_obekta_privyazkoy_k_porucheniyu(string $id_poruchenie)
     {
         // dd($poruchenie_urr_id);
-        return view('porucheniya-urr.obekti_poruchenia', compact('poruchenie_urr_id'));
+        return view('porucheniya-urr.obekti_poruchenia', compact('id_poruchenie'));
     }
 }
