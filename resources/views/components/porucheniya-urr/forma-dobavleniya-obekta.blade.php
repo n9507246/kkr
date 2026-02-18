@@ -8,7 +8,8 @@
         </button>
     </div>
 
-    <form id="cadastralForm" method="POST" action="{{ $order ? route('obekty-nedvizhimosti.update', $order->id) : route('obekty-nedvizhimosti.store') }}">
+    {{-- <form id="cadastralForm" method="POST" action="{{ $order ? route('obekty-nedvizhimosti.update', $order->id) : route('obekty-nedvizhimosti.store') }}"> --}}
+    <form id="cadastralForm" method="POST" action="">
         @csrf
         @if($order)
             @method('PUT')

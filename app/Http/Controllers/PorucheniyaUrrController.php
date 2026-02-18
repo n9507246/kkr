@@ -88,7 +88,7 @@ class PorucheniyaUrrController extends Controller
     public function edit(string $id)
     {
         $poruchenie = ExternalOrder::findOrFail($id);
-        return view('porucheniya-urr.edit', compact('poruchenie'));
+        return view('porucheniya-urr.edit', ['id_poruchenie' => $poruchenie->id]);
     }
 
     /**
