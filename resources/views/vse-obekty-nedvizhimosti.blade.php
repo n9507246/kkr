@@ -76,7 +76,7 @@
     <div class="row">
         <div class="col-12">
             <h2 class="mb-4">Отчет о выполненных работах</h2>
-           
+
             {{-- ФИЛЬТРЫ --}}
             <div class="card mb-4">
                 <div class="card-header bg-primary text-white">
@@ -160,7 +160,7 @@
                                     {{ $work['object_type'] }}
                                 @endif
                             </td>
-                            
+
                             <td>{{ $work['incoming_number'] }}</td>
                             <td>{{ $work['incoming_date'] }}</td>
                             <td>{{ $work['urr_number'] }}</td>
@@ -193,7 +193,7 @@
                     </tbody>
                 </table>
             </div>
-            
+
             {{-- ПАГИНАЦИЯ (для примера) --}}
             <div class="d-flex justify-content-between align-items-center mt-3">
                 <div>Показано 5 из 5 записей</div>

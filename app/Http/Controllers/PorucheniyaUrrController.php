@@ -34,7 +34,7 @@ class PorucheniyaUrrController extends Controller
         //     'works_count' => 23
         // ]];
 
-        return view('orders.index', compact('orders'));
+        return view('porucheniya-urr.index', compact('orders'));
 
 
     }
@@ -44,7 +44,7 @@ class PorucheniyaUrrController extends Controller
      */
     public function create()
     {
-        return view('orders.create');
+        return view('porucheniya-urr.create');
     }
 
     /**
@@ -77,7 +77,7 @@ class PorucheniyaUrrController extends Controller
         ]);
 
         return redirect()
-            ->route('orders.edit', $order)
+            ->route('porucheniya-urr.edit', $order)
             ->with('success', 'Распоряжение успешно создано');
     }
 
@@ -110,7 +110,7 @@ class PorucheniyaUrrController extends Controller
     public function edit(string $id)
     {
         $order = ExternalOrder::findOrFail($id);
-        return view('orders.edit', compact('order'));
+        return view('porucheniya-urr.edit', compact('order'));
     }
 
     /**
@@ -133,7 +133,7 @@ class PorucheniyaUrrController extends Controller
         $order->update($validated);
 
         return redirect()
-            ->route('orders.show', $order)
+            ->route('porucheniya-urr.show', $order)
             ->with('success', 'Распоряжение успешно обновлено');
     }
 
@@ -146,7 +146,7 @@ class PorucheniyaUrrController extends Controller
         $order->delete();
 
         return redirect()
-            ->route('orders.index')
+            ->route('porucheniya-urr.index')
             ->with('success', 'Распоряжение удалено');
     }
 
@@ -165,7 +165,7 @@ class PorucheniyaUrrController extends Controller
         $order->update($validated);
 
         return redirect()
-            ->route('orders.show', $order)
+            ->route('porucheniya-urr.show', $order)
             ->with('success', 'Ответ зарегистрирован');
     }
 

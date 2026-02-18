@@ -1,17 +1,18 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\KkrReportController;
+use App\Http\Controllers\ObektyNedvizhimostiController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\PorucheniyaUrrController;
 
-Route::resource('orders', PorucheniyaUrrController::class);
+Route::get('/', [ObektyNedvizhimostiController::class, 'index'])->name('home');
+Route::resource('porucheniya-urr', PorucheniyaUrrController::class);
 
 // // Главная страница
-Route::get('/', [KkrReportController::class, 'index'])->name('home');
+// Route::get('/', [KkrReportController::class, 'index'])->name('home');
 
 // // МАРШРУТЫ ДЛЯ РАСПОРЯЖЕНИЙ (ORDERS)
-Route::prefix('orders')->name('orders.')->group(function () {
+// Route::prefix('orders')->name('orders.')->group(function () {
 
 //     // Список всех распоряжений
 //     Route::get('/', [PorucheniyaUrrController::class, 'index'])->name('index');
@@ -35,15 +36,15 @@ Route::prefix('orders')->name('orders.')->group(function () {
 //     Route::delete('/{order}', [PorucheniyaUrrController::class, 'destroy'])->name('destroy');
 
 //     // ИМПОРТ (отдельно, не относится к конкретному распоряжению)
-    Route::get('/import', [ImportController::class, 'showForm'])->name('import.form');
-    Route::post('/import', [ImportController::class, 'import'])->name('import');
+//     Route::get('/import', [ImportController::class, 'showForm'])->name('import.form');
+//     Route::post('/import', [ImportController::class, 'import'])->name('import');
 
-//     // ЭКСПОРТ (на будущее)
-    Route::get('/export', [PorucheniyaUrrController::class, 'export'])->name('export');
+// //     // ЭКСПОРТ (на будущее)
+//     Route::get('/export', [PorucheniyaUrrController::class, 'export'])->name('export');
 
 //     // ОТПРАВКА ОТВЕТА (для конкретного распоряжения)
 //     Route::post('/{order}/send-response', [PorucheniyaUrrController::class, 'sendResponse'])->name('send-response');
-});
+// });
 
 // // Шаблон для импорта (если нужен)
 // Route::get('/import/template', [ImportController::class, 'downloadTemplate'])->name('import.template');
