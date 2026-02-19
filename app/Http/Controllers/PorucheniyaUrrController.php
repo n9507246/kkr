@@ -55,7 +55,7 @@ class PorucheniyaUrrController extends Controller
         ]);
 
         return redirect()
-            ->route('porucheniya-urr.edit', $order)
+            ->route('porucheniya-urr.spisok-porucheniy', $order)
             ->with('success', 'Распоряжение успешно создано');
     }
 

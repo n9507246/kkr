@@ -17,7 +17,7 @@
                             <x-porucheniya-urr.tab-item :active="true" icon="bi-file-text">
                                 Основные данные
                             </x-porucheniya-urr.tab-item>
-                        </x-porucheniya-urr.nav-tabs>
+                        </x-porucheniya-urr.nav-tabs> 
 
                     <x-porucheniya-urr.forma-dobavleniya-porucheniya></x-porucheniya-urr.forma-dobavleniya-porucheniya>
 

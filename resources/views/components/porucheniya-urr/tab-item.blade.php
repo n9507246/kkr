@@ -1,19 +1,31 @@
+{{-- resources/views/components/porucheniya-urr/tab-item.blade.php --}}
 @props([
-    'route' => null,
-    'active' => false,
+    'active' => false, 
+    'url' => '#',  // переименовали route в url
     'icon' => null,
     'disabled' => false
 ])
 
-<li class="nav-item" role="presentation">
-    @if($disabled)
-        <a class="nav-link disabled" aria-disabled="true">
-            @if($icon) <i class="bi {{ $icon }}"></i> @endif
+@php
+    $href = $url;
+    $isDisabled = $disabled || $active;
+@endphp
+
+<li class="nav-item">
+    @if($isDisabled)
+        <span class="nav-link {{ $active ? 'active' : '' }} {{ $disabled ? 'disabled' : '' }}" 
+              @if($disabled) aria-disabled="true" @endif
+              @if($active) aria-current="page" @endif>
+            @if($icon)
+                <i class="bi {{ $icon }} me-1"></i>
+            @endif
             {{ $slot }}
-        </a>
+        </span>
     @else
-        <a href="{{ $route ?? '#' }}" class="nav-link {{ $active ? 'active' : '' }}">
-            @if($icon) <i class="bi {{ $icon }}"></i> @endif
+        <a class="nav-link" href="{{ $href }}">
+            @if($icon)
+                <i class="bi {{ $icon }} me-1"></i>
+            @endif
             {{ $slot }}
         </a>
     @endif

@@ -4,45 +4,47 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ObektyNedvizhimostiController;
 use App\Http\Controllers\PorucheniyaUrrController;
 
+use App\Http\Controllers\PorucheniyaUrr;
+
+// use App\Http\Controllers\PorucheniyaUrr\Nedvizhimosti\CreateController as NedvizhimostiCreateController;
+// use App\Http\Controllers\PorucheniyaUrr\Nedvizhimosti\StoreController as NedvizhimostiStoreController;
+
 Route::get('/', [ObektyNedvizhimostiController::class, 'index'])->name('home');
 
-// Группа маршрутов для поручений (юр. лица)
+
+
 Route::prefix('porucheniya-urr')
     ->name('porucheniya-urr.')
-    ->controller(PorucheniyaUrrController::class)
     ->group(function () {
 
-        // Список поручений
-        Route::get('/', 'index')->name('index');
-
-        // Создание нового поручения
-        Route::get('/create', 'create')->name('create');
-        Route::post('/', 'store')->name('store');
+        Route::get('/', PorucheniyaUrr\SpisokPorucheniy::class)->name('spisok-porucheniy');
+        Route::post('/', PorucheniyaUrr\SohranitPoruchenie::class)->name('sohranit-poruchenie');
+        Route::get('/sordat-poruchenie', PorucheniyaUrr\SozdatPoruchenie::class)->name('sozdat-poruchenie');
 
         // Работа с конкретным поручением
-        Route::get('/{poruchenie_urr}', 'show')->name('show');
-        Route::get('/{poruchenie_urr}/edit', 'edit')->name('edit');
-        Route::put('/{poruchenie_urr}', 'update')->name('update');
-        Route::delete('/{poruchenie_urr}', 'destroy')->name('destroy');
-
+        // Route::get('/{poruchenie_urr}', function(){return'ok';})->name('pokazat-poruchenie');
+        Route::get('/{poruchenie_urr}/redaktirovat-poruchenie', PorucheniyaUrr\RedaktirovatPoruchenie::class)->name('redaktirovat-poruchenie');
+        // Route::put('/{poruchenie_urr}', function(){return'ok';})->name('obnovit-poruchenie');
+        Route::delete('/{poruchenie_urr}', PorucheniyaUrr\UdalitPoruchenie::class)->name('udalit-posuchenie');
+/* 
         // Вложенные ресурсы (объекты недвижимости для конкретного поручения)
         Route::prefix('{poruchenie_urr}/obekty-nedvizhimosti')
             ->name('nedvizhimosti.')
-            ->controller(ObektyNedvizhimostiController::class)
             ->group(function () {
 
                 // Форма создания объекта недвижимости
-                Route::get('/create', 'forma_obekta_privyazkoy_k_porucheniyu')->name('create');
+                Route::get('/create', NedvizhimostiCreateController::class)->name('create');
 
                 // Сохранение объекта недвижимости
-                Route::post('/', 'sozdat_s_privyazkoy_k_porucheniyu')->name('store');
+                Route::post('/', NedvizhimostiStoreController::class)->name('store');
 
                 // Можно добавить другие методы для объектов недвижимости:
-                // Route::get('/', 'index')->name('index');
-                // Route::get('/{obekt}', 'show')->name('show');
-                // Route::get('/{obekt}/edit', 'edit')->name('edit');
-                // Route::put('/{obekt}', 'update')->name('update');
-                // Route::delete('/{obekt}', 'destroy')->name('destroy');
+                // Route::get('/', [SomeController::class, '__invoke'])->name('index');
+                // Route::get('/{obekt}', [SomeController::class, '__invoke'])->name('show');
+                // Route::get('/{obekt}/edit', [SomeController::class, '__invoke'])->name('edit');
+                // Route::put('/{obekt}', [SomeController::class, '__invoke'])->name('update');
+                // Route::delete('/{obekt}', [SomeController::class, '__invoke'])->name('destroy');
     });
 
+*/
 });

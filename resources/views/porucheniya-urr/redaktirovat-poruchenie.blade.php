@@ -15,16 +15,17 @@
 
                     <x-porucheniya-urr.nav-tabs>
                         <x-porucheniya-urr.tab-item
-                            :route="route('porucheniya-urr.edit', ['poruchenie_urr' => $id_poruchenie])"
-                            :active="request()->routeIs('porucheniya-urr.edit')"
+                            :url="route('porucheniya-urr.sozdat-poruchenie', ['poruchenie_urr' => $poruchenie->id])"
+                            :active="request()->routeIs('porucheniya-urr.redaktirovat-poruchenie')"
                             icon="bi-file-text"
-                        >
+                        >   
+
                             Основные данные
                         </x-porucheniya-urr.tab-item>
 
                         <x-porucheniya-urr.tab-item
-                            :route="route('porucheniya-urr.nedvizhimosti.create', ['poruchenie_urr' => $id_poruchenie])"
-                            :active="request()->routeIs('porucheniya-urr.nedvizhimosti.*')"
+                            {{-- :route="route('porucheniya-urr.nedvizhimosti.create', ['poruchenie_urr' => $poruchenie->id])"
+                            :active="request()->routeIs('porucheniya-urr.nedvizhimosti.*')"--}}
                             icon="bi-grid"
                         >
                             Объекты
@@ -38,7 +39,7 @@
                         </x-porucheniya-urr.tab-item>
                     </x-porucheniya-urr.nav-tabs>
 
-                    <x-porucheniya-urr.forma-dobavleniya-porucheniya></x-porucheniya-urr.forma-dobavleniya-porucheniya>
+                    <x-porucheniya-urr.forma-dobavleniya-porucheniya :poruchenie="$poruchenie"></x-porucheniya-urr.forma-dobavleniya-porucheniya>
 
                 </div>
             </div>

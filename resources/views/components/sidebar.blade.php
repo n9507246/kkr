@@ -149,7 +149,7 @@
 
         {{-- ПОРУЧЕНИЯ УРР --}}
         <li class="{{ request()->routeIs('porucheniya-urr.*') ? 'active' : '' }}">
-            <a href="{{ route('porucheniya-urr.index') }}">
+            <a href="{{ route('porucheniya-urr.spisok-porucheniy') }}">
                 <i class="bi bi-file-text"></i>
                 Поручения УРР
                 <span class="badge rounded-pill">5</span>

@@ -4,7 +4,7 @@
 <div class="container-fluid px-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2><i class="bi bi-file-text me-2"></i>Список поручений УРР</h2>
-        <a href="{{ route('porucheniya-urr.create') }}" class="btn btn-primary">
+        <a href="{{ route('porucheniya-urr.sozdat-poruchenie') }}" class="btn btn-primary">
             <i class="bi bi-plus-circle"></i> Новое поручение
         </a>
     </div>
@@ -31,7 +31,7 @@
                         @forelse($spisok_porucheniy ?? [] as $poruchenie)
                         <tr>
                             <td>
-                                <a href="{{ route('porucheniya-urr.edit', $poruchenie->id ?? 1) }}" title="Редактировать">
+                                <a href="{{ route('porucheniya-urr.redaktirovat-poruchenie', $poruchenie->id ?? 1) }}" title="Редактировать">
                                     {{ $poruchenie->incoming_number ?? 'Б/Н' }}
                                 </a>
                             </td>
@@ -44,12 +44,9 @@
                             <td class="text-center">{{ $poruchenie->works_count ?? 0 }}</td>
                             <td>
                                 <div class="btn-group btn-group-sm">
-                                    <a href="{{ route('porucheniya-urr.show', $poruchenie->id ?? 1) }}" class="btn btn-info" title="Просмотр">
-                                        <i class="bi bi-eye"></i>
-                                    </a>
-                                    <a href="{{ route('porucheniya-urr.edit', $poruchenie->id ?? 1) }}" class="btn btn-warning" title="Редактировать">
+                                    <a href="{{ route('porucheniya-urr.redaktirovat-poruchenie', $poruchenie->id ?? 1) }}" class="btn btn-warning" title="Редактировать">
                                         <i class="bi bi-pencil"></i>
-                                    </a>
+                                    </a> 
                                     <button type="button" class="btn btn-danger" title="Удалить" onclick="confirmDelete({{ $poruchenie->id ?? 1 }})">
                                         <i class="bi bi-trash"></i>
                                     </button>
@@ -61,7 +58,7 @@
                             <td colspan="9" class="text-center py-4">
                                 <i class="bi bi-inbox fs-1 d-block text-muted mb-2"></i>
                                 <p class="text-muted mb-0">Нет поручений</p>
-                                <a href="{{ route('porucheniya-urr.create') }}" class="btn btn-primary btn-sm mt-2">
+                                <a href="{{ route('porucheniya-urr.sozdat-poruchenie') }}" class="btn btn-primary btn-sm mt-2">
                                     Создать первое поручение
                                 </a>
                             </td>

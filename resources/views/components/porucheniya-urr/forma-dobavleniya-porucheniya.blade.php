@@ -1,7 +1,8 @@
+@props(['poruchenie' => null])
 <div class="tab-pane fade show active" id="main" role="tabpanel">
-    <form method="POST" action="{{ isset($order) ? route('porucheniya-urr.update', $order['id'] ?? 1) : route('porucheniya-urr.store') }}" id="mainForm">
+    <form method="POST" action="{{ isset($poruchenie) ? route('porucheniya-urr.obnovit-poruchenie', $poruchenie['id'] ?? 1) : route('porucheniya-urr.sohranit-poruchenie') }}" id="mainForm">
         @csrf
-        @if(isset($order))
+        @if(isset($poruchenie))
             @method('PUT')
         @endif
 
@@ -15,7 +16,7 @@
                         class="form-control @error('incoming_number') is-invalid @enderror"
                         id="incoming_number"
                         name="incoming_number"
-                        value="{{ old('incoming_number', $order['incoming_number'] ?? '') }}"
+                        value="{{ old('incoming_number', $poruchenie['incoming_number'] ?? '') }}"
                         placeholder="ВХ-123/2025"
                         required>
                     @error('incoming_number')
@@ -29,7 +30,7 @@
                         class="form-control @error('incoming_date') is-invalid @enderror"
                         id="incoming_date"
                         name="incoming_date"
-                        value="{{ old('incoming_date', $order['incoming_date'] ?? '') }}"
+                        value="{{ old('incoming_date', $poruchenie['incoming_date'] ?? '') }}"
                         required>
                     @error('incoming_date')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -46,7 +47,7 @@
                         class="form-control @error('urr_number') is-invalid @enderror"
                         id="urr_number"
                         name="urr_number"
-                        value="{{ old('urr_number', $order['urr_number'] ?? '') }}"
+                        value="{{ old('urr_number', $poruchenie['urr_number'] ?? '') }}"
                         placeholder="12-3456/25"
                         required>
                     @error('urr_number')
@@ -60,7 +61,7 @@
                         class="form-control @error('urr_date') is-invalid @enderror"
                         id="urr_date"
                         name="urr_date"
-                        value="{{ old('urr_date', $order['urr_date'] ?? '') }}"
+                        value="{{ old('urr_date', $poruchenie['urr_date'] ?? '') }}"
                         required>
                     @error('urr_date')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -77,7 +78,7 @@
                             id="description"
                             name="description"
                             rows="2"
-                            placeholder="Краткое описание работ...">{{ old('description', $order['description'] ?? '') }}</textarea>
+                            placeholder="Краткое описание работ...">{{ old('description', $poruchenie['description'] ?? '') }}</textarea>
                     @error('description')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -97,7 +98,7 @@
                         class="form-control"
                         id="outgoing_number"
                         name="outgoing_number"
-                        value="{{ old('outgoing_number', $order['outgoing_number'] ?? '') }}"
+                        value="{{ old('outgoing_number', $poruchenie['outgoing_number'] ?? '') }}"
                         placeholder="ИСХ-456/2025">
                 </div>
             </div>
@@ -108,13 +109,16 @@
                         class="form-control"
                         id="outgoing_date"
                         name="outgoing_date"
-                        value="{{ old('outgoing_date', $order['outgoing_date'] ?? '') }}">
+                        value="{{ old('outgoing_date', $poruchenie['outgoing_date'] ?? '') }}">
                 </div>
             </div>
         </div>
 
         <div class="d-flex justify-content-between mt-4">
-            <button type="button" class="btn btn-primary" id="saveMainAndNext">
+            <a class="btn btn-secondary" href="{{ route('porucheniya-urr.spisok-porucheniy')}}">
+                Выйти без сохранения
+            </a>
+            <button type="submit" class="btn btn-primary" >
                 Сохранить
             </button>
         </div>
