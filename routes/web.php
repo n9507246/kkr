@@ -1,12 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ObektyNedvizhimostiController;
+use App\Http\Controllers\ObektiNedvizhimocti;
 use App\Http\Controllers\PorucheniyaUrrController;
 use App\Http\Controllers\PorucheniyaUrr;
-use App\Http\Controllers\ObektiNedvizhimocti;
 
-Route::get('/', [ObektyNedvizhimostiController::class, 'index'])->name('home');
+Route::get('/', ObektiNedvizhimocti\SpisokObektov::class, 'index')->name('home');
 
 Route::prefix('porucheniya-urr')
     ->name('porucheniya-urr.')

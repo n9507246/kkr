@@ -45,8 +45,16 @@ class ObektiNedvizhimosti extends Model
     /**
      * Связь с поручением
      */
-    public function externalOrder()
+    public function poruchenie()
     {
         return $this->belongsTo(ExternalOrder::class, 'id_porucheniya_urr');
+    }
+    
+    /**
+     * Альтернативное название для обратной совместимости
+     */
+    public function externalOrder()
+    {
+        return $this->poruchenie();
     }
 }

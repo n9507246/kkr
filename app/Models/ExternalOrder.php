@@ -37,5 +37,15 @@ class ExternalOrder extends Model
         return $this->hasMany(CadastralItem::class, 'external_order_id');
     }
 
+    protected static function booted()
+    {
+        static::deleting(function ($poruchenie) {
+            $poruchenie->obektiNedvizhimosti()->delete();
+        });
+    }
 
+    public function obektiNedvizhimosti()
+    {
+        return $this->hasMany(ObektiNedvizhimosti::class, 'id_porucheniya_urr');
+    }
 }
