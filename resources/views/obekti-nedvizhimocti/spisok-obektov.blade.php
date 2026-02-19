@@ -7,7 +7,6 @@
     #report-table { border-radius: 8px; overflow: hidden; border: 1px solid #eaecf0; }
     .tabulator-header { text-transform: uppercase; font-size: 0.75rem !important; background-color: #f8f9fa !important; }
     .tabulator-cell { font-size: 0.85rem !important; vertical-align: middle !important; }
-    /* Исправляем отображение кнопок пагинации */
     .tabulator-footer .tabulator-paginator button { margin: 0 2px; border: 1px solid #dee2e6; border-radius: 4px; }
     .tabulator-footer .tabulator-page.active { background-color: #0d6efd !important; color: white !important; }
 </style>
@@ -60,18 +59,48 @@ document.addEventListener("DOMContentLoaded", function() {
         // Основные настройки
         height: "600px",
         layout: "fitColumns",
+        locale: "ru",
+        placeholder: "Нет данных для отображения",
+
+        // ПОЛНАЯ русская локализация
+        langs: {
+            "ru": {
+                "ajax": {
+                    "loading": "Загрузка...",
+                    "error": "Ошибка загрузки"
+                },
+                "pagination": {
+                    "page_size": "Показать",
+                    "first": "Первая",
+                    "first_title": "Первая страница",
+                    "last": "Последняя",
+                    "last_title": "Последняя страница",
+                    "prev": "Предыдущая",
+                    "prev_title": "Предыдущая страница",
+                    "next": "Следующая",
+                    "next_title": "Следующая страница",
+                    "all": "Все",
+                    "counter": {
+                        "showing": "Показано",
+                        "of": "из",
+                        "rows": "записей",
+                        "pages": "страниц"
+                    }
+                }
+            }
+        },
 
         // AJAX настройки
         ajaxURL: "{{ url()->current() }}",
         ajaxConfig: "GET",
         ajaxContentType: "json",
 
-        // Настройки пагинации - исправлено для правильной работы
+        // Настройки пагинации - ИСПРАВЛЕНО
         pagination: "remote",
         paginationMode: "remote",
         paginationSize: 10,
         paginationSizeSelector: [10, 25, 50, 100],
-        paginationCounter: "rows",
+        paginationCounter: "pages", // МЕНЯЕМ НА "pages" для отображения страниц
 
         // Параметры, отправляемые на сервер
         ajaxParams: function() {
@@ -93,11 +122,10 @@ document.addEventListener("DOMContentLoaded", function() {
                 document.getElementById('total-count').textContent = response.total || 0;
             }
 
-            // ВАЖНО: Возвращаем данные в формате, который ожидает Tabulator
             return {
-                data: response.data,           // Массив данных для текущей страницы
-                last_page: response.last_page,  // Последняя страница
-                total: response.total           // Общее количество записей
+                data: response.data,
+                last_page: response.last_page,
+                total: response.total
             };
         },
 
@@ -168,15 +196,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         </div>`;
                 }
             }
-        ],
-
-        // События для отладки (можно удалить после проверки)
-        dataLoaded: function(data) {
-            console.log("Data loaded:", data);
-        },
-        pageLoaded: function(pageno) {
-            console.log("Page loaded:", pageno);
-        }
+        ]
     });
 
     // Обработка формы фильтрации
@@ -184,7 +204,6 @@ document.addEventListener("DOMContentLoaded", function() {
     if (filterForm) {
         filterForm.addEventListener("submit", function(e) {
             e.preventDefault();
-            // При применении фильтров возвращаемся на первую страницу
             table.setPage(1);
             table.setData();
         });
