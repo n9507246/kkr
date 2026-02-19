@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-<link href="https://unpkg.com/tabulator-tables@5.5.0/dist/css/tabulator_bootstrap5.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+<link href="https://unpkg.com/tabulator-tables/dist/css/tabulator.min.css" rel="stylesheet">
+<script type="text/javascript" src="https://unpkg.com/tabulator-tables/dist/js/tabulator.min.js"></script>
 
 <style>
     #report-table { border-radius: 8px; overflow: hidden; border: 1px solid #eaecf0; }
@@ -164,10 +164,18 @@ document.addEventListener("DOMContentLoaded", function() {
     // Инициализация таблицы
     var table = new Tabulator("#report-table", {
         height: "600px",
-        width: "500px",
         layout: "fitColumns",  // Это важно для автоматического растягивания
         locale: "ru",
         placeholder: "Нет данных для отображения",
+        // layoutColumnsOnNewData:true,
+        persistence: true, // включаем сохранение
+        persistence: {
+                sort: true,
+                filter: true,
+                headerFilter: true,
+                page: true,
+                columns: ["visible", "frozen"] // СОХРАНЯЕМ ТОЛЬКО ВИДИМОСТЬ И ЗАМОРОЗКУ, НО НЕ ШИРИНУ
+            },
 
         // Русская локализация
         langs: {
@@ -236,7 +244,7 @@ document.addEventListener("DOMContentLoaded", function() {
             {
                 title: "Кадастровый номер",
                 field: "kadastroviy_nomer",
-                // width: 230,
+                width: 230,
                 frozen: true,
                 cssClass: "fw-bold text-primary"
             },
@@ -281,7 +289,7 @@ document.addEventListener("DOMContentLoaded", function() {
             {
                 title: "Действия",
                 field: "id",
-                // width: 120,
+                width: 120,
                 frozen: true,
                 headerSort: false,
                 hozAlign: "center",
