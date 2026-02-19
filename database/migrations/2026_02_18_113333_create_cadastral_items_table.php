@@ -15,62 +15,55 @@ return new class extends Migration
             $table->id();
             
             // Связь с поручением УРР
-            $table->foreignId('external_order_id')
-                  ->constrained()
+            $table->foreignId('id_porucheniya_urr')
+                  ->constrained('external_orders')
                   ->onDelete('cascade')
                   ->comment('ID поручения из УРР');
             
-            // Основные поля
-            $table->string('cadastral_number')
+            // Кадастровый номер
+            $table->string('kadastroviy_nomer')
                   ->comment('Кадастровый номер');
             
-            $table->string('object_type')
-                  ->comment('Вид/тип объекта (Земельный участок, Здание, Сооружение и т.д.)');
-            
-            $table->string('work_type')
+            // Тип объекта недвижимости
+            $table->string('tip_obekta_nedvizhimosti')
                   ->nullable()
-                  ->comment('Вид работ (Отчет, Заключение, Межевой план и т.д.)');
+                  ->comment('Тип объекта (Земельный участок, Здание и т.д.)');
             
-            $table->date('report_date')
+            // Вид работ
+            $table->string('vid_rabot')
+                  ->nullable()
+                  ->comment('Вид работ (Отчет, Заключение и т.д.)');
+            
+            // Дата окончания работ
+            $table->date('data_okonchaniya_rabot')
                   ->nullable()
                   ->comment('Дата отчета/завершения работ');
             
-            // Дополнительные поля
-            $table->string('status')
-                  ->default('assigned')
-                  ->comment('Статус: assigned, in_progress, completed, problem');
-            
-            $table->foreignId('assigned_to')
+            // Исполнитель
+            $table->string('ispolnitel')
                   ->nullable()
-                  ->constrained('users')
-                  ->comment('Кому назначено (ID пользователя)');
+                  ->comment('Кому назначено');
             
-            $table->text('comment')
+            // Комментарий
+            $table->text('komentarii')
                   ->nullable()
-                  ->comment('Комментарий исполнителя');
+                  ->comment('Комментарий');
             
-            // Даты начала и завершения
-            $table->date('start_date')
+            // Дата начала
+            $table->date('data_nachala')
                   ->nullable()
                   ->comment('Дата начала работ');
             
-            $table->date('completion_date')
+            // Дата завершения
+            $table->date('data_zaversheniya')
                   ->nullable()
-                  ->comment('Дата фактического завершения');
+                  ->comment('Дата завершения работ');
             
             $table->timestamps();
             $table->softDeletes();
             
             // Уникальность кадастрового номера в рамках одного поручения
-            $table->unique(['external_order_id', 'cadastral_number'], 'unique_cadastral_per_order');
-            
-            // Индексы для поиска (после всех полей)
-            $table->index('cadastral_number');
-            $table->index('object_type');
-            $table->index('status');
-            $table->index('report_date');
-            $table->index('assigned_to');
-            $table->index('completion_date');
+            $table->unique(['id_porucheniya_urr', 'kadastroviy_nomer'], 'unique_cadastral_per_order');
         });
     }
 

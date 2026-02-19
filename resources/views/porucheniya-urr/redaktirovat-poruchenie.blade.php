@@ -24,8 +24,8 @@
                         </x-porucheniya-urr.tab-item>
 
                         <x-porucheniya-urr.tab-item
-                            {{-- :route="route('porucheniya-urr.nedvizhimosti.create', ['poruchenie_urr' => $poruchenie->id])"
-                            :active="request()->routeIs('porucheniya-urr.nedvizhimosti.*')"--}}
+                            :url="route('porucheniya-urr.obekti-nedvizhimosti.spisok-obektov', ['poruchenie_urr' => $poruchenie->id])"
+                            :active="request()->routeIs('porucheniya-urr.obekti-nedvizhimosti.*')"
                             icon="bi-grid"
                         >
                             Объекты

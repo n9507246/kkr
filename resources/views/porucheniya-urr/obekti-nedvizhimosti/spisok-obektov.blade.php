@@ -15,16 +15,17 @@
                     <!-- Табы -->
                     <x-porucheniya-urr.nav-tabs>
                         <x-porucheniya-urr.tab-item
-                            :route="route('porucheniya-urr.edit', ['poruchenie_urr' => $id_poruchenie])"
-                            :active="request()->routeIs('porucheniya-urr.edit')"
+                            :url="route('porucheniya-urr.redaktirovat-poruchenie', ['poruchenie_urr' => $id_poruchenie])"
+                            :active="request()->routeIs('porucheniya-urr.redaktirovat-poruchenie')"
                             icon="bi-file-text"
-                        >
+                        >   
+
                             Основные данные
                         </x-porucheniya-urr.tab-item>
 
                         <x-porucheniya-urr.tab-item
-                            :route="route('porucheniya-urr.nedvizhimosti.create', ['poruchenie_urr' => $id_poruchenie])"
-                            :active="request()->routeIs('porucheniya-urr.nedvizhimosti.*')"
+                            :url="route('porucheniya-urr.obekti-nedvizhimosti.spisok-obektov', ['poruchenie_urr' => $id_poruchenie])"
+                            :active="request()->routeIs('porucheniya-urr.obekti-nedvizhimosti.*')"
                             icon="bi-grid"
                         >
                             Объекты
@@ -39,19 +40,19 @@
                     </x-porucheniya-urr.nav-tabs>
 
                     <!-- ФОРМА СОЗДАНИЯ ПОРУЧЕНИЯ -->
-                    <form method="POST" action="{{ route('porucheniya-urr.store') }}">
+                    <form method="POST" action="{{ route('porucheniya-urr.obekti-nedvizhimosti.sozdat-obekt', ['poruchenie_urr' => $id_poruchenie]) }}">
                         @csrf
                         <div class="row">
 
                             <div class="col-md-6 mb-3">
-                                <label for="cadastral_number" class="form-label">Кадастровый номер</label>
-                                <input type="text" class="form-control" id="cadastral_number" name="cadastral_number">
+                                <label for="kadastroviy_nomer" class="form-label">Кадастровый номер</label>
+                                <input type="text" class="form-control" id="kadastroviy_nomer" name="kadastroviy_nomer">
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="type" class="form-label">Тип</label>
-                                <select class="form-control" id="type" name="type">
-                                    <option value="ZU">ЗУ</option>
-                                    <option value="OKS">ОКС</option>
+                                <label for="vid_rabot" class="form-label">Тип</label>
+                                <select class="form-control" id="kadastroviy_nomer" name="vid_rabot">
+                                    <option value="ЗУ">ЗУ</option>
+                                    <option value="ОКС">ОКС</option>
                                 </select>
                             </div>
                         </div>
@@ -71,12 +72,23 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($porucheniya ?? [] as $item)
+                            @foreach($spisok_obektov ?? [] as $item)
                             <tr>
-                                <td>{{ $item->cadastral_number }}</td>
-                                <td>{{ $item->type }}</td>
-                                <td>
-                                    <a href="#" class="btn btn-sm btn-primary">Редактировать</a>
+                                <td>{{ $item->kadastroviy_nomer }}</td>
+                                <td>{{ $item->tip_obekta_nedvizhimosti }}</td>
+                                <td>     
+                                    <form method="POST" 
+                                        action="{{ route('porucheniya-urr.obekti-nedvizhimosti.udalit-obekt', [
+                                            'poruchenie_urr' => $id_poruchenie,
+                                            'obekt' => $item->id
+                                        ]) }}"
+                                        onsubmit="return confirm('Вы уверены?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            <i class="bi bi-trash"></i> Удалить
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
                             @endforeach

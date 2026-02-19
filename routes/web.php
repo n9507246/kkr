@@ -3,15 +3,10 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ObektyNedvizhimostiController;
 use App\Http\Controllers\PorucheniyaUrrController;
-
 use App\Http\Controllers\PorucheniyaUrr;
-
-// use App\Http\Controllers\PorucheniyaUrr\Nedvizhimosti\CreateController as NedvizhimostiCreateController;
-// use App\Http\Controllers\PorucheniyaUrr\Nedvizhimosti\StoreController as NedvizhimostiStoreController;
+use App\Http\Controllers\ObektiNedvizhimocti;
 
 Route::get('/', [ObektyNedvizhimostiController::class, 'index'])->name('home');
-
-
 
 Route::prefix('porucheniya-urr')
     ->name('porucheniya-urr.')
@@ -22,29 +17,47 @@ Route::prefix('porucheniya-urr')
         Route::get('/sordat-poruchenie', PorucheniyaUrr\SozdatPoruchenie::class)->name('sozdat-poruchenie');
 
         // Работа с конкретным поручением
-        // Route::get('/{poruchenie_urr}', function(){return'ok';})->name('pokazat-poruchenie');
         Route::get('/{poruchenie_urr}/redaktirovat-poruchenie', PorucheniyaUrr\RedaktirovatPoruchenie::class)->name('redaktirovat-poruchenie');
-        // Route::put('/{poruchenie_urr}', function(){return'ok';})->name('obnovit-poruchenie');
+        Route::put('/{poruchenie_urr}', function(){return'ok';})->name('obnovit-poruchenie');
         Route::delete('/{poruchenie_urr}', PorucheniyaUrr\UdalitPoruchenie::class)->name('udalit-posuchenie');
-/* 
+
         // Вложенные ресурсы (объекты недвижимости для конкретного поручения)
         Route::prefix('{poruchenie_urr}/obekty-nedvizhimosti')
-            ->name('nedvizhimosti.')
+            ->name('obekti-nedvizhimosti.')  // ВАЖНО: добавили точку в конце
             ->group(function () {
 
-                // Форма создания объекта недвижимости
-                Route::get('/create', NedvizhimostiCreateController::class)->name('create');
+                // СПИСОК объектов недвижимости (porucheniya-urr.obekti-nedvizhimosti.spisok-obektov)
+                Route::get('/', PorucheniyaUrr\ObektiNedvizhimocti\SpisokObektovNedvizhimosti::class)
+                    ->name('spisok-obektov');
 
-                // Сохранение объекта недвижимости
-                Route::post('/', NedvizhimostiStoreController::class)->name('store');
+                Route::post('/', PorucheniyaUrr\ObektiNedvizhimocti\SohranitObektNedvizhimosti::class)
+                    ->name('sozdat-obekt');
 
-                // Можно добавить другие методы для объектов недвижимости:
-                // Route::get('/', [SomeController::class, '__invoke'])->name('index');
-                // Route::get('/{obekt}', [SomeController::class, '__invoke'])->name('show');
-                // Route::get('/{obekt}/edit', [SomeController::class, '__invoke'])->name('edit');
-                // Route::put('/{obekt}', [SomeController::class, '__invoke'])->name('update');
-                // Route::delete('/{obekt}', [SomeController::class, '__invoke'])->name('destroy');
+                Route::delete('/{obekt}', PorucheniyaUrr\ObektiNedvizhimocti\UdalitObektNedvizhimosti::class)
+                    ->name('udalit-obekt');
+/*
+                // Форма создания объекта недвижимости (porucheniya-urr.obekti-nedvizhimosti.sozdat)
+                Route::get('/sozdat', PorucheniyaUrr\ObektiNedvizhimocti\SozdatObektNedvizhimosti::class)
+                    ->name('sozdat');
+
+                // Сохранение объекта недвижимости (porucheniya-urr.obekti-nedvizhimosti.sohranit)
+                Route::post('/', PorucheniyaUrr\ObektiNedvizhimocti\SohranitObektNedvizhimosti::class)
+                    ->name('sohranit');
+
+                // Просмотр конкретного объекта (porucheniya-urr.obekti-nedvizhimosti.pokazat)
+                Route::get('/{obekt}', PorucheniyaUrr\ObektiNedvizhimocti\PokazatObektNedvizhimosti::class)
+                    ->name('pokazat');
+
+                // Редактирование объекта (porucheniya-urr.obekti-nedvizhimosti.redaktirovat)
+                Route::get('/{obekt}/redaktirovat', PorucheniyaUrr\ObektiNedvizhimocti\RedaktirovatObektNedvizhimosti::class)
+                    ->name('redaktirovat');
+
+                // Обновление объекта (porucheniya-urr.obekti-nedvizhimosti.obnovit)
+                Route::put('/{obekt}', PorucheniyaUrr\ObektiNedvizhimocti\ObnovitObektNedvizhimosti::class)
+                    ->name('obnovit');
+
+                // Удаление объекта (porucheniya-urr.obekti-nedvizhimosti.udalit)
+                Route::delete('/{obekt}', PorucheniyaUrr\ObektiNedvizhimocti\UdalitObektNedvizhimosti::class)
+                    ->name('udalit');*/
+            });
     });
-
-*/
-});

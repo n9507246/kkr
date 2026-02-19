@@ -65,6 +65,6 @@ class ObektyNedvizhimostiController extends Controller
     public function forma_obekta_privyazkoy_k_porucheniyu(string $id_poruchenie)
     {
         // dd($poruchenie_urr_id);
-        return view('porucheniya-urr.obekti_poruchenia', compact('id_poruchenie'));
+        return view('porucheniya-urr.sozdat-obekt', compact('id_poruchenie'));
     }
 }
