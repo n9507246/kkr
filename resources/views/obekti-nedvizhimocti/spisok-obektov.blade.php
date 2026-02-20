@@ -248,7 +248,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     const id = data.id;
                     const nomer = data.kadastroviy_nomer || "-";
 
-                    return `<a href="/obekti-nedvizhimosti/${id}/redaktirovat"
+                    return `<a href="/obekti-nedvizhimosti/${id}/redaktirovat-obekt"
                             class="link-primary link-offset-2 link-underline-opacity-0 fw-bold">
                                 ${nomer}
                             </a>`;
@@ -275,7 +275,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     const id = cell.getValue();
                     return `
                         <div class="d-flex gap-1 justify-content-center">
-                            <a href="/obekti-nedvizhimosti/${id}/redaktirovat" class="btn btn-outline-warning btn-sm p-1" >
+                            <a href="/obekti-nedvizhimosti/${id}/redaktirovat-obekt" class="btn btn-outline-warning btn-sm p-1" >
                                 <i class="bi bi-pencil"></i>
                             </a>
                             <button class="btn btn-outline-danger btn-sm p-1" onclick="deleteObject(${id})">

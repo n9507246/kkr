@@ -1,5 +1,5 @@
 @extends('layouts.app')
-
+{{-- @php dump($obekt) @endphp --}}
 @section('content')
 <div class="container-fluid px-4">
     <div class="row justify-content-center">
@@ -58,12 +58,8 @@
                                             id="tip_obekta_nedvizhimosti"
                                             name="tip_obekta_nedvizhimosti">
                                         <option value="">Выберите тип...</option>
-                                        <option value="Земельный участок" {{ old('tip_obekta_nedvizhimosti', $obekt->tip_obekta_nedvizhimosti) == 'Земельный участок' ? 'selected' : '' }}>Земельный участок</option>
-                                        <option value="Здание" {{ old('tip_obekta_nedvizhimosti', $obekt->tip_obekta_nedvizhimosti) == 'Здание' ? 'selected' : '' }}>Здание</option>
-                                        <option value="Сооружение" {{ old('tip_obekta_nedvizhimosti', $obekt->tip_obekta_nedvizhimosti) == 'Сооружение' ? 'selected' : '' }}>Сооружение</option>
-                                        <option value="Помещение" {{ old('tip_obekta_nedvizhimosti', $obekt->tip_obekta_nedvizhimosti) == 'Помещение' ? 'selected' : '' }}>Помещение</option>
-                                        <option value="Объект незавершенного строительства" {{ old('tip_obekta_nedvizhimosti', $obekt->tip_obekta_nedvizhimosti) == 'Объект незавершенного строительства' ? 'selected' : '' }}>Объект незавершенного строительства</option>
-                                        <option value="Машино-место" {{ old('tip_obekta_nedvizhimosti', $obekt->tip_obekta_nedvizhimosti) == 'Машино-место' ? 'selected' : '' }}>Машино-место</option>
+                                        <option value="ЗУ" {{ old('tip_obekta_nedvizhimosti', $obekt->tip_obekta_nedvizhimosti) == 'ЗУ' ? 'selected' : '' }}>Земельный участок (ЗУ)</option>
+                                        <option value="ОКС" {{ old('tip_obekta_nedvizhimosti', $obekt->tip_obekta_nedvizhimosti) == 'ОКС' ? 'selected' : '' }}>Объект капитального строительства (ОКС)</option>
                                     </select>
                                     @error('tip_obekta_nedvizhimosti')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -185,7 +181,7 @@
 
                         {{-- Кнопки --}}
                         <div class="d-flex justify-content-between">
-                            <a href="{{ route('оbekti-nedvizhimosti.spisok-obektov', $obekt->id_porucheniya_urr) }}" class="btn btn-secondary">
+                            <a href="{{ route('obekti-nedvizhimosti.spisok-obektov', $obekt->id_porucheniya_urr) }}" class="btn btn-secondary">
                                 <i class="bi bi-arrow-left"></i> Назад
                             </a>
 

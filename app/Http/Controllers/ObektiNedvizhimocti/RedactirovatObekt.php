@@ -14,6 +14,6 @@ class RedactirovatObekt extends Controller
                     ->firstOrFail();
 
         // dump($obekt);
-        return view('obekti-nedvizhimocti.redactirovat-obekt', compact('obekt'));
+        return view('obekti-nedvizhimocti.redaktirovat-obekt', compact('obekt'));
     }
 }

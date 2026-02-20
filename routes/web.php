@@ -5,16 +5,16 @@ use App\Http\Controllers\ObektiNedvizhimocti;
 use App\Http\Controllers\PorucheniyaUrr;
 
 
-Route::get('/', function() {return redirect()->route('obekti-nedvizhimosti.spisok');})->name('home');
+Route::get('/', function() {return redirect()->route('obekti-nedvizhimosti.spisok-obektov');})->name('home');
 
 
-Route::get('/оbekti-nedvizhimosti', ObektiNedvizhimocti\SpisokObektov::class, 'index')
-    ->name('оbekti-nedvizhimosti.spisok-obektov');
+Route::get('/obekti-nedvizhimosti', ObektiNedvizhimocti\SpisokObektov::class, 'index')
+    ->name('obekti-nedvizhimosti.spisok-obektov');
 
-Route::get('/obekti-nedvizhimosti/{id_obekta}/redaktirovat', ObektiNedvizhimocti\RedactirovatObekt::class, 'index')
+Route::get('/obekti-nedvizhimosti/{id_obekta}/redaktirovat-obekt', ObektiNedvizhimocti\RedactirovatObekt::class, 'index')
     ->name('obekti-nedvizhimosti.redactirovat-obekt');
 
-Route::post('/obekti-nedvizhimosti/{id_obekta}/obnovit', function(){}, 'index')
+Route::post('/obekti-nedvizhimosti/{id_obekta}/obnovit-obekt', function(){}, 'index')
     ->name('obekti-nedvizhimosti.obnovit-obekt');
 
 Route::prefix('porucheniya-urr')
