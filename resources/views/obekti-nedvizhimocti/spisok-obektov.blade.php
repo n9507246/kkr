@@ -58,7 +58,7 @@
 </style>
 
 @section('content')
-<div class="py-4">
+<div class="">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="h3 mb-0">Реестр объектов</h2>
         <div class="badge bg-primary p-2">Всего: <span id="total-count">0</span></div>
