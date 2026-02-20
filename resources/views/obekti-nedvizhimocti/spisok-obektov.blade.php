@@ -168,8 +168,6 @@ document.addEventListener("DOMContentLoaded", function() {
         layout: "fitColumns",  // Это важно для автоматического растягивания
         locale: "ru",
         placeholder: "Нет данных для отображения",
-        /* layoutColumnsOnNewData:true,*/
-        persistence: true, // включаем сохранение
         persistence: {
             sort: true,
             filter: true,
