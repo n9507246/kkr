@@ -35,6 +35,6 @@ class SpisokObektov extends Controller
             ]);
         }
 
-        return view('obekti-nedvizhimocti.spisok-obektov');
+        return view('spisok-obektov');
     }
 }
