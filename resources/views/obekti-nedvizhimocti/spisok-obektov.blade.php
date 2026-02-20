@@ -51,14 +51,14 @@
     }
 
     #report-table  {
-        max-width: 1320px;
+        max-width: 1760px;
     }
 
 
 </style>
 
 @section('content')
-<div class="container-fluid py-4">
+<div class="py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="h3 mb-0">Реестр объектов</h2>
         <div class="badge bg-primary p-2">Всего: <span id="total-count">0</span></div>
@@ -167,15 +167,15 @@ document.addEventListener("DOMContentLoaded", function() {
         layout: "fitColumns",  // Это важно для автоматического растягивания
         locale: "ru",
         placeholder: "Нет данных для отображения",
-        // layoutColumnsOnNewData:true,
+        /* layoutColumnsOnNewData:true,*/
         persistence: true, // включаем сохранение
         persistence: {
-                sort: true,
-                filter: true,
-                headerFilter: true,
-                page: true,
-                columns: ["visible", "frozen"] // СОХРАНЯЕМ ТОЛЬКО ВИДИМОСТЬ И ЗАМОРОЗКУ, НО НЕ ШИРИНУ
-            },
+            sort: true,
+            filter: true,
+            headerFilter: true,
+            page: true,
+            columns: ["visible", "frozen"] // СОХРАНЯЕМ ТОЛЬКО ВИДИМОСТЬ И ЗАМОРОЗКУ, НО НЕ ШИРИНУ
+        },
 
         // Русская локализация
         langs: {

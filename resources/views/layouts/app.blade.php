@@ -19,8 +19,8 @@
 </head>
 <body>
     <div class="wrapper">
-        {{-- БОКОВАЯ ПАНЕЛЬ (теперь как компонент) --}}
-        <x-sidebar :user="['name' => 'Иванов И.И.', 'role' => 'Администратор']" />
+        {{-- БОКОВАЯ ПАНЕЛЬ (теперь как компонент) 
+        <x-sidebar :user="['name' => 'Иванов И.И.', 'role' => 'Администратор']" />--}}
 
         {{-- ОСНОВНОЙ КОНТЕНТ --}}
         <div id="content">
@@ -28,7 +28,7 @@
                 <i class="bi bi-list"></i> Меню
             </button>
 
-            {{-- ХЛЕБНЫЕ КРОШКИ --}}
+            {{-- ХЛЕБНЫЕ КРОШКИ 
             @if(request()->route())
             <nav aria-label="breadcrumb" class="mb-3">
                 <ol class="breadcrumb">
@@ -47,7 +47,7 @@
                     @endif
                 </ol>
             </nav>
-            @endif
+            @endif--}}
 
             {{-- СООБЩЕНИЯ --}}
             @if(session('success'))
@@ -64,7 +64,7 @@
                 </div>
             @endif
 
-            <div class="container-fluid">
+            <div class="container">
                 @yield('content')
             </div>
         </div>
