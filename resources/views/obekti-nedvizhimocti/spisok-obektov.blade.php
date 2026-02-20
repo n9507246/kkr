@@ -47,7 +47,6 @@
 <div class="container-fluid py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="h3 mb-0">Все объекты недвижимости</h2>
-        <div class="badge bg-primary p-2 fs-6">Всего: <span id="total-count">0</span></div>
     </div>
 
     <div class="d-flex gap-2 mb-3">
