@@ -154,7 +154,33 @@ document.addEventListener("DOMContentLoaded", function() {
                 last_row: response.total || 0
             };
         },
-
+        // Русская локализация
+            langs: {
+                "ru": {
+                    "ajax": {
+                        "loading": "Загрузка...",
+                        "error": "Ошибка загрузки"
+                    },
+                    "pagination": {
+                        "page_size": "Показать",
+                        "first": "Первая",
+                        "first_title": "Первая страница",
+                        "last": "Последняя",
+                        "last_title": "Последняя страница",
+                        "prev": "Предыдущая",
+                        "prev_title": "Предыдущая страница",
+                        "next": "Следующая",
+                        "next_title": "Следующая страница",
+                        "all": "Все",
+                        "counter": {
+                            "showing": "Показано",
+                            "of": "из",
+                            "rows": "записей",
+                            "pages": "страниц"
+                        }
+                    }
+                }
+            },
         columns: [
             { title: "Кадастровый номер", field: "kadastroviy_nomer", minWidth: 200, frozen: true,
                 formatter: (cell) => {
