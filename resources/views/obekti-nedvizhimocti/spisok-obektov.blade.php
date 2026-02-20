@@ -4,11 +4,12 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 
 <style>
+    /* Основные стили таблицы */
     #report-table { border-radius: 8px; overflow: hidden; border: 1px solid #eaecf0; width: 100%; }
     .tabulator-header { text-transform: uppercase; font-size: 0.75rem !important; background-color: #f8f9fa !important; }
     .tabulator-cell { font-size: 0.85rem !important; vertical-align: middle !important; }
 
-    /* Стили выпадающего списка */
+    /* Стили выпадающего списка колонок */
     .dropdown-menu { max-height: 450px; overflow-y: auto; min-width: 280px; padding: 12px; z-index: 1060; }
     .dropdown-item-checkbox { padding: 6px 10px; border-radius: 4px; transition: background 0.2s; cursor: pointer; display: flex; align-items: center; }
     .dropdown-item-checkbox:hover { background-color: #f8f9fa; }
@@ -17,8 +18,29 @@
 
     .hidden-count-badge { background-color: #dc3545; color: white; padding: 2px 7px; border-radius: 10px; font-size: 0.7rem; margin-left: 5px; }
 
-    /* Скрытие фильтров по умолчанию */
-    #filter-panel { display: none; }
+    /* Плавная анимация панели фильтров */
+    #filter-panel {
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        margin-bottom: 0;
+        transition: all 0.4s ease-in-out;
+        pointer-events: none;
+    }
+
+    #filter-panel.show {
+        max-height: 500px; /* С запасом для контента */
+        opacity: 1;
+        margin-bottom: 1.5rem;
+        pointer-events: auto;
+    }
+
+    /* Подсветка активной кнопки фильтров */
+    #toggle-filters.active {
+        background-color: #6c757d;
+        color: white;
+        border-color: #6c757d;
+    }
 </style>
 
 @section('content')
@@ -49,8 +71,8 @@
         </button>
     </div>
 
-    <div id="filter-panel" class="card border-0 shadow-sm mb-4">
-        <div class="card-body bg-light">
+    <div id="filter-panel" class="card border-0 shadow-sm">
+        <div class="card-body bg-light border-bottom">
             <form id="filter-form" class="row g-3 align-items-end">
                 <div class="col-md-3">
                     <label class="form-label small text-muted fw-bold">Кадастровый номер</label>
@@ -77,30 +99,37 @@
 <script>
 document.addEventListener("DOMContentLoaded", function() {
 
-    // Логика показа/скрытия фильтров
+    // 1. ЛОГИКА ПЛАВНОГО ПОКАЗА ФИЛЬТРОВ
     const filterBtn = document.getElementById('toggle-filters');
     const filterPanel = document.getElementById('filter-panel');
 
     filterBtn.addEventListener('click', function() {
-        const isHidden = window.getComputedStyle(filterPanel).display === 'none';
-        filterPanel.style.display = isHidden ? 'block' : 'none';
-        this.classList.toggle('btn-secondary', isHidden);
-        this.classList.toggle('btn-outline-secondary', !isHidden);
+        const isOpen = filterPanel.classList.toggle('show');
+        this.classList.toggle('active', isOpen);
+
+        // Небольшая задержка, чтобы таблица пересчитала высоту после анимации
+        setTimeout(() => {
+            if(typeof table !== 'undefined') table.redraw();
+        }, 450);
     });
 
+    // Глобальная функция удаления
     window.deleteObject = function(id) {
         if (confirm("Вы действительно хотите удалить объект #" + id + "?")) {
             console.log("Удаление:", id);
         }
     }
 
+    // 2. ИНИЦИАЛИЗАЦИЯ ТАБЛИЦЫ
     const table = new Tabulator("#report-table", {
         height: "600px",
         layout: "fitColumns",
         locale: "ru",
         placeholder: "Данные загружаются...",
+
         persistence: { columns: ["visible"] },
         persistenceID: "realEstateTable_vFinal",
+
         ajaxURL: "{{ url()->current() }}",
         pagination: "remote",
         paginationMode: "remote",
@@ -114,13 +143,15 @@ document.addEventListener("DOMContentLoaded", function() {
         },
 
         ajaxResponse: function(url, params, response) {
-            if (document.getElementById('total-count')) {
-                document.getElementById('total-count').textContent = response.total || 0;
+            // Обновляем счетчик количества записей
+            const countElement = document.getElementById('total-count');
+            if (countElement) {
+                countElement.textContent = response.total || 0;
             }
             return {
-                data: response.data,
-                last_page: response.last_page,
-                last_row: response.total
+                data: response.data || [],
+                last_page: response.last_page || 1,
+                last_row: response.total || 0
             };
         },
 
@@ -146,14 +177,19 @@ document.addEventListener("DOMContentLoaded", function() {
                     const id = cell.getValue();
                     return `
                         <div class="d-flex gap-2">
-                            <a href="/obekti-nedvizhimosti/${id}/redaktirovat-obekt" class="btn btn-outline-warning btn-sm py-0 px-1" title="Редактировать"><i class="bi bi-pencil"></i></a>
-                            <button onclick="deleteObject(${id})" class="btn btn-outline-danger btn-sm py-0 px-1" title="Удалить"><i class="bi bi-trash"></i></button>
+                            <a href="/obekti-nedvizhimosti/${id}/redaktirovat-obekt" class="btn btn-outline-warning btn-sm py-0 px-1" title="Редактировать">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <button onclick="deleteObject(${id})" class="btn btn-outline-danger btn-sm py-0 px-1" title="Удалить">
+                                <i class="bi bi-trash"></i>
+                            </button>
                         </div>`;
                 }
             }
         ],
     });
 
+    // 3. УПРАВЛЕНИЕ КОЛОНКАМИ
     table.on("tableBuilt", function() {
         const container = document.getElementById("columnCheckboxes");
         if (!container) return;
@@ -173,8 +209,12 @@ document.addEventListener("DOMContentLoaded", function() {
             `;
 
             div.querySelector("input").addEventListener("change", function() {
-                this.checked ? column.show() : column.hide();
+                if (this.checked) column.show();
+                else column.hide();
+
                 updateHiddenCount();
+
+                // Пересчет ширины после скрытия/показа
                 setTimeout(() => table.redraw(true), 10);
             });
             container.appendChild(div);
@@ -192,6 +232,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
+    // 4. ФИЛЬТРАЦИЯ И СБРОС
     document.getElementById("filter-form").addEventListener("submit", (e) => {
         e.preventDefault();
         table.setData();
@@ -203,7 +244,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     document.getElementById("resetColumnState").addEventListener("click", () => {
-        if(confirm("Сбросить настройки вида?")) {
+        if(confirm("Сбросить все настройки колонок?")) {
             localStorage.removeItem("tabulator-realEstateTable_vFinal-columns");
             location.reload();
         }
