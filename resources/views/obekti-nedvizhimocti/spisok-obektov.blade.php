@@ -205,9 +205,24 @@ document.addEventListener("DOMContentLoaded", function() {
             },
 
 
-            { title: "Тип работ", field: "vid_rabot", minWidth: 180, widthGrow: 1, },
+            { title: "Тип работ", field: "vid_rabot", minWidth: 120, widthGrow: 1, },
             { title: "Исполнитель", field: "ispolnitel", minWidth: 150, widthGrow: 1 },
-            { title: "Дата заверш.", field: "data_zaversheniya", minWidth: 130 },
+            { title: "Дата заверш.", field: "data_zaversheniya", minWidth: 150, widthGrow: 1,
+                formatter: function(cell) {
+                    const value = cell.getValue();
+                    if (!value) return '';
+
+                    // Если дата в формате ISO (2026-02-20T00:00:00.000Z)
+                    if (value.includes('T')) {
+                        const date = new Date(value);
+                        return date.toLocaleDateString('ru-RU');
+                    }
+
+                    return value;
+                },
+            },
+
+            { title: "Комментарии", field: "komentarii", minWidth: 350, widthGrow: 3 },
             { title: "Действия", field: "id", width: 100, headerSort: false, hozAlign: "center", frozen: true,
                 formatter: function(cell) {
                     const id = cell.getValue();

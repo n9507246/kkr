@@ -18,7 +18,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/obekti-nedvizhimosti/{id_obekta}/redaktirovat-obekt', ObektiNedvizhimocti\RedactirovatObekt::class)
         ->name('obekti-nedvizhimosti.redactirovat-obekt');
 
-    Route::post('/obekti-nedvizhimosti/{id_obekta}/obnovit-obekt', function(){}, 'index')
+    Route::post('/obekti-nedvizhimosti/{id_obekta}/obnovit-obekt', ObektiNedvizhimocti\ObnovitObekt::class)
         ->name('obekti-nedvizhimosti.obnovit-obekt');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -38,7 +38,7 @@ Route::middleware(['auth'])->group(function () {
         // Работа с конкретным поручением
         Route::get('/{poruchenie_urr}/redaktirovat-poruchenie', PorucheniyaUrr\RedaktirovatPoruchenie::class)
             ->name('redaktirovat-poruchenie');
-        Route::put('/{poruchenie_urr}', function(){return'ok';})->name('obnovit-poruchenie');
+        Route::post('/{poruchenie_urr}', function(){return'ok';})->name('obnovit-poruchenie');
         Route::delete('/{poruchenie_urr}', PorucheniyaUrr\UdalitPoruchenie::class)->name('udalit-posuchenie');
 
         // Вложенные ресурсы
