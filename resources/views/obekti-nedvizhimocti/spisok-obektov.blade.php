@@ -66,14 +66,14 @@
 
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-body">
-            <form id="filter-form" class="row g-3">
-                <div class="col-md-3">
+            <form id="filter-form" class="row g-3 p-0 m-0 ">
+                <div class="col-md-3 p-0 ms-0 my-0 me-3">
                     <input type="text" name="cadastral_number" class="form-control form-control-sm" placeholder="Кадастровый номер">
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-2 p-0 ms-0 my-0 me-3">
                     <input type="text" name="incoming_number" class="form-control form-control-sm" placeholder="Вх. номер">
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-3 p-0 m-0">
                     <button type="submit" class="btn btn-primary btn-sm">Найти</button>
                     <button type="button" id="reset-filters" class="btn btn-light btn-sm border">Сбросить</button>
                 </div>
@@ -81,7 +81,7 @@
         </div>
     </div>
 
-    {{-- Панель управления столбцами --}}
+    {{-- Панель управления столбцами
     <div class="card border-0 shadow-sm mb-3">
         <div class="card-body py-2">
             <div class="d-flex justify-content-between align-items-center">
@@ -92,7 +92,7 @@
                         <span class="hidden-count-badge" id="hiddenColumnsCount">0</span>
                     </button>
                     <div class="dropdown-menu shadow" aria-labelledby="columnDropdown">
-                        {{-- Список всех столбцов с чекбоксами --}}
+
                         <div id="columnCheckboxes">
                             <div class="dropdown-item-checkbox d-flex align-items-center">
                                 <input type="checkbox" class="col-checkbox" data-column="kadastroviy_nomer" id="col_kadastr" checked>
@@ -126,7 +126,7 @@
 
                         <div class="dropdown-divider"></div>
 
-                        {{-- Кнопка сброса --}}
+
                         <div class="px-2 pt-2">
                             <button type="button" class="btn btn-outline-secondary btn-sm w-100" id="resetColumnState">
                                 <i class="bi bi-arrow-counterclockwise"></i> Сбросить настройки
@@ -141,7 +141,7 @@
             </div>
         </div>
     </div>
-
+    --}}
     <div id="report-table"></div>
 </div>
 @endsection
