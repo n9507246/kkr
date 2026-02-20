@@ -2,11 +2,20 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ObektiNedvizhimocti;
-use App\Http\Controllers\PorucheniyaUrrController;
 use App\Http\Controllers\PorucheniyaUrr;
 
-Route::get('/', function() {return redirect()->route('home');});
-Route::get('/оbekti-nedvizhimocti', ObektiNedvizhimocti\SpisokObektov::class, 'index')->name('home');
+
+Route::get('/', function() {return redirect()->route('obekti-nedvizhimosti.spisok');})->name('home');
+
+
+Route::get('/оbekti-nedvizhimosti', ObektiNedvizhimocti\SpisokObektov::class, 'index')
+    ->name('оbekti-nedvizhimosti.spisok-obektov');
+
+Route::get('/obekti-nedvizhimosti/{id_obekta}/redaktirovat', ObektiNedvizhimocti\RedactirovatObekt::class, 'index')
+    ->name('obekti-nedvizhimosti.redactirovat-obekt');
+
+Route::post('/obekti-nedvizhimosti/{id_obekta}/obnovit', function(){}, 'index')
+    ->name('obekti-nedvizhimosti.obnovit-obekt');
 
 Route::prefix('porucheniya-urr')
     ->name('porucheniya-urr.')

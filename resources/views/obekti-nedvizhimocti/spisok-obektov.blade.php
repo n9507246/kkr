@@ -242,7 +242,18 @@ document.addEventListener("DOMContentLoaded", function() {
 
         // Настройка колонок
         columns: [
-            { title: "Кадастровый номер", field: "kadastroviy_nomer", width: 230, frozen: true, cssClass: "fw-bold text-primary"},
+            { title: "Кадастровый номер", field: "kadastroviy_nomer", width: 230, frozen: true, cssClass: "fw-bold text-primary",
+                formatter: function(cell) {
+                    const data = cell.getData();
+                    const id = data.id;
+                    const nomer = data.kadastroviy_nomer || "-";
+
+                    return `<a href="/obekti-nedvizhimosti/${id}/redaktirovat"
+                            class="link-primary link-offset-2 link-underline-opacity-0 fw-bold">
+                                ${nomer}
+                            </a>`;
+                }
+            },
             { title: "Тип объекта", field: "tip_obekta_nedvizhimosti", },
             { title: "Вх. номер", field: "incoming_number",
                 formatter: function(cell) {
@@ -264,7 +275,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     const id = cell.getValue();
                     return `
                         <div class="d-flex gap-1 justify-content-center">
-                            <a href="/obekti-nedvizhimocti/${id}/edit" class="btn btn-outline-warning btn-sm p-1" >
+                            <a href="/obekti-nedvizhimosti/${id}/redaktirovat" class="btn btn-outline-warning btn-sm p-1" >
                                 <i class="bi bi-pencil"></i>
                             </a>
                             <button class="btn btn-outline-danger btn-sm p-1" onclick="deleteObject(${id})">
