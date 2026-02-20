@@ -44,7 +44,7 @@
 </style>
 
 @section('content')
-<div class="container-fluid py-4">
+<div class="">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="h3 mb-0">Все объекты недвижимости</h2>
     </div>
