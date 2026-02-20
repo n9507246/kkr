@@ -10,6 +10,25 @@ class SpisokObektov extends Controller
 {
     public function __invoke(Request $request)
     {
+
+        $query = ObektiNedvizhimosti::query()->with('poruchenie');
+
+            // Фильтры
+            if ($request->filled('cadastral_number')) {
+                $query->where('kadastroviy_nomer', 'like', "%{$request->cadastral_number}%");
+            }
+            if ($request->filled('incoming_number')) {
+                $query->whereHas('poruchenie', function($q) use ($request) {
+                    $q->where('incoming_number', 'like', "%{$request->incoming_number}%");
+                });
+            }
+
+            $size = $request->get('size', 10);
+            $paginated = $query->paginate($size);
+            // dd($paginated->toArray()   );
+
+
+
         if ($request->ajax()) {
             $query = ObektiNedvizhimosti::query()->with('poruchenie');
 
@@ -25,7 +44,7 @@ class SpisokObektov extends Controller
 
             $size = $request->get('size', 10);
             $paginated = $query->paginate($size);
-
+            // dd($paginated   );
             // Возвращаем объект для Tabulator
             return response()->json([
                 'data' => $paginated->items(),

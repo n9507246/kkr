@@ -144,6 +144,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         ajaxResponse: function(url, params, response) {
             // Обновляем счетчик количества записей
+            console.log("Ответ сервера:", response);
             const countElement = document.getElementById('total-count');
             if (countElement) {
                 countElement.textContent = response.total || 0;
@@ -188,14 +189,23 @@ document.addEventListener("DOMContentLoaded", function() {
                     return `<a href="/obekti-nedvizhimosti/${d.id}/redaktirovat-obekt" class="text-primary fw-bold text-decoration-none">${d.kadastroviy_nomer || '-'}</a>`;
                 }
             },
-            { title: "Тип объекта", field: "tip_obekta_nedvizhimosti", minWidth: 120, widthGrow: 1 },
+            { title: "Тип объекта", field: "tip_obekta_nedvizhimosti", minWidth: 140, widthGrow: 1 },
             { title: "Вх. номер", field: "incoming_number", minWidth: 120,
                 formatter: (cell) => cell.getData().poruchenie?.incoming_number || "-"
             },
-            { title: "Вх. дата", field: "incoming_date", minWidth: 120,
+            { title: "Вх. дата", field: "incoming_date", minWidth: 120, widthGrow: 1,
                 formatter: (cell) => cell.getData().poruchenie?.incoming_date || "-"
             },
-            { title: "Тип работ", field: "vid_rabot", minWidth: 180, widthGrow: 2 },
+
+            { title: "номер УРР", field: "urr_number", minWidth: 120, widthGrow: 1,
+                formatter: (cell) => cell.getData().poruchenie?.urr_number || "-"
+            },
+            { title: "дата УРР", field: "urr_date", minWidth: 120, widthGrow: 1,
+                formatter: (cell) => cell.getData().poruchenie?.urr_date || "-"
+            },
+
+
+            { title: "Тип работ", field: "vid_rabot", minWidth: 180, widthGrow: 1, },
             { title: "Исполнитель", field: "ispolnitel", minWidth: 150, widthGrow: 1 },
             { title: "Дата заверш.", field: "data_zaversheniya", minWidth: 130 },
             { title: "Действия", field: "id", width: 100, headerSort: false, hozAlign: "center", frozen: true,
