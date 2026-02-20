@@ -198,7 +198,10 @@ document.addEventListener("DOMContentLoaded", function() {
             },
 
             { title: "номер УРР", field: "urr_number", minWidth: 120, widthGrow: 1,
-                formatter: (cell) => cell.getData().poruchenie?.urr_number || "-"
+                formatter: function(cell) {
+                    const d = cell.getData();
+                    return `<a href="/porucheniya-urr/${d.poruchenie?.id}/redaktirovat-poruchenie" class=" text-decoration-none">${d.poruchenie?.urr_number  || ' '}</a>`;
+                }
             },
             { title: "дата УРР", field: "urr_date", minWidth: 120, widthGrow: 1,
                 formatter: (cell) => cell.getData().poruchenie?.urr_date || "-"
