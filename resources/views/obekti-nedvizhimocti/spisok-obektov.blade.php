@@ -233,66 +233,32 @@ document.addEventListener("DOMContentLoaded", function() {
                 document.getElementById('total-count').textContent = response.total || 0;
             }
             return {
-                data: response.data,
-                last_page: response.last_page,
-                total: response.total
-            };
+                    data: response.data,
+                    last_page: response.last_page,
+                    last_row: response.total  // <-- ИСПРАВЛЕНИЕ: используйте last_row вместо total
+                };
         },
 
         // Настройка колонок
         columns: [
-            {
-                title: "Кадастровый номер",
-                field: "kadastroviy_nomer",
-                width: 230,
-                frozen: true,
-                cssClass: "fw-bold text-primary"
-            },
-            {
-                title: "Тип объекта",
-                field: "tip_obekta_nedvizhimosti",
-                // width: 150
-            },
-            {
-                title: "Вх. номер",
-                field: "incoming_number",
-                // width: 180,
+            { title: "Кадастровый номер", field: "kadastroviy_nomer", width: 230, frozen: true, cssClass: "fw-bold text-primary"},
+            { title: "Тип объекта", field: "tip_obekta_nedvizhimosti", },
+            { title: "Вх. номер", field: "incoming_number",
                 formatter: function(cell) {
                     const data = cell.getData();
                     return data.poruchenie?.incoming_number || "-";
                 }
             },
-            {
-                title: "Вх. дата",
-                field: "incoming_date",
-                // width: 130,
+            { title: "Вх. дата", field: "incoming_date",
                 formatter: function(cell) {
                     const data = cell.getData();
                     return data.poruchenie?.incoming_date || "-";
                 }
             },
-            {
-                title: "Тип работ",
-                field: "vid_rabot",
-                // width: 200
-            },
-            {
-                title: "Исполнитель",
-                field: "ispolnitel",
-                // width: 180
-            },
-            {
-                title: "Дата заверш.",
-                field: "data_zaversheniya",
-                // width: 140
-            },
-            {
-                title: "Действия",
-                field: "id",
-                width: 120,
-                frozen: true,
-                headerSort: false,
-                hozAlign: "center",
+            { title: "Тип работ", field: "vid_rabot" },
+            { title: "Исполнитель", field: "ispolnitel"},
+            { title: "Дата заверш.", field: "data_zaversheniya" },
+            { title: "Действия", field: "id", width: 120, frozen: true, headerSort: false, hozAlign: "center",
                 formatter: function(cell) {
                     const id = cell.getValue();
                     return `
@@ -317,159 +283,161 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
+    //
     // ==== ФУНКЦИИ ДЛЯ УПРАВЛЕНИЯ СТОЛБЦАМИ ====
-
+    //
     // Сохранение состояния в localStorage
-    function saveColumnState() {
-        const state = {};
-        document.querySelectorAll('.col-checkbox').forEach(checkbox => {
-            state[checkbox.dataset.column] = checkbox.checked;
-        });
-        localStorage.setItem('columnVisibility', JSON.stringify(state));
-        updateHiddenColumnsCount();
-    }
+        function saveColumnState() {
+            const state = {};
+            document.querySelectorAll('.col-checkbox').forEach(checkbox => {
+                state[checkbox.dataset.column] = checkbox.checked;
+            });
+            localStorage.setItem('columnVisibility', JSON.stringify(state));
+            updateHiddenColumnsCount();
+        }
 
     // Загрузка состояния из localStorage
-    function loadColumnState() {
-        const saved = localStorage.getItem('columnVisibility');
+        function loadColumnState() {
+            const saved = localStorage.getItem('columnVisibility');
 
-        // Если есть сохраненное состояние
-        if (saved) {
-            try {
-                const state = JSON.parse(saved);
+            // Если есть сохраненное состояние
+            if (saved) {
+                try {
+                    const state = JSON.parse(saved);
 
-                // Блокируем перерисовку для производительности
-                table.blockRedraw();
+                    // Блокируем перерисовку для производительности
+                    table.blockRedraw();
 
-                // Применяем сохраненное состояние
-                Object.keys(state).forEach(field => {
-                    const checkbox = document.querySelector(`.col-checkbox[data-column="${field}"]`);
-                    if (checkbox) {
-                        checkbox.checked = state[field];
-                        if (state[field]) {
-                            table.showColumn(field);
-                        } else {
-                            table.hideColumn(field);
+                    // Применяем сохраненное состояние
+                    Object.keys(state).forEach(field => {
+                        const checkbox = document.querySelector(`.col-checkbox[data-column="${field}"]`);
+                        if (checkbox) {
+                            checkbox.checked = state[field];
+                            if (state[field]) {
+                                table.showColumn(field);
+                            } else {
+                                table.hideColumn(field);
+                            }
                         }
-                    }
-                });
+                    });
 
-                table.restoreRedraw();
+                    table.restoreRedraw();
 
-                // ВАЖНО: Пересчитываем ширину колонок после применения состояния
-                setTimeout(() => {
-                    table.redraw(true); // true - пересчитать ширину
-                }, 50);
+                    // ВАЖНО: Пересчитываем ширину колонок после применения состояния
+                    setTimeout(() => {
+                        table.redraw(true); // true - пересчитать ширину
+                    }, 50);
 
-            } catch (e) {
-                console.error('Ошибка загрузки состояния:', e);
-                // В случае ошибки показываем все колонки
+                } catch (e) {
+                    console.error('Ошибка загрузки состояния:', e);
+                    // В случае ошибки показываем все колонки
+                    resetToDefault();
+                }
+            } else {
+                // Если нет сохраненного состояния, показываем все колонки
                 resetToDefault();
             }
-        } else {
-            // Если нет сохраненного состояния, показываем все колонки
-            resetToDefault();
-        }
 
-        updateHiddenColumnsCount();
-    }
+            updateHiddenColumnsCount();
+        }
 
     // Сброс к настройкам по умолчанию (все колонки видны)
-    function resetToDefault() {
-        table.blockRedraw();
-
-        document.querySelectorAll('.col-checkbox').forEach(checkbox => {
-            checkbox.checked = true;
-            table.showColumn(checkbox.dataset.column);
-        });
-
-        table.restoreRedraw();
-
-        // Пересчитываем ширину
-        setTimeout(() => {
-            table.redraw(true);
-        }, 50);
-    }
-
-    // Обновление счетчика скрытых столбцов
-    function updateHiddenColumnsCount() {
-        const hiddenCount = document.querySelectorAll('.col-checkbox:not(:checked)').length;
-        const badge = document.getElementById('hiddenColumnsCount');
-        if (badge) {
-            badge.textContent = hiddenCount;
-            badge.style.display = hiddenCount > 0 ? 'inline-block' : 'none';
-        }
-    }
-
-    // ==== ОБРАБОТЧИКИ СОБЫТИЙ ====
-
-    // Обработка чекбоксов столбцов
-    document.querySelectorAll('.col-checkbox').forEach(checkbox => {
-        checkbox.addEventListener('change', function() {
-            const column = this.dataset.column;
-
+        function resetToDefault() {
             table.blockRedraw();
 
-            if (this.checked) {
-                table.showColumn(column);
-            } else {
-                table.hideColumn(column);
-            }
+            document.querySelectorAll('.col-checkbox').forEach(checkbox => {
+                checkbox.checked = true;
+                table.showColumn(checkbox.dataset.column);
+            });
 
             table.restoreRedraw();
 
-            // ВАЖНО: Пересчитываем ширину колонок после изменения
+            // Пересчитываем ширину
             setTimeout(() => {
-                table.redraw(true); // true - пересчитать ширину с учетом видимых колонок
+                table.redraw(true);
             }, 50);
+        }
 
-            // Сохраняем состояние после изменения
-            saveColumnState();
+    // Обновление счетчика скрытых столбцов
+        function updateHiddenColumnsCount() {
+            const hiddenCount = document.querySelectorAll('.col-checkbox:not(:checked)').length;
+            const badge = document.getElementById('hiddenColumnsCount');
+            if (badge) {
+                badge.textContent = hiddenCount;
+                badge.style.display = hiddenCount > 0 ? 'inline-block' : 'none';
+            }
+        }
+
+    //
+    // ==== ОБРАБОТЧИКИ СОБЫТИЙ ====
+    //
+    // Обработка чекбоксов столбцов
+        document.querySelectorAll('.col-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const column = this.dataset.column;
+
+                table.blockRedraw();
+
+                if (this.checked) {
+                    table.showColumn(column);
+                } else {
+                    table.hideColumn(column);
+                }
+
+                table.restoreRedraw();
+
+                // ВАЖНО: Пересчитываем ширину колонок после изменения
+                setTimeout(() => {
+                    table.redraw(true); // true - пересчитать ширину с учетом видимых колонок
+                }, 50);
+
+                // Сохраняем состояние после изменения
+                saveColumnState();
+            });
         });
-    });
 
     // Кнопка сброса настроек
-    document.getElementById('resetColumnState')?.addEventListener('click', function() {
-        // Удаляем сохраненное состояние
-        localStorage.removeItem('columnVisibility');
+        document.getElementById('resetColumnState')?.addEventListener('click', function() {
+            // Удаляем сохраненное состояние
+            localStorage.removeItem('columnVisibility');
 
-        // Сбрасываем все чекбоксы на "показано"
-        table.blockRedraw();
+            // Сбрасываем все чекбоксы на "показано"
+            table.blockRedraw();
 
-        document.querySelectorAll('.col-checkbox').forEach(checkbox => {
-            checkbox.checked = true;
-            table.showColumn(checkbox.dataset.column);
+            document.querySelectorAll('.col-checkbox').forEach(checkbox => {
+                checkbox.checked = true;
+                table.showColumn(checkbox.dataset.column);
+            });
+
+            table.restoreRedraw();
+
+            // Пересчитываем ширину
+            setTimeout(() => {
+                table.redraw(true);
+            }, 50);
+
+            updateHiddenColumnsCount();
         });
-
-        table.restoreRedraw();
-
-        // Пересчитываем ширину
-        setTimeout(() => {
-            table.redraw(true);
-        }, 50);
-
-        updateHiddenColumnsCount();
-    });
 
     // Обработка формы фильтрации
-    const filterForm = document.getElementById("filter-form");
-    if (filterForm) {
-        filterForm.addEventListener("submit", function(e) {
-            e.preventDefault();
-            table.setPage(1);
-            table.setData();
-        });
-    }
+        const filterForm = document.getElementById("filter-form");
+        if (filterForm) {
+            filterForm.addEventListener("submit", function(e) {
+                e.preventDefault();
+                table.setPage(1);
+                table.setData();
+            });
+        }
 
     // Сброс фильтров
-    const resetBtn = document.getElementById("reset-filters");
-    if (resetBtn) {
-        resetBtn.addEventListener("click", function() {
-            filterForm.reset();
-            table.setPage(1);
-            table.setData();
-        });
-    }
+        const resetBtn = document.getElementById("reset-filters");
+        if (resetBtn) {
+            resetBtn.addEventListener("click", function() {
+                filterForm.reset();
+                table.setPage(1);
+                table.setData();
+            });
+        }
 });
 </script>
 @endpush
