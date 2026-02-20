@@ -60,88 +60,89 @@
 @section('content')
 <div class="">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="h3 mb-0">Реестр объектов</h2>
+        <h2 class="h3 mb-0">Все объекты недвижимости</h2>
         <div class="badge bg-primary p-2">Всего: <span id="total-count">0</span></div>
     </div>
 
-    <div class="card border-0 shadow-sm mb-4">
-        <div class="card-body">
-            <form id="filter-form" class="row g-3 p-0 m-0 ">
-                <div class="col-md-3 p-0 ms-0 my-0 me-3">
-                    <input type="text" name="cadastral_number" class="form-control form-control-sm" placeholder="Кадастровый номер">
-                </div>
-                <div class="col-md-2 p-0 ms-0 my-0 me-3">
-                    <input type="text" name="incoming_number" class="form-control form-control-sm" placeholder="Вх. номер">
-                </div>
-                <div class="col-md-3 p-0 m-0">
-                    <button type="submit" class="btn btn-primary btn-sm">Найти</button>
-                    <button type="button" id="reset-filters" class="btn btn-light btn-sm border">Сбросить</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    {{-- Панель управления столбцами
-    <div class="card border-0 shadow-sm mb-3">
-        <div class="card-body py-2">
-            <div class="d-flex justify-content-between align-items-center">
-                <div class="dropdown">
-                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button"
-                            id="columnDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-layout-three-columns"></i> Колонки
-                        <span class="hidden-count-badge" id="hiddenColumnsCount">0</span>
-                    </button>
-                    <div class="dropdown-menu shadow" aria-labelledby="columnDropdown">
-
-                        <div id="columnCheckboxes">
-                            <div class="dropdown-item-checkbox d-flex align-items-center">
-                                <input type="checkbox" class="col-checkbox" data-column="kadastroviy_nomer" id="col_kadastr" checked>
-                                <label for="col_kadastr">Кадастровый номер</label>
-                            </div>
-                            <div class="dropdown-item-checkbox d-flex align-items-center">
-                                <input type="checkbox" class="col-checkbox" data-column="tip_obekta_nedvizhimosti" id="col_tip" checked>
-                                <label for="col_tip">Тип объекта</label>
-                            </div>
-                            <div class="dropdown-item-checkbox d-flex align-items-center">
-                                <input type="checkbox" class="col-checkbox" data-column="incoming_number" id="col_in" checked>
-                                <label for="col_in">Вх. номер</label>
-                            </div>
-                            <div class="dropdown-item-checkbox d-flex align-items-center">
-                                <input type="checkbox" class="col-checkbox" data-column="incoming_date" id="col_indate" checked>
-                                <label for="col_indate">Вх. дата</label>
-                            </div>
-                            <div class="dropdown-item-checkbox d-flex align-items-center">
-                                <input type="checkbox" class="col-checkbox" data-column="vid_rabot" id="col_vid" checked>
-                                <label for="col_vid">Тип работ</label>
-                            </div>
-                            <div class="dropdown-item-checkbox d-flex align-items-center">
-                                <input type="checkbox" class="col-checkbox" data-column="ispolnitel" id="col_isp" checked>
-                                <label for="col_isp">Исполнитель</label>
-                            </div>
-                            <div class="dropdown-item-checkbox d-flex align-items-center">
-                                <input type="checkbox" class="col-checkbox" data-column="data_zaversheniya" id="col_date" checked>
-                                <label for="col_date">Дата заверш.</label>
-                            </div>
-                        </div>
-
-                        <div class="dropdown-divider"></div>
-
-
-                        <div class="px-2 pt-2">
-                            <button type="button" class="btn btn-outline-secondary btn-sm w-100" id="resetColumnState">
-                                <i class="bi bi-arrow-counterclockwise"></i> Сбросить настройки
-                            </button>
-                        </div>
+    <!-- Панель фильтров -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <form id="filter-form" class="row g-3 p-0 m-0 ">
+                    <div class="col-md-3 p-0 ms-0 my-0 me-3">
+                        <input type="text" name="cadastral_number" class="form-control form-control-sm" placeholder="Кадастровый номер">
                     </div>
-                </div>
-
-                <small class="text-muted">
-                    <i class="bi bi-info-circle"></i> Выберите колонки для отображения
-                </small>
+                    <div class="col-md-2 p-0 ms-0 my-0 me-3">
+                        <input type="text" name="incoming_number" class="form-control form-control-sm" placeholder="Вх. номер">
+                    </div>
+                    <div class="col-md-3 p-0 m-0">
+                        <button type="submit" class="btn btn-primary btn-sm">Найти</button>
+                        <button type="button" id="reset-filters" class="btn btn-light btn-sm border">Сбросить</button>
+                    </div>
+                </form>
             </div>
         </div>
-    </div>
-    --}}
+
+    <!-- Панель управления столбцами -->
+        {{--<div class="card border-0 shadow-sm mb-3">
+            <div class="card-body py-2">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button"
+                                id="columnDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-layout-three-columns"></i> Колонки
+                            <span class="hidden-count-badge" id="hiddenColumnsCount">0</span>
+                        </button>
+                        <div class="dropdown-menu shadow" aria-labelledby="columnDropdown">
+
+                            <div id="columnCheckboxes">
+                                <div class="dropdown-item-checkbox d-flex align-items-center">
+                                    <input type="checkbox" class="col-checkbox" data-column="kadastroviy_nomer" id="col_kadastr" checked>
+                                    <label for="col_kadastr">Кадастровый номер</label>
+                                </div>
+                                <div class="dropdown-item-checkbox d-flex align-items-center">
+                                    <input type="checkbox" class="col-checkbox" data-column="tip_obekta_nedvizhimosti" id="col_tip" checked>
+                                    <label for="col_tip">Тип объекта</label>
+                                </div>
+                                <div class="dropdown-item-checkbox d-flex align-items-center">
+                                    <input type="checkbox" class="col-checkbox" data-column="incoming_number" id="col_in" checked>
+                                    <label for="col_in">Вх. номер</label>
+                                </div>
+                                <div class="dropdown-item-checkbox d-flex align-items-center">
+                                    <input type="checkbox" class="col-checkbox" data-column="incoming_date" id="col_indate" checked>
+                                    <label for="col_indate">Вх. дата</label>
+                                </div>
+                                <div class="dropdown-item-checkbox d-flex align-items-center">
+                                    <input type="checkbox" class="col-checkbox" data-column="vid_rabot" id="col_vid" checked>
+                                    <label for="col_vid">Тип работ</label>
+                                </div>
+                                <div class="dropdown-item-checkbox d-flex align-items-center">
+                                    <input type="checkbox" class="col-checkbox" data-column="ispolnitel" id="col_isp" checked>
+                                    <label for="col_isp">Исполнитель</label>
+                                </div>
+                                <div class="dropdown-item-checkbox d-flex align-items-center">
+                                    <input type="checkbox" class="col-checkbox" data-column="data_zaversheniya" id="col_date" checked>
+                                    <label for="col_date">Дата заверш.</label>
+                                </div>
+                            </div>
+
+                            <div class="dropdown-divider"></div>
+
+
+                            <div class="px-2 pt-2">
+                                <button type="button" class="btn btn-outline-secondary btn-sm w-100" id="resetColumnState">
+                                    <i class="bi bi-arrow-counterclockwise"></i> Сбросить настройки
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle"></i> Выберите колонки для отображения
+                    </small>
+                </div>
+            </div>
+        </div>--}}
+
     <div id="report-table"></div>
 </div>
 @endsection
@@ -178,32 +179,32 @@ document.addEventListener("DOMContentLoaded", function() {
         },
 
         // Русская локализация
-        langs: {
-            "ru": {
-                "ajax": {
-                    "loading": "Загрузка...",
-                    "error": "Ошибка загрузки"
-                },
-                "pagination": {
-                    "page_size": "Показать",
-                    "first": "Первая",
-                    "first_title": "Первая страница",
-                    "last": "Последняя",
-                    "last_title": "Последняя страница",
-                    "prev": "Предыдущая",
-                    "prev_title": "Предыдущая страница",
-                    "next": "Следующая",
-                    "next_title": "Следующая страница",
-                    "all": "Все",
-                    "counter": {
-                        "showing": "Показано",
-                        "of": "из",
-                        "rows": "записей",
-                        "pages": "страниц"
+            langs: {
+                "ru": {
+                    "ajax": {
+                        "loading": "Загрузка...",
+                        "error": "Ошибка загрузки"
+                    },
+                    "pagination": {
+                        "page_size": "Показать",
+                        "first": "Первая",
+                        "first_title": "Первая страница",
+                        "last": "Последняя",
+                        "last_title": "Последняя страница",
+                        "prev": "Предыдущая",
+                        "prev_title": "Предыдущая страница",
+                        "next": "Следующая",
+                        "next_title": "Следующая страница",
+                        "all": "Все",
+                        "counter": {
+                            "showing": "Показано",
+                            "of": "из",
+                            "rows": "записей",
+                            "pages": "страниц"
+                        }
                     }
                 }
-            }
-        },
+            },
 
         // AJAX настройки
         ajaxURL: "{{ url()->current() }}",
@@ -263,9 +264,9 @@ document.addEventListener("DOMContentLoaded", function() {
                     const id = cell.getValue();
                     return `
                         <div class="d-flex gap-1 justify-content-center">
-                            <button class="btn btn-outline-warning btn-sm p-1" onclick="editObject(${id})">
+                            <a href="/obekti-nedvizhimocti/${id}/edit" class="btn btn-outline-warning btn-sm p-1" >
                                 <i class="bi bi-pencil"></i>
-                            </button>
+                            </a>
                             <button class="btn btn-outline-danger btn-sm p-1" onclick="deleteObject(${id})">
                                 <i class="bi bi-trash"></i>
                             </button>

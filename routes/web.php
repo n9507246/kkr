@@ -5,7 +5,8 @@ use App\Http\Controllers\ObektiNedvizhimocti;
 use App\Http\Controllers\PorucheniyaUrrController;
 use App\Http\Controllers\PorucheniyaUrr;
 
-Route::get('/', ObektiNedvizhimocti\SpisokObektov::class, 'index')->name('home');
+Route::get('/', function() {return redirect()->route('home');});
+Route::get('/оbekti-nedvizhimocti', ObektiNedvizhimocti\SpisokObektov::class, 'index')->name('home');
 
 Route::prefix('porucheniya-urr')
     ->name('porucheniya-urr.')

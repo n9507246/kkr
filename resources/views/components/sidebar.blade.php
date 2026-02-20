@@ -20,7 +20,7 @@
                 <a href="{{ route('home') }}"
                    class="d-flex align-items-center gap-2 px-3 py-2 text-white text-decoration-none  {{ request()->routeIs('home') ? 'border-white' : 'border-transparent' }} hover-class">
                     <i class="bi bi-grid"></i>
-                    Все объекты
+                    Объекты недвижимости
                 </a>
             </li>
 
