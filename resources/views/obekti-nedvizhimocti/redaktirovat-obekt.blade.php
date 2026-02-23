@@ -50,14 +50,15 @@
                                 <!-- Тип объекта -->
                                     <div class="mb-3">
                                         <label for="tip_obekta_nedvizhimosti" class="form-label">Тип объекта</label>
-                                        <select class="form-select @error('tip_obekta_nedvizhimosti') is-invalid @enderror"
-                                                id="tip_obekta_nedvizhimosti"
-                                                name="tip_obekta_nedvizhimosti">
+                                        <select class="form-select @error('tip_obekta_id') is-invalid @enderror"
+                                                id="tip_obekta_id"
+                                                name="tip_obekta_id">
                                             <option value="">Выберите тип...</option>
-                                            <option value="ЗУ" {{ old('tip_obekta_nedvizhimosti', $obekt->tip_obekta_nedvizhimosti) == 'ЗУ' ? 'selected' : '' }}>Земельный участок (ЗУ)</option>
-                                            <option value="ОКС" {{ old('tip_obekta_nedvizhimosti', $obekt->tip_obekta_nedvizhimosti) == 'ОКС' ? 'selected' : '' }}>Объект капитального строительства (ОКС)</option>
+                                            @foreach($tipyObektov as $tip)
+                                                <option value="{{ $tip->id }}" {{ old('tip_obekta_id', $obekt->tip_obekta_id) == $tip->id ? 'selected' : '' }}>{{ $tip->nazvanie }} ({{ $tip->abbreviatura }})</option>
+                                            @endforeach
                                         </select>
-                                        @error('tip_obekta_nedvizhimosti')
+                                        @error('tip_obekta_id')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
@@ -65,21 +66,16 @@
                                 <!-- Вид работ -->
                                     <div class="mb-3">
                                         <label for="vid_rabot" class="form-label">Вид работ</label>
-                                        <select class="form-select @error('vid_rabot') is-invalid @enderror"
-                                                id="vid_rabot"
-                                                name="vid_rabot">
+                                        <select class="form-select @error('vid_rabot_id') is-invalid @enderror"
+                                                id="vid_rabot_id"
+                                                name="vid_rabot_id">
                                             <option value="">Выберите вид работ...</option>
-                                            <option value="Отчет" {{ old('vid_rabot', $obekt->vid_rabot) == 'Отчет' ? 'selected' : '' }}>Отчет</option>
-                                            <option value="Заключение" {{ old('vid_rabot', $obekt->vid_rabot) == 'Заключение' ? 'selected' : '' }}>Заключение</option>
-                                            <!-- <option value="Акт согласования" {{ old('vid_rabot', $obekt->vid_rabot) == 'Акт согласования' ? 'selected' : '' }}>Акт согласования</option>
-                                            <option value="Карта-план" {{ old('vid_rabot', $obekt->vid_rabot) == 'Карта-план' ? 'selected' : '' }}>Карта-план</option>
-                                            <option value="Межевой план" {{ old('vid_rabot', $obekt->vid_rabot) == 'Межевой план' ? 'selected' : '' }}>Межевой план</option>
-                                            <option value="Технический план" {{ old('vid_rabot', $obekt->vid_rabot) == 'Технический план' ? 'selected' : '' }}>Технический план</option>
-                                            <option value="Акт обследования" {{ old('vid_rabot', $obekt->vid_rabot) == 'Акт обследования' ? 'selected' : '' }}>Акт обследования</option>
-                                            -->
+                                            @foreach($vidiRabot as $vid)
+                                                <option value="{{ $vid->id }}" {{ old('vid_rabot_id', $obekt->vid_rabot_id) == $vid->id ? 'selected' : '' }}>{{ $vid->nazvanie }}</option>
+                                            @endforeach
                                         </select>
 
-                                        @error('vid_rabot')
+                                        @error('vid_rabot_id')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>

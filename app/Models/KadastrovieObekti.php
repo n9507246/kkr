@@ -15,7 +15,7 @@ class KadastrovieObekti extends Model
     protected $fillable = [
         'poruchenie_id',
         'kadastroviy_nomer',
-        'tip_obekta',
+        'tip_obekta_id',
         'vid_rabot_id',
         'data_nachala',
         'data_zaversheniya',

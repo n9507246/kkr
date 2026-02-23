@@ -4,6 +4,8 @@ namespace App\Http\Controllers\ObektiNedvizhimocti;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\TipyObektov;
+use App\Models\VidiRabot;
 
 class RedactirovatObekt extends Controller
 {
@@ -12,7 +14,10 @@ class RedactirovatObekt extends Controller
         $obekt = \App\Models\KadastrovieObekti::query()
                     ->where('id', $id_obekta)
                     ->firstOrFail();
-        // dump($obekt);
-        return view('obekti-nedvizhimocti.redaktirovat-obekt', compact('obekt'));
+
+        $tipyObektov = TipyObektov::where('activno', true)->get();
+        $vidiRabot = VidiRabot::where('activno', true)->get();
+
+        return view('obekti-nedvizhimocti.redaktirovat-obekt', compact('obekt', 'tipyObektov', 'vidiRabot'));
     }
 }

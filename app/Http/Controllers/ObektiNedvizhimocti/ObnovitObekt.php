@@ -17,8 +17,8 @@ class ObnovitObekt extends Controller
         $obekt = \App\Models\KadastrovieObekti::findOrFail($id_obekta);
         $validated = $request->validate([
             'kadastroviy_nomer' => 'required|string|max:50',
-            'tip_obekta_nedvizhimosti' => 'required|string|max:100',
-            'vid_rabot' => 'required|string|max:100',
+            'tip_obekta_id' => 'required|exists:tipy_obektov,id',
+            'vid_rabot_id' => 'nullable|exists:vidi_rabot,id',
             'data_zaversheniya' => 'required|date',
             'komentarii' => 'nullable|string',
         ]);
