@@ -8,9 +8,9 @@
     #report-table { border-radius: 8px; overflow: hidden; border: 1px solid #eaecf0; width: 100%; }
     .tabulator-header { text-transform: uppercase; font-size: 0.75rem !important; background-color: #f8f9fa !important; }
     .tabulator-cell { font-size: 0.85rem !important; vertical-align: middle !important; }
-
+    /* .spisok-polonok { max-height: 500px !important;  } */
     /* Стили выпадающего списка колонок */
-    .dropdown-menu { max-height: 450px; overflow-y: auto; min-width: 280px; padding: 12px; z-index: 1060; }
+    .dropdown-menu { max-height: 500px !important; overflow-y: auto; min-width: 180px !important;  padding: 12px; z-index: 1060; max-height: 250px !important;}
     .dropdown-item-checkbox { padding: 6px 10px; border-radius: 4px; transition: background 0.2s; cursor: pointer; display: flex; align-items: center; }
     .dropdown-item-checkbox:hover { background-color: #f8f9fa; }
     .dropdown-item-checkbox input { cursor: pointer; margin-right: 12px; width: 16px; height: 16px; }
@@ -55,8 +55,8 @@
                 <i class="bi bi-layout-three-columns me-1"></i> Колонки
                 <span id="hiddenColumnsCount" class="hidden-count-badge" style="display:none;">0</span>
             </button>
-            <div class="dropdown-menu shadow border-0" aria-labelledby="columnDropdown">
-                <div class="fw-bold small mb-2 border-bottom pb-2">Отображение полей:</div>
+            <div class="spisok-polonok dropdown-menu shadow border-0" aria-labelledby="columnDropdown" >
+                <div class="fw-bold small mb-2 border-bottom px-3 py-2">Отображение полей:</div>
                 <div id="columnCheckboxes"></div>
                 <div class="dropdown-divider"></div>
                 <button type="button" class="btn btn-link btn-sm text-decoration-none w-100 text-start" id="resetColumnState">
