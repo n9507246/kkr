@@ -206,7 +206,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // 2. ИНИЦИАЛИЗАЦИЯ ТАБЛИЦЫ
     const table = new Tabulator("#report-table", {
-        height: "550px",
+        height: "78vh",
         layout: "fitColumns",
         locale: "ru",
         placeholder: "Список пуст",
