@@ -3,11 +3,12 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use App\Models\ExternalOrder; // Добавили импорт модели
-use App\Models\ObektiNedvizhimosti; // Добавили импорт модели
+use App\Models\VneshniePorucheniya;
+use App\Models\KadastrovieObekti;
+use App\Models\VidiRabot;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Carbon; // Обязательно для работы с датами
+use Illuminate\Support\Carbon;
 
 class DatabaseSeeder extends Seeder
 {
@@ -18,48 +19,60 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // 1. Создаем пользователей
+        // 1. Создаем виды работ (справочник)
+        $this->command->info('Создаю справочник видов работ (vidi_rabot)...');
+        $vidiRabot = collect(['Отчет', 'Заключение', 'Акт обследования', 'Технический план'])
+            ->map(function ($name) {
+                return VidiRabot::firstOrCreate(['nazvanie' => $name]);
+            });
+
+        // 2. Создаем пользователей
         $this->command->info('Создаю 20 пользователей...');
         $users = User::factory()->count(20)->create();
 
-        // Создаем тестового админа, если нужно
+        // Тестовый админ
         User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+            'name' => 'Admin Local',
+            'email' => 'admin@example.com',
         ]);
 
         $targetTotalOrders = 1000;
-        $this->command->info("Генерирую {$targetTotalOrders} поручений за прошедший год...");
+        $this->command->info("Генерирую {$targetTotalOrders} поручений (vneshnie_porucheniya)...");
 
         for ($i = 0; $i < $targetTotalOrders; $i++) {
-            // Генерируем дату создания: от 365 дней назад до сегодня
+            // Генерируем дату создания
             $createdAt = Carbon::now()->subDays(rand(0, 365))->subMinutes(rand(0, 1440));
-
-            // Определяем, будет ли это поручение "отработанным" (70% вероятность)
             $isCompleted = (rand(1, 100) <= 70);
 
-            // 2. Создаем поручение
-            $order = ExternalOrder::factory()->create([
-                'created_by'      => $users->random()->id,
-                'incoming_date'   => $createdAt->toDateString(),
-                'urr_date'        => $createdAt->copy()->subDays(rand(1, 7))->toDateString(),
-                'created_at'      => $createdAt,
-                'updated_at'      => $isCompleted ? $createdAt->copy()->addDays(rand(10, 20)) : $createdAt,
-
-                'outgoing_number' => $isCompleted ? 'ИСХ-' . rand(1000, 9999) . '/' . $createdAt->year : null,
-                'outgoing_date'   => $isCompleted ? $createdAt->copy()->addDays(rand(5, 15))->toDateString() : null,
+            // 3. Создаем поручение (транслит полей)
+            $order = VneshniePorucheniya::create([
+                'sozdal_id'    => $users->random()->id,
+                'vhod_nomer'   => 'ВХ-' . rand(100, 999) . '/' . $createdAt->year . '-' . $i,
+                'vhod_data'    => $createdAt->toDateString(),
+                'urr_nomer'    => rand(10, 99) . '-' . rand(1000, 9999) . '/25',
+                'urr_data'     => $createdAt->copy()->subDays(rand(1, 7))->toDateString(),
+                'ishod_nomer'  => $isCompleted ? 'ИСХ-' . rand(1000, 9999) . '/' . $createdAt->year : null,
+                'ishod_data'   => $isCompleted ? $createdAt->copy()->addDays(rand(5, 15))->toDateString() : null,
+                'opisanie'     => 'Тестовое описание поручения №' . $i,
+                'created_at'   => $createdAt,
+                'updated_at'   => $isCompleted ? $createdAt->copy()->addDays(rand(10, 20)) : $createdAt,
             ]);
 
-            // 3. Создаем связанные объекты для каждого поручения (от 1 до 3 шт)
+            // 4. Создаем связанные объекты (транслит полей)
             $objectsCount = rand(1, 3);
             for ($j = 0; $j < $objectsCount; $j++) {
                 $startDate = $createdAt->copy()->addDays(rand(1, 3));
 
-                ObektiNedvizhimosti::factory()->create([
-                    'id_porucheniya_urr'     => $order->id,
+                KadastrovieObekti::create([
+                    'poruchenie_id'          => $order->id,
+                    'kadastroviy_nomer'      => rand(10, 99) . ':' . rand(10, 99) . ':' . rand(100000, 999999) . ':' . rand(100, 999),
+                    'tip_obekta'             => collect(['Здание', 'Помещение', 'Земельный участок'])->random(),
+                    'vid_rabot_id'           => $vidiRabot->random()->id,
                     'data_nachala'           => $startDate->toDateString(),
                     'data_zaversheniya'      => $isCompleted ? $startDate->copy()->addDays(rand(3, 10)) : null,
                     'data_okonchaniya_rabot' => $isCompleted ? $startDate->copy()->addDays(rand(3, 10)) : null,
+                    'ispolnitel'             => $users->random()->name,
+                    'kommentariy'            => 'Тестовый комментарий к объекту',
                     'created_at'             => $createdAt,
                     'updated_at'             => $isCompleted ? $createdAt->copy()->addDays(rand(10, 20)) : $createdAt,
                 ]);

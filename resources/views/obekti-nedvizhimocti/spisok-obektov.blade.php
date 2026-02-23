@@ -213,9 +213,10 @@ document.addEventListener("DOMContentLoaded", function() {
             { title: "дата УРР", field: "urr_date", minWidth: 120, widthGrow: 1,
                 formatter: (cell) => cell.getData().poruchenie?.urr_date || "-"
             },
-
-
-            { title: "Тип работ", field: "vid_rabot", minWidth: 120, widthGrow: 1, },
+            { title: "Тип работ", field: "vidi_rabot.nazvanie", minWidth: 120, widthGrow: 1,
+                // Tabulator сам подхватит вложенное поле через точку, formatter можно упростить
+                formatter: (cell) => cell.getValue() || "-"
+            },
             { title: "Исполнитель", field: "ispolnitel", minWidth: 150, widthGrow: 1 },
             { title: "Дата заверш.", field: "data_zaversheniya", minWidth: 150, widthGrow: 1,
                 formatter: function(cell) {
