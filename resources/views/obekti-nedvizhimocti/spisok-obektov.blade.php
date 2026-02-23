@@ -190,12 +190,14 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             },
         columns: [
-            { title: "Кадастровый номер", field: "kadastroviy_nomer", minWidth: 200, frozen: true,
-                formatter: (cell) => {
-                    const d = cell.getData();
-                    return `<a href="/obekti-nedvizhimosti/${d.id}/redaktirovat-obekt" class="text-primary fw-bold text-decoration-none">${d.kadastroviy_nomer || '-'}</a>`;
-                }
-            },
+            // Кадастровый номер
+                { title: "Кадастровый номер", field: "kadastroviy_nomer", minWidth: 200, frozen: true,
+                    formatter: (cell) => {
+                        const d = cell.getData();
+                        return `<a href="/obekti-nedvizhimosti/${d.id}/redaktirovat-obekt" class="text-primary fw-bold text-decoration-none">${d.kadastroviy_nomer || '-'}</a>`;
+                    }
+                },
+            // Тип объекта
             { title: "Тип объекта", field: "tip_obekta_nedvizhimosti", minWidth: 140, widthGrow: 1 },
             { title: "Вх. номер", field: "incoming_number", minWidth: 120,
                 formatter: (cell) => cell.getData().poruchenie?.incoming_number || "-"
@@ -233,7 +235,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 },
             },
 
-            { title: "Комментарии", field: "komentarii", minWidth: 350, widthGrow: 3 },
+            { title: "Комментарии", field: "kommentariy", minWidth: 350, widthGrow: 3 },
             { title: "Действия", field: "id", width: 100, headerSort: false, hozAlign: "center", frozen: true,
                 formatter: function(cell) {
                     const id = cell.getValue();

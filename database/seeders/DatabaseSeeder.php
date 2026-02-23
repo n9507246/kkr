@@ -14,15 +14,13 @@ class DatabaseSeeder extends Seeder
 {
     use WithoutModelEvents;
 
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // 1. Создаем виды работ (справочник)
-        $this->command->info('Создаю справочник видов работ (vidi_rabot)...');
-        $vidiRabot = collect(['Отчет', 'Заключение', 'Акт обследования', 'Технический план'])
+        // 1. Создаем виды работ (ТОЛЬКО ДВА)
+        $this->command->info('Создаю справочник видов работ (Отчет, Заключение)...');
+        $vidiRabot = collect(['Отчет', 'Заключение'])
             ->map(function ($name) {
+                // Используем firstOrCreate, чтобы не дублировать, если записи уже есть
                 return VidiRabot::firstOrCreate(['nazvanie' => $name]);
             });
 
@@ -30,21 +28,18 @@ class DatabaseSeeder extends Seeder
         $this->command->info('Создаю 20 пользователей...');
         $users = User::factory()->count(20)->create();
 
-        // Тестовый админ
         User::factory()->create([
             'name' => 'Admin Local',
             'email' => 'admin@example.com',
         ]);
 
         $targetTotalOrders = 1000;
-        $this->command->info("Генерирую {$targetTotalOrders} поручений (vneshnie_porucheniya)...");
+        $this->command->info("Генерирую {$targetTotalOrders} поручений...");
 
         for ($i = 0; $i < $targetTotalOrders; $i++) {
-            // Генерируем дату создания
             $createdAt = Carbon::now()->subDays(rand(0, 365))->subMinutes(rand(0, 1440));
             $isCompleted = (rand(1, 100) <= 70);
 
-            // 3. Создаем поручение (транслит полей)
             $order = VneshniePorucheniya::create([
                 'sozdal_id'    => $users->random()->id,
                 'vhod_nomer'   => 'ВХ-' . rand(100, 999) . '/' . $createdAt->year . '-' . $i,
@@ -58,7 +53,6 @@ class DatabaseSeeder extends Seeder
                 'updated_at'   => $isCompleted ? $createdAt->copy()->addDays(rand(10, 20)) : $createdAt,
             ]);
 
-            // 4. Создаем связанные объекты (транслит полей)
             $objectsCount = rand(1, 3);
             for ($j = 0; $j < $objectsCount; $j++) {
                 $startDate = $createdAt->copy()->addDays(rand(1, 3));
@@ -67,6 +61,7 @@ class DatabaseSeeder extends Seeder
                     'poruchenie_id'          => $order->id,
                     'kadastroviy_nomer'      => rand(10, 99) . ':' . rand(10, 99) . ':' . rand(100000, 999999) . ':' . rand(100, 999),
                     'tip_obekta'             => collect(['Здание', 'Помещение', 'Земельный участок'])->random(),
+                    // Теперь здесь рандом только между Отчетом и Заключением
                     'vid_rabot_id'           => $vidiRabot->random()->id,
                     'data_nachala'           => $startDate->toDateString(),
                     'data_zaversheniya'      => $isCompleted ? $startDate->copy()->addDays(rand(3, 10)) : null,
