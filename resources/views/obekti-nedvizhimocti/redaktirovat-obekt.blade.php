@@ -21,8 +21,8 @@
                                 <i class="bi bi-info-circle fs-4 me-2"></i>
                                 <div>
                                     <strong>Поручение УРР:</strong>
-                                    {{ $obekt->poruchenie->incoming_number ?? 'Не указано' }}
-                                    от {{ $obekt->poruchenie->incoming_date ?? 'неизвестно' }}
+                                    {{ $obekt->poruchenie->vhod_nomer ?? 'Не указано' }}
+                                    от {{ $obekt->poruchenie->vhod_data ? \Carbon\Carbon::parse($obekt->poruchenie->vhod_data)->format('d.m.Y') : 'неизвестно' }}
                                 </div>
                             </div>
                         </div>
@@ -108,13 +108,13 @@
                         </div>
 
                         <!-- Скрытое поле ID поручения -->
-                        <input type="hidden" name="id_porucheniya_urr" value="{{ $obekt->id_porucheniya_urr }}">
+                        <input type="hidden" name="id_porucheniya_urr" value="{{ $obekt->poruchenie_id }}">
 
                         <hr class="my-4">
 
                         <!-- Кнопки -->
                         <div class="d-flex justify-content-between">
-                            <a href="{{ route('obekti-nedvizhimosti.spisok-obektov', $obekt->id_porucheniya_urr) }}" class="btn btn-secondary">
+                            <a href="{{ route('obekti-nedvizhimosti.spisok-obektov', $obekt->poruchenie_id) }}" class="btn btn-secondary">
                                 <i class="bi bi-arrow-left"></i> Назад
                             </a>
 

@@ -12,6 +12,7 @@ class RedactirovatObekt extends Controller
     public function __invoke(Request $request, string $id_obekta)
     {
         $obekt = \App\Models\KadastrovieObekti::query()
+                    ->with('poruchenie')
                     ->where('id', $id_obekta)
                     ->firstOrFail();
 
