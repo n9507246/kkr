@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\VneshniePorucheniya;
 use App\Models\KadastrovieObekti;
 use App\Models\VidiRabot;
+use App\Models\TipyObektov;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
@@ -16,16 +17,26 @@ class DatabaseSeeder extends Seeder
 
     public function run(): void
     {
-        // 1. Создаем виды работ (ТОЛЬКО ДВА)
-        $this->command->info('Создаю справочник видов работ (Отчет, Заключение)...');
-        $vidiRabot = collect(['Отчет', 'Заключение'])
-            ->map(function ($name) {
-                // Используем firstOrCreate, чтобы не дублировать, если записи уже есть
-                return VidiRabot::firstOrCreate(['nazvanie' => $name]);
-            });
+        // 1. Справочник Видов Работ
+        $this->command->info('Создаю справочник vidi_rabot...');
+        $vidiRabot = collect([
+            ['nazvanie' => 'Отчет'],
+            ['nazvanie' => 'Заключение']
+        ])->map(function ($item) {
+            return VidiRabot::firstOrCreate($item);
+        });
 
-        // 2. Создаем пользователей
-        $this->command->info('Создаю 20 пользователей...');
+        // 2. Справочник Типов Объектов (ОСТАВЛЯЕМ ТОЛЬКО ЗУ и ОКС)
+        $this->command->info('Создаю справочник tipy_obektov (ЗУ и ОКС)...');
+        $tipyObektov = collect([
+            ['abbreviatura' => 'ЗУ', 'nazvanie' => 'Земельный участок'],
+            ['abbreviatura' => 'ОКС', 'nazvanie' => 'Объект капитального строительства'],
+        ])->map(function ($item) {
+            return TipyObektov::firstOrCreate($item);
+        });
+
+        // 3. Пользователи
+        $this->command->info('Создаю пользователей...');
         $users = User::factory()->count(20)->create();
 
         User::factory()->create([
@@ -60,20 +71,22 @@ class DatabaseSeeder extends Seeder
                 KadastrovieObekti::create([
                     'poruchenie_id'          => $order->id,
                     'kadastroviy_nomer'      => rand(10, 99) . ':' . rand(10, 99) . ':' . rand(100000, 999999) . ':' . rand(100, 999),
-                    'tip_obekta'             => collect(['Здание', 'Помещение', 'Земельный участок'])->random(),
-                    // Теперь здесь рандом только между Отчетом и Заключением
+
+                    // Теперь будет выбирать только между ОКС и ЗУ
+                    'tip_obekta_id'          => $tipyObektov->random()->id,
+
                     'vid_rabot_id'           => $vidiRabot->random()->id,
                     'data_nachala'           => $startDate->toDateString(),
                     'data_zaversheniya'      => $isCompleted ? $startDate->copy()->addDays(rand(3, 10)) : null,
                     'data_okonchaniya_rabot' => $isCompleted ? $startDate->copy()->addDays(rand(3, 10)) : null,
                     'ispolnitel'             => $users->random()->name,
-                    'kommentariy'            => 'Тестовый комментарий к объекту',
+                    'kommentariy'            => 'Тестовый комментарий к объекту недвижимости',
                     'created_at'             => $createdAt,
                     'updated_at'             => $isCompleted ? $createdAt->copy()->addDays(rand(10, 20)) : $createdAt,
                 ]);
             }
         }
 
-        $this->command->info('Готово! База наполнена.');
+        $this->command->info('Сидинг завершен успешно!');
     }
 }

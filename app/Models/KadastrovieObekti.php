@@ -29,7 +29,9 @@ class KadastrovieObekti extends Model
         'data_zaversheniya' => 'date',
         'data_okonchaniya_rabot' => 'date',
     ];
-
+    public function tipObekta() {
+        return $this->belongsTo(TipyObektov::class, 'tip_obekta_id');
+    }
     /**
      * Связь с видом работ (справочник)
      */

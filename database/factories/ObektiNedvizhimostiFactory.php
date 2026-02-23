@@ -2,13 +2,13 @@
 
 namespace Database\Factories;
 
-use App\Models\ObektiNedvizhimosti;
-use App\Models\ExternalOrder;
+use App\Models\KadastrovieObekti;
+use App\Models\VneshniePorucheniya;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class ObektiNedvizhimostiFactory extends Factory
+class KadastrovieObektiFactory extends Factory
 {
-    protected $model = ObektiNedvizhimosti::class;
+    protected $model = KadastrovieObekti::class;
 
     public function definition(): array
     {
@@ -16,7 +16,7 @@ class ObektiNedvizhimostiFactory extends Factory
         $works = ['Отчет', 'Заключение', 'Технический план'];
 
         return [
-            'id_porucheniya_urr' => ExternalOrder::factory(),
+            'id_porucheniya_urr' => VneshniePorucheniya::factory(),
             'kadastroviy_nomer' => $this->faker->numerify('##:##:#######:####'),
             'tip_obekta_nedvizhimosti' => $this->faker->randomElement($types),
             'vid_rabot' => $this->faker->randomElement($works),

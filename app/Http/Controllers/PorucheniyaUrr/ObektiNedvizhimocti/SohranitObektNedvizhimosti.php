@@ -4,7 +4,7 @@ namespace App\Http\Controllers\PorucheniyaUrr\ObektiNedvizhimocti;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\ObektiNedvizhimosti;
+use App\Models\KadastrovieObekti;
 use Illuminate\Support\Facades\DB;
 use App\Rules\UniqueCadastralWithSoftDelete;
 
@@ -31,7 +31,7 @@ class SohranitObektNedvizhimosti extends Controller
         $obekt['id_porucheniya_urr'] = $id_porucheniya_urr;
 
         // Создание нового объекта
-        $obekt = ObektiNedvizhimosti::create($obekt);
+        $obekt = KadastrovieObekti::create($obekt);
 
         return redirect()
             ->route('porucheniya-urr.obekti-nedvizhimosti.spisok-obektov', [

@@ -12,7 +12,7 @@ class CadastralItemsImport implements ToModel
 
         dd($row);
         // Сначала создаем или находим поручение
-        $order = ExternalOrder::firstOrCreate(
+        $order = VneshniePorucheniya::firstOrCreate(
             [
                 'incoming_number' => $row['incoming_number'],
                 'incoming_date' => $row['incoming_date'],
@@ -24,7 +24,7 @@ class CadastralItemsImport implements ToModel
                 'created_by' => auth()->id(),
             ]
         );
-        
+
         // Создаем кадастровый номер
         return new CadastralItem([
             'external_order_id' => $order->id,
@@ -36,7 +36,7 @@ class CadastralItemsImport implements ToModel
             'comment' => $row['comment'] ?? null,
         ]);
     }
-    
+
     public function rules(): array
     {
         return [
@@ -49,11 +49,11 @@ class CadastralItemsImport implements ToModel
             'work_type' => 'required|string',
         ];
     }
-    
+
     private function findUser($name)
     {
         if (!$name) return null;
-        
+
         $user = \App\Models\User::where('full_name', 'LIKE', "%{$name}%")->first();
         return $user ? $user->id : null;
     }

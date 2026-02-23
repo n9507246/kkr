@@ -9,7 +9,7 @@ class RedactirovatObekt extends Controller
 {
     public function __invoke(Request $request, string $id_obekta)
     {
-        $obekt = \App\Models\ObektiNedvizhimosti::query()
+        $obekt = \App\Models\KadastrovieObekti::query()
                     ->where('id', $id_obekta)
                     ->firstOrFail();
         // dump($obekt);

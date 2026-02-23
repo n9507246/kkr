@@ -17,7 +17,7 @@ return new class extends Migration
                   ->onDelete('cascade');
 
             $table->string('kadastroviy_nomer');
-            $table->string('tip_obekta')->nullable();
+            $table->foreignId('tip_obekta_id')->constrained('tipy_obektov');
 
             // Внешний ключ на справочник видов работ
             $table->foreignId('vid_rabot_id')

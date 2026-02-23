@@ -4,7 +4,7 @@ namespace App\Rules;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
-use App\Models\ObektiNedvizhimosti;
+use App\Models\KadastrovieObekti;
 
 class UniqueCadastralWithSoftDelete implements ValidationRule
 {
@@ -19,7 +19,7 @@ class UniqueCadastralWithSoftDelete implements ValidationRule
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        $query = ObektiNedvizhimosti::query()
+        $query = KadastrovieObekti::query()
             ->where('id_porucheniya_urr', $this->id_porucheniya_urr)
             ->where('kadastroviy_nomer', $value);
 

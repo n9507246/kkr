@@ -191,51 +191,61 @@ document.addEventListener("DOMContentLoaded", function() {
             },
         columns: [
             // Кадастровый номер
-                { title: "Кадастровый номер", field: "kadastroviy_nomer", minWidth: 200, frozen: true,
-                    formatter: (cell) => {
-                        const d = cell.getData();
-                        return `<a href="/obekti-nedvizhimosti/${d.id}/redaktirovat-obekt" class="text-primary fw-bold text-decoration-none">${d.kadastroviy_nomer || '-'}</a>`;
-                    }
-                },
-            // Тип объекта
-            { title: "Тип объекта", field: "tip_obekta_nedvizhimosti", minWidth: 140, widthGrow: 1 },
-            { title: "Вх. номер", field: "incoming_number", minWidth: 120,
-                formatter: (cell) => cell.getData().poruchenie?.incoming_number || "-"
-            },
-            { title: "Вх. дата", field: "incoming_date", minWidth: 120, widthGrow: 1,
-                formatter: (cell) => cell.getData().poruchenie?.incoming_date || "-"
-            },
-
-            { title: "номер УРР", field: "urr_number", minWidth: 120, widthGrow: 1,
-                formatter: function(cell) {
+            { title: "Кадастровый номер", field: "kadastroviy_nomer", minWidth: 200, frozen: true,
+                formatter: (cell) => {
                     const d = cell.getData();
-                    return `<a href="/porucheniya-urr/${d.poruchenie?.id}/redaktirovat-poruchenie" class=" text-decoration-none">${d.poruchenie?.urr_number  || ' '}</a>`;
+                    return `<a href="/obekti-nedvizhimosti/${d.id}/redaktirovat-obekt" class="text-primary fw-bold text-decoration-none">${d.kadastroviy_nomer || '-'}</a>`;
                 }
             },
-            { title: "дата УРР", field: "urr_date", minWidth: 120, widthGrow: 1,
-                formatter: (cell) => cell.getData().poruchenie?.urr_date || "-"
+
+            // Тип объекта (используем аббревиатуру из справочника + подсказка)
+            {
+                title: "Тип",
+                field: "tip_obekta.abbreviatura",
+                minWidth: 80,
+                hozAlign: "center",
+                tooltip: (cell) => cell.getData().tip_obekta?.nazvanie || ""
             },
-            { title: "Тип работ", field: "vidi_rabot.nazvanie", minWidth: 120, widthGrow: 1,
-                // Tabulator сам подхватит вложенное поле через точку, formatter можно упростить
+
+            // Входящие реквизиты из связи poruchenie
+            { title: "Вх. номер", field: "poruchenie.vhod_nomer", minWidth: 120,
                 formatter: (cell) => cell.getValue() || "-"
             },
-            { title: "Исполнитель", field: "ispolnitel", minWidth: 150, widthGrow: 1 },
-            { title: "Дата заверш.", field: "data_zaversheniya", minWidth: 150, widthGrow: 1,
-                formatter: function(cell) {
-                    const value = cell.getValue();
-                    if (!value) return '';
-
-                    // Если дата в формате ISO (2026-02-20T00:00:00.000Z)
-                    if (value.includes('T')) {
-                        const date = new Date(value);
-                        return date.toLocaleDateString('ru-RU');
-                    }
-
-                    return value;
-                },
+            { title: "Вх. дата", field: "poruchenie.vhod_data", minWidth: 120,
+                formatter: (cell) => cell.getValue() || "-"
             },
 
-            { title: "Комментарии", field: "kommentariy", minWidth: 350, widthGrow: 3 },
+            // Реквизиты УРР
+            { title: "Номер УРР", field: "poruchenie.urr_nomer", minWidth: 120,
+                formatter: function(cell) {
+                    const d = cell.getData();
+                    if (!d.poruchenie) return "-";
+                    return `<a href="/porucheniya-urr/${d.poruchenie.id}/redaktirovat-poruchenie" class="text-decoration-none">${d.poruchenie.urr_nomer || ' '}</a>`;
+                }
+            },
+            { title: "Дата УРР", field: "poruchenie.urr_data", minWidth: 120,
+                formatter: (cell) => cell.getValue() || "-"
+            },
+
+            // Вид работ (из справочника vidi_rabot)
+            { title: "Тип работ", field: "vidi_rabot.nazvanie", minWidth: 150,
+                formatter: (cell) => cell.getValue() || "-"
+            },
+
+            { title: "Исполнитель", field: "ispolnitel", minWidth: 150 },
+
+            // Дата завершения с форматированием
+            { title: "Дата заверш.", field: "data_zaversheniya", minWidth: 130,
+                formatter: function(cell) {
+                    const val = cell.getValue();
+                    return val ? new Date(val).toLocaleDateString('ru-RU') : "-";
+                }
+            },
+
+            // Комментарий (исправлено поле с komentarii на kommentariy)
+            { title: "Комментарии", field: "kommentariy", minWidth: 300, widthGrow: 2 },
+
+            // Действия
             { title: "Действия", field: "id", width: 100, headerSort: false, hozAlign: "center", frozen: true,
                 formatter: function(cell) {
                     const id = cell.getValue();

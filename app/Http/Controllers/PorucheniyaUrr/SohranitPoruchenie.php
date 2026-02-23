@@ -12,7 +12,7 @@ class SohranitPoruchenie extends Controller
      */
     public function __invoke(Request $request)
     {
-        $order = \App\Models\ExternalOrder::create([
+        $order = \App\Models\VneshniePorucheniya::create([
             "incoming_number" => $request['incoming_number'],
             "incoming_date" => $request['incoming_date'],
             "urr_number" => $request['urr_number'],

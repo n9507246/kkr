@@ -12,7 +12,7 @@ class RedaktirovatPoruchenie extends Controller
      */
     public function __invoke(Request $request, string $id_porucheniya)
     {
-        $poruchenie = \App\Models\ExternalOrder::findOrFail($id_porucheniya);
+        $poruchenie = \App\Models\VneshniePorucheniya::findOrFail($id_porucheniya);
         return view('porucheniya-urr.redaktirovat-poruchenie', ['poruchenie' => $poruchenie]);
     }
 }

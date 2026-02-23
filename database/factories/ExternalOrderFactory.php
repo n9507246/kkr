@@ -1,13 +1,13 @@
 <?php
 namespace Database\Factories;
 
-use App\Models\ExternalOrder;
+use App\Models\VneshniePorucheniya;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class ExternalOrderFactory extends Factory
+class VneshniePorucheniyaFactory extends Factory
 {
-    protected $model = ExternalOrder::class;
+    protected $model = VneshniePorucheniya::class;
 
     public function definition(): array
     {

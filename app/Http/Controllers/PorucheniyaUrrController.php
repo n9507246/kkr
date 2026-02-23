@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 
-use App\Models\ExternalOrder;
+use App\Models\VneshniePorucheniya;
 use Illuminate\Http\Request;
 
 class PorucheniyaUrrController extends Controller
@@ -13,7 +13,7 @@ class PorucheniyaUrrController extends Controller
      */
     public function index()
     {
-        $spisok_porucheniy = ExternalOrder::all();
+        $spisok_porucheniy = VneshniePorucheniya::all();
         return view('porucheniya-urr.index', compact('spisok_porucheniy'));
     }
 
@@ -44,7 +44,7 @@ class PorucheniyaUrrController extends Controller
 
         // $validated['created_by'] = auth()->id();
 
-        $order = ExternalOrder::create([
+        $order = VneshniePorucheniya::create([
             "incoming_number" => $request['incoming_number'],
             "incoming_date" => $request['incoming_date'],
             "urr_number" => $request['urr_number'],
@@ -67,7 +67,7 @@ class PorucheniyaUrrController extends Controller
 
     //     return view('orders.index', []);
 
-    //     $order = ExternalOrder::with('cadastralItems', 'cadastralItems.executor')
+    //     $order = VneshniePorucheniya::with('cadastralItems', 'cadastralItems.executor')
     //         ->withCount('cadastralItems')
     //         ->findOrFail($id);
 
@@ -87,7 +87,7 @@ class PorucheniyaUrrController extends Controller
      */
     public function edit(string $id)
     {
-        $poruchenie = ExternalOrder::findOrFail($id);
+        $poruchenie = VneshniePorucheniya::findOrFail($id);
         return view('porucheniya-urr.edit', ['id_poruchenie' => $poruchenie->id]);
     }
 
@@ -96,7 +96,7 @@ class PorucheniyaUrrController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $order = ExternalOrder::findOrFail($id);
+        $order = VneshniePorucheniya::findOrFail($id);
 
         $validated = $request->validate([
             'incoming_number' => 'required|string|max:50|unique:external_orders,incoming_number,' . $id,
@@ -120,7 +120,7 @@ class PorucheniyaUrrController extends Controller
      */
     public function destroy(string $id)
     {
-        $order = ExternalOrder::findOrFail($id);
+        $order = VneshniePorucheniya::findOrFail($id);
         $order->delete();
 
         return redirect()
@@ -133,7 +133,7 @@ class PorucheniyaUrrController extends Controller
      */
     public function sendResponse(Request $request, string $id)
     {
-        $order = ExternalOrder::findOrFail($id);
+        $order = VneshniePorucheniya::findOrFail($id);
 
         $validated = $request->validate([
             'outgoing_number' => 'required|string|max:50',

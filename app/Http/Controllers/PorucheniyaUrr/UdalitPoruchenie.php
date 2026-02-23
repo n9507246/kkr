@@ -12,7 +12,7 @@ class UdalitPoruchenie extends Controller
      */
     public function __invoke(Request $request,string $id_poruchenia)
     {
-        $poruchenie = \App\Models\ExternalOrder::findOrFail($id_poruchenia);
+        $poruchenie = \App\Models\VneshniePorucheniya::findOrFail($id_poruchenia);
         $poruchenie->delete();
 
         return redirect()
