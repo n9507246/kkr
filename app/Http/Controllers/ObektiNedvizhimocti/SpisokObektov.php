@@ -26,6 +26,17 @@ class SpisokObektov extends Controller
                     $q->where('incoming_number', 'like', "%{$request->incoming_number}%");
                 });
             }
+            if ($request->filled('ispolnitel')) {
+                $query->whereHas('poruchenie', function($q) use ($request) {
+                    $q->where('ispolnitel', 'like', "%{$request->ispolnitel}%");
+                });
+            }
+
+            if ($request->filled('incoming_number')) {
+                $query->whereHas('poruchenie', function($q) use ($request) {
+                    $q->where('incoming_number', 'like', "%{$request->incoming_number}%");
+                });
+            }
 
             $size = $request->get('size', 10);
             $paginated = $query->paginate($size);

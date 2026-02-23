@@ -70,24 +70,32 @@
         </button>
     </div>
 
-    <div id="filter-panel" class="card border-0 shadow-sm">
-        <div class="card-body bg-light border-bottom">
-            <form id="filter-form" class="row g-3 align-items-end">
-                <div class="col-md-3">
-                    <label class="form-label small text-muted fw-bold">Кадастровый номер</label>
-                    <input type="text" name="cadastral_number" class="form-control form-control-sm" placeholder="Введите номер...">
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label small text-muted fw-bold">Вх. номер</label>
-                    <input type="text" name="incoming_number" class="form-control form-control-sm" placeholder="Номер">
-                </div>
-                <div class="col-md-4">
-                    <button type="submit" class="btn btn-primary btn-sm px-4">Найти</button>
-                    <button type="button" id="reset-filters" class="btn btn-light btn-sm border px-3">Сбросить</button>
-                </div>
-            </form>
+    <!-- ПАНЕЛЬ ФИЛЬТРОВ -->
+        <div id="filter-panel" class="card border-0 shadow-sm">
+            <div class="card-body bg-light border-bottom">
+                <form id="filter-form" class="row g-3 align-items-end">
+                    <!-- Кадастровый номер -->
+                        <div class="col-md-3">
+                            <label class="form-label small text-muted fw-bold">Кадастровый номер</label>
+                            <input type="text" name="cadastral_number" class="form-control form-control-sm" placeholder="Введите номер...">
+                        </div>
+                    <!-- Исполнитель -->
+                        <div class="col-md-3">
+                            <label class="form-label small text-muted fw-bold">Исполнитель</label>
+                            <input type="text" name="ispolnitel" class="form-control form-control-sm" placeholder="Введите имя...">
+                        </div>
+                    <!-- Вх. номер -->
+                        <div class="col-md-2">
+                            <label class="form-label small text-muted fw-bold">Вх. номер</label>
+                            <input type="text" name="incoming_number" class="form-control form-control-sm" placeholder="Номер">
+                        </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-primary btn-sm px-4">Найти</button>
+                        <button type="button" id="reset-filters" class="btn btn-light btn-sm border px-3">Сбросить</button>
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
 
     <div id="report-table"></div>
 </div>
@@ -124,7 +132,7 @@ document.addEventListener("DOMContentLoaded", function() {
         height: "600px",
         layout: "fitColumns",
         locale: "ru",
-        placeholder: "Данные загружаются...",
+        placeholder: "Список пуст",
 
         persistence: { columns: ["visible"] },
         persistenceID: "realEstateTable_vFinal",
