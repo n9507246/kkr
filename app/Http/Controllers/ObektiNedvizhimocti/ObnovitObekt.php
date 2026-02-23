@@ -20,7 +20,7 @@ class ObnovitObekt extends Controller
             'tip_obekta_id' => 'required|exists:tipy_obektov,id',
             'vid_rabot_id' => 'nullable|exists:vidi_rabot,id',
             'data_zaversheniya' => 'required|date',
-            'komentarii' => 'nullable|string',
+            'kommentariy' => 'nullable|string',
         ]);
         // Добавляем текущего пользователя как исполнителя
         $validated['ispolnitel'] = Auth::user()->name;

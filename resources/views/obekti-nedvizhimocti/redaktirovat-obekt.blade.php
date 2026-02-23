@@ -95,13 +95,13 @@
 
                                 <!-- Комментарий -->
                                     <div class="mb-3">
-                                        <label for="komentarii" class="form-label">Комментарий</label>
-                                        <textarea class="form-control @error('komentarii') is-invalid @enderror"
-                                                    id="komentarii"
-                                                    name="komentarii"
+                                        <label for="kommentariy" class="form-label">Комментарий</label>
+                                        <textarea class="form-control @error('kommentariy') is-invalid @enderror"
+                                                    id="kommentariy"
+                                                    name="kommentariy"
                                                     rows="4"
-                                                    placeholder="Дополнительная информация...">{{ old('komentarii', $obekt->komentarii) }}</textarea>
-                                        @error('komentarii')
+                                                    placeholder="Дополнительная информация...">{{ old('kommentariy', $obekt->kommentariy) }}</textarea>
+                                        @error('kommentariy')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>

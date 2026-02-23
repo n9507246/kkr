@@ -18,7 +18,7 @@ class SohranitObektNedvizhimosti extends Controller
                 'tip_obekta_nedvizhimosti' => 'required|string|max:100',
                 'vid_rabot' => 'nullable|string|max:100',
                 'data_zaversheniya' => 'nullable|date',
-                'komentarii' => 'nullable|string',
+                'kommentariy' => 'nullable|string',
 
             ], [
                 'kadastroviy_nomer.required' => 'Кадастровый номер обязателен для заполнения',
