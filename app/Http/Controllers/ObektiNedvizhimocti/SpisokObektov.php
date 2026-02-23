@@ -5,6 +5,8 @@ namespace App\Http\Controllers\ObektiNedvizhimocti;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\KadastrovieObekti;
+use App\Models\TipyObektov;
+use App\Models\VidiRabot;
 
 class SpisokObektov extends Controller
 {
@@ -44,6 +46,37 @@ class SpisokObektov extends Controller
                 $query->where('vid_rabot_id', $request->vid_rabot_id);
             }
 
+            // Фильтр по дате завершения
+            if ($request->filled('completion_date')) {
+                $query->whereDate('data_zaversheniya', $request->completion_date);
+            }
+
+            // Фильтр по входящей дате (через связь)
+            if ($request->filled('incoming_date')) {
+                $query->whereHas('poruchenie', function($q) use ($request) {
+                    $q->whereDate('vhod_data', $request->incoming_date);
+                });
+            }
+
+            // Фильтр по номеру УРР (через связь)
+            if ($request->filled('urr_number')) {
+                $query->whereHas('poruchenie', function($q) use ($request) {
+                    $q->where('urr_nomer', 'like', "%{$request->urr_number}%");
+                });
+            }
+
+            // Фильтр по дате УРР (через связь)
+            if ($request->filled('urr_date')) {
+                $query->whereHas('poruchenie', function($q) use ($request) {
+                    $q->whereDate('urr_data', $request->urr_date);
+                });
+            }
+
+            // Фильтр по комментарию
+            if ($request->filled('comment')) {
+                $query->where('kommentariy', 'like', "%{$request->comment}%");
+            }
+
             $size = $request->get('size', 10);
             $paginated = $query->paginate($size);
 
@@ -55,6 +88,9 @@ class SpisokObektov extends Controller
             ]);
         }
 
-        return view('obekti-nedvizhimocti.spisok-obektov');
+        $tipyObektov = TipyObektov::where('activno', true)->get();
+        $vidiRabot = VidiRabot::where('activno', true)->get();
+
+        return view('obekti-nedvizhimocti.spisok-obektov', compact('tipyObektov', 'vidiRabot'));
     }
 }

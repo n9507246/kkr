@@ -73,26 +73,66 @@
     <!-- ПАНЕЛЬ ФИЛЬТРОВ -->
         <div id="filter-panel" class="card border-0 shadow-sm">
             <div class="card-body bg-light border-bottom">
-                <form id="filter-form" class="row g-3 align-items-end">
-                    <!-- Кадастровый номер -->
+                <form id="filter-form" class="row g-3">
+                    <!-- Ряд 1 -->
                         <div class="col-md-3">
                             <label class="form-label small text-muted fw-bold">Кадастровый номер</label>
                             <input type="text" name="cadastral_number" class="form-control form-control-sm" placeholder="Введите номер...">
                         </div>
-                    <!-- Исполнитель -->
+                        <div class="col-md-2">
+                            <label class="form-label small text-muted fw-bold">Тип объекта</label>
+                            <select name="tip_obekta_id" class="form-select form-select-sm">
+                                <option value="">Все</option>
+                                @foreach($tipyObektov as $tip)
+                                    <option value="{{ $tip->id }}">{{ $tip->abbreviatura }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label small text-muted fw-bold">Вид работ</label>
+                            <select name="vid_rabot_id" class="form-select form-select-sm">
+                                <option value="">Все</option>
+                                @foreach($vidiRabot as $vid)
+                                    <option value="{{ $vid->id }}">{{ $vid->nazvanie }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                         <div class="col-md-3">
                             <label class="form-label small text-muted fw-bold">Исполнитель</label>
                             <input type="text" name="ispolnitel" class="form-control form-control-sm" placeholder="Введите имя...">
                         </div>
-                    <!-- Вх. номер -->
+                        <div class="col-md-2">
+                            <label class="form-label small text-muted fw-bold">Дата завершения</label>
+                            <input type="date" name="completion_date" class="form-control form-control-sm">
+                        </div>
+
+                    <!-- Ряд 2 -->
                         <div class="col-md-2">
                             <label class="form-label small text-muted fw-bold">Вх. номер</label>
                             <input type="text" name="incoming_number" class="form-control form-control-sm" placeholder="Номер">
                         </div>
-                    <div class="col-md-4">
-                        <button type="submit" class="btn btn-primary btn-sm px-4">Найти</button>
-                        <button type="button" id="reset-filters" class="btn btn-light btn-sm border px-3">Сбросить</button>
-                    </div>
+                        <div class="col-md-2">
+                            <label class="form-label small text-muted fw-bold">Вх. дата</label>
+                            <input type="date" name="incoming_date" class="form-control form-control-sm">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label small text-muted fw-bold">Номер УРР</label>
+                            <input type="text" name="urr_number" class="form-control form-control-sm" placeholder="Номер УРР">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label small text-muted fw-bold">Дата УРР</label>
+                            <input type="date" name="urr_date" class="form-control form-control-sm">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small text-muted fw-bold">Комментарий</label>
+                            <input type="text" name="comment" class="form-control form-control-sm" placeholder="Поиск по тексту...">
+                        </div>
+
+                    <!-- Кнопки -->
+                        <div class="col-12 text-end mt-2">
+                            <button type="button" id="reset-filters" class="btn btn-light btn-sm border me-2">Сбросить</button>
+                            <button type="submit" class="btn btn-primary btn-sm px-4">Найти</button>
+                        </div>
                 </form>
             </div>
         </div>
