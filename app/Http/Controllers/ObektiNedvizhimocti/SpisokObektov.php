@@ -46,9 +46,12 @@ class SpisokObektov extends Controller
                 $query->where('vid_rabot_id', $request->vid_rabot_id);
             }
 
-            // Фильтр по дате завершения
-            if ($request->filled('completion_date')) {
-                $query->whereDate('data_zaversheniya', $request->completion_date);
+            // Фильтр по дате завершения (диапазон)
+            if ($request->filled('completion_date_start')) {
+                $query->whereDate('data_zaversheniya', '>=', $request->completion_date_start);
+            }
+            if ($request->filled('completion_date_end')) {
+                $query->whereDate('data_zaversheniya', '<=', $request->completion_date_end);
             }
 
             // Фильтр по входящей дате (через связь)

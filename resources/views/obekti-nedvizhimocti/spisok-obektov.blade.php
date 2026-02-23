@@ -97,13 +97,17 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <label class="form-label small text-muted fw-bold">Исполнитель</label>
                             <input type="text" name="ispolnitel" class="form-control form-control-sm" placeholder="Введите имя...">
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-3">
                             <label class="form-label small text-muted fw-bold">Дата завершения</label>
-                            <input type="date" name="completion_date" class="form-control form-control-sm">
+                            <div class="input-group input-group-sm">
+                                <input type="date" name="completion_date_start" class="form-control" placeholder="С">
+                                <span class="input-group-text px-1">-</span>
+                                <input type="date" name="completion_date_end" class="form-control" placeholder="По">
+                            </div>
                         </div>
 
                     <!-- Ряд 2 -->
