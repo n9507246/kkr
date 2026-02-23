@@ -155,9 +155,12 @@ document.addEventListener("DOMContentLoaded", function() {
     const filterPanel = document.getElementById('filter-panel');
     const filterForm = document.getElementById("filter-form");
     const storageKey = "realEstateFilters_v1";
+    const visibilityKey = "realEstateFiltersPanelVisible";
 
     // Восстановление фильтров из localStorage
     const savedFilters = localStorage.getItem(storageKey);
+    let shouldOpenPanel = localStorage.getItem(visibilityKey) === 'true';
+
     if (savedFilters) {
         try {
             const data = JSON.parse(savedFilters);
@@ -171,17 +174,22 @@ document.addEventListener("DOMContentLoaded", function() {
             });
             // Если есть активные фильтры, открываем панель, чтобы пользователь видел контекст
             if (hasActiveFilters) {
-                filterPanel.classList.add('show');
-                filterBtn.classList.add('active');
+                shouldOpenPanel = true;
             }
         } catch (e) {
             console.error("Ошибка загрузки фильтров", e);
         }
     }
 
+    if (shouldOpenPanel) {
+        filterPanel.classList.add('show');
+        filterBtn.classList.add('active');
+    }
+
     filterBtn.addEventListener('click', function() {
         const isOpen = filterPanel.classList.toggle('show');
         this.classList.toggle('active', isOpen);
+        localStorage.setItem(visibilityKey, isOpen);
 
         // Небольшая задержка, чтобы таблица пересчитала высоту после анимации
         setTimeout(() => {
