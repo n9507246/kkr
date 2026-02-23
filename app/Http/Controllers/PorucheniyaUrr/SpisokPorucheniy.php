@@ -15,8 +15,40 @@ class SpisokPorucheniy extends Controller
         if ($request->ajax()) {
             $query = VneshniePorucheniya::query();
 
-            $size = $request->get('size', 10);
-            $paginated = $query->orderBy('created_at', 'desc')->paginate($size);
+            // Фильтрация
+            if ($request->filled('vhod_nomer')) {
+                $query->where('vhod_nomer', 'like', '%' . $request->vhod_nomer . '%');
+            }
+            if ($request->filled('vhod_data')) {
+                $query->whereDate('vhod_data', $request->vhod_data);
+            }
+            if ($request->filled('urr_nomer')) {
+                $query->where('urr_nomer', 'like', '%' . $request->urr_nomer . '%');
+            }
+            if ($request->filled('urr_data')) {
+                $query->whereDate('urr_data', $request->urr_data);
+            }
+            if ($request->filled('ishod_nomer')) {
+                $query->where('ishod_nomer', 'like', '%' . $request->ishod_nomer . '%');
+            }
+            if ($request->filled('ishod_data')) {
+                $query->whereDate('ishod_data', $request->ishod_data);
+            }
+            if ($request->filled('opisanie')) {
+                $query->where('opisanie', 'like', '%' . $request->opisanie . '%');
+            }
+
+            // Сортировка
+            if ($request->has('sort') && is_array($request->sort)) {
+                foreach ($request->sort as $sort) {
+                    $query->orderBy($sort['field'], $sort['dir']);
+                }
+            } else {
+                $query->orderBy('created_at', 'desc');
+            }
+
+            $size = $request->get('size', 20);
+            $paginated = $query->paginate($size);
 
             return response()->json([
                 'last_page' => $paginated->lastPage(),
