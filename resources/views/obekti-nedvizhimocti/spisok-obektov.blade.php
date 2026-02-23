@@ -153,6 +153,31 @@ document.addEventListener("DOMContentLoaded", function() {
     // 1. ЛОГИКА ПЛАВНОГО ПОКАЗА ФИЛЬТРОВ
     const filterBtn = document.getElementById('toggle-filters');
     const filterPanel = document.getElementById('filter-panel');
+    const filterForm = document.getElementById("filter-form");
+    const storageKey = "realEstateFilters_v1";
+
+    // Восстановление фильтров из localStorage
+    const savedFilters = localStorage.getItem(storageKey);
+    if (savedFilters) {
+        try {
+            const data = JSON.parse(savedFilters);
+            let hasActiveFilters = false;
+            Object.keys(data).forEach(key => {
+                const input = filterForm.querySelector(`[name="${key}"]`);
+                if (input) {
+                    input.value = data[key];
+                    if (data[key]) hasActiveFilters = true;
+                }
+            });
+            // Если есть активные фильтры, открываем панель, чтобы пользователь видел контекст
+            if (hasActiveFilters) {
+                filterPanel.classList.add('show');
+                filterBtn.classList.add('active');
+            }
+        } catch (e) {
+            console.error("Ошибка загрузки фильтров", e);
+        }
+    }
 
     filterBtn.addEventListener('click', function() {
         const isOpen = filterPanel.classList.toggle('show');
@@ -351,13 +376,23 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     // 4. ФИЛЬТРАЦИЯ И СБРОС
-    document.getElementById("filter-form").addEventListener("submit", (e) => {
+    filterForm.addEventListener("submit", (e) => {
         e.preventDefault();
+
+        // Сохраняем текущее состояние фильтров
+        const formData = new FormData(filterForm);
+        const data = {};
+        formData.forEach((value, key) => {
+            if (value) data[key] = value;
+        });
+        localStorage.setItem(storageKey, JSON.stringify(data));
+
         table.setData();
     });
 
     document.getElementById("reset-filters").addEventListener("click", () => {
-        document.getElementById("filter-form").reset();
+        filterForm.reset();
+        localStorage.removeItem(storageKey);
         table.setData();
     });
 
