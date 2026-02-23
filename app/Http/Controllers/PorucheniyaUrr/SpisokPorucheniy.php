@@ -12,9 +12,19 @@ class SpisokPorucheniy extends Controller
      */
     public function __invoke(Request $request)
     {
-        $spisok_porucheniy = VneshniePorucheniya::query()
-                        ->orderBy('created_at', 'desc')
-                        ->get();
-        return view('porucheniya-urr.spisok-porucheniy', compact('spisok_porucheniy'));
+        if ($request->ajax()) {
+            $query = VneshniePorucheniya::query();
+
+            $size = $request->get('size', 10);
+            $paginated = $query->orderBy('created_at', 'desc')->paginate($size);
+
+            return response()->json([
+                'last_page' => $paginated->lastPage(),
+                'data' => $paginated->items(),
+                'total' => $paginated->total(),
+            ]);
+        }
+
+        return view('porucheniya-urr.spisok-porucheniy');
     }
 }

@@ -9,104 +9,111 @@
         </a>
     </div>
 
-    {{-- ТАБЛИЦА С поручениями --}}
-    <div class="card">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover table-striped mb-0">
-                    <thead class="table-primary">
-                        <tr>
-                            <th>Вх. номер</th>
-                            <th>Вх. дата</th>
-                            <th>Номер УРР</th>
-                            <th>Дата УРР</th>
-                            <th>Исх. номер</th>
-                            <th>Исх. дата</th>
-                            <th>Описание</th>
-                            <th>Кол-во работ</th>
-                            <th style="width: 120px">Действия</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($spisok_porucheniy ?? [] as $poruchenie)
-                        <tr>
-                            <td>
-                                <a href="{{ route('porucheniya-urr.redaktirovat-poruchenie', $poruchenie->id ?? 1) }}" title="Редактировать">
-                                    {{ $poruchenie->incoming_number ?? 'Б/Н' }}
-                                </a>
-                            </td>
-                            <td>{{ $poruchenie->incoming_date ?? '' }}</td>
-                            <td>{{ $poruchenie->urr_number ?? '' }}</td>
-                            <td>{{ $poruchenie->urr_date ??  '' }}</td>
-                            <td>{{ $poruchenie->outgoing_number ?? '' }}</td>
-                            <td>{{ $poruchenie->outgoing_date ??  '' }}</td>
-                            <td>{{ $poruchenie->description ?? '' }}</td>
-                            <td class="text-center">{{ $poruchenie->works_count ?? 0 }}</td>
-                            <td>
-                                <div class="btn-group btn-group-sm">
-                                    <a href="{{ route('porucheniya-urr.redaktirovat-poruchenie', $poruchenie->id ?? 1) }}" class="btn btn-warning" title="Редактировать">
-                                        <i class="bi bi-pencil"></i>
-                                    </a> 
-                                    <button type="button" class="btn btn-danger" title="Удалить" onclick="confirmDelete({{ $poruchenie->id ?? 1 }})">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="9" class="text-center py-4">
-                                <i class="bi bi-inbox fs-1 d-block text-muted mb-2"></i>
-                                <p class="text-muted mb-0">Нет поручений</p>
-                                <a href="{{ route('porucheniya-urr.sozdat-poruchenie') }}" class="btn btn-primary btn-sm mt-2">
-                                    Создать первое поручение
-                                </a>
-                            </td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        {{-- ПАГИНАЦИЯ --}}
-        @if(isset($porucheniya) && method_exists($porucheniya, 'links'))
-        <div class="card-footer">
-            {{ $porucheniya->links() }}
-        </div>
-        @endif
-    </div>
+    <div id="report-table"></div>
 </div>
 
-{{-- МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ УДАЛЕНИЯ --}}
 <div class="modal fade" id="deleteModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title">Подтверждение удаления</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <p>Вы уверены, что хотите удалить это поручение?</p>
-                <p class="text-danger"><small>Все связанные данные будут также удалены!</small></p>
-            </div>
-            <div class="modal-footer">
-                <form id="deleteForm" method="POST">
-                    @csrf
-                    @method('DELETE')
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                    <button type="submit" class="btn btn-danger">Удалить</button>
-                </form>
-            </div>
-        </div>
-    </div>
+    <!-- модальное окно как у вас -->
 </div>
 
+@push('scripts')
 <script>
 function confirmDelete(id) {
     const form = document.getElementById('deleteForm');
-    form.action = '{{ url("/porucheniya-urr") }}/' + id;
+    form.action = '/porucheniya-urr/' + id;
     new bootstrap.Modal(document.getElementById('deleteModal')).show();
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+    var table = new Tabulator("#report-table", {
+        height: "600px",
+        layout: "fitColumns",
+        placeholder: "Нет данных",
+
+        ajaxURL: "{{ route('porucheniya-urr.spisok-porucheniy') }}",
+
+        // ВАЖНО: убираем remote pagination из таблицы
+        // pagination: "remote",  // ЗАКОММЕНТИРУЙТЕ ЭТО
+
+        // Просто получаем все данные сразу
+        ajaxResponse: function(url, params, response) {
+            console.log("Ответ сервера:", response);
+            // Возвращаем ТОЛЬКО массив данных
+            return response.data || [];
+        },
+
+        columns: [
+            {
+                title: "Вх. номер",
+                field: "vhod_nomer",
+                width: 120,
+                formatter: function(cell) {
+                    const data = cell.getData();
+                    const url = `/porucheniya-urr/${data.id}/redaktirovat-poruchenie`;
+                    return `<a href="${url}" class="text-decoration-none">${cell.getValue() || '-'}</a>`;
+                }
+            },
+            {
+                title: "Вх. дата",
+                field: "vhod_data",
+                width: 100,
+                formatter: function(cell) {
+                    return cell.getValue() ? new Date(cell.getValue()).toLocaleDateString('ru-RU') : '-';
+                }
+            },
+            {
+                title: "Номер УРР",
+                field: "urr_nomer",
+                width: 120
+            },
+            {
+                title: "Дата УРР",
+                field: "urr_data",
+                width: 100,
+                formatter: function(cell) {
+                    return cell.getValue() ? new Date(cell.getValue()).toLocaleDateString('ru-RU') : '-';
+                }
+            },
+            {
+                title: "Исх. номер",
+                field: "ishod_nomer",
+                width: 120
+            },
+            {
+                title: "Исх. дата",
+                field: "ishod_data",
+                width: 100,
+                formatter: function(cell) {
+                    return cell.getValue() ? new Date(cell.getValue()).toLocaleDateString('ru-RU') : '-';
+                }
+            },
+            {
+                title: "Описание",
+                field: "opisanie",
+                minWidth: 200
+            },
+            {
+                title: "Действия",
+                width: 100,
+                hozAlign: "center",
+                headerSort: false,
+                formatter: function(cell) {
+                    const data = cell.getData();
+                    return `
+                        <div class="btn-group btn-group-sm">
+                            <a href="/porucheniya-urr/${data.id}/redaktirovat-poruchenie" class="btn btn-warning" title="Редактировать">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <button type="button" class="btn btn-danger" title="Удалить" onclick="confirmDelete(${data.id})">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                }
+            }
+        ]
+    });
+});
 </script>
+@endpush
 @endsection
