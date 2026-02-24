@@ -1,107 +1,121 @@
-<!-- TODO: добавить скрол а то поля не видно -->
 @props([
     'id',
-    'rows' => [],
+    'ajaxUrl',
     'columns' => [],
-    'autoColumns' => true,
-    'showActions' => false,
-    'deleteUrl' => null,
+    'height' => '500px',
+    'method' => 'GET',
     'editUrl' => null,
+    'deleteUrl' => null,
+    'debug' => false
 ])
 
-<div id="{{ $id }}"></div>
+<div style="overflow-x:auto;">
+    <div id="{{ $id }}"></div>
+</div>
 
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
 
-    const tableConfig = {
-        data: @json($rows),
-        layout: "fitColumns",
-        pagination: "local",
+    const defaultMinWidth = 200;
+    const defaultMaxWidth = 300;
+
+    let preparedColumns = @json($columns).map(col => ({
+        minWidth: defaultMinWidth,
+        maxWidth: defaultMaxWidth,
+        ...col,
+    }));
+
+
+    const table = new Tabulator("#{{ $id }}", {
+        layout: "fitDataStretch",
+        height: "{{ $height }}",
+
+        ajaxURL: "{{ $ajaxUrl }}",
+        ajaxConfig: "{{ $method }}",
+
+        pagination: true,
+        paginationMode: "remote",
+        sortMode: "remote",
+        filterMode: "remote",
+
         paginationSize: 10,
-    };
 
-    @if($autoColumns)
-        tableConfig.autoColumns = true;
-    @endif
-
-    @if(!empty($columns))
-        tableConfig.columns = @json($columns);
-    @endif
-
-    const table = new Tabulator("#{{ $id }}", tableConfig);
-
-    @if($showActions)
-        table.on("tableBuilt", function () {
-
-            // Добавляем колонку Actions один раз
-            const actionsColumnExists = table.getColumnDefinitions().some(col => col.field === 'actions');
-            if(!actionsColumnExists){
-                table.addColumn({
-                    title: 'Действия',
-                    field: 'actions',
-                    hozAlign: "center",
-                    width: 160,
-                    frozen: true
-                });
-            }
-
-            // ======= предупреждения один раз =======
-            @if(!$deleteUrl)
-                console.warn("deleteUrl не указан, кнопка удаления не создана.");
+        ajaxResponse: function(url, params, response) {
+            @if($debug)
+                console.log('ajaxResponse ==========> ', {
+                data: response.data,
+                last_page: response.last_page,
+            })
             @endif
-            @if(!$editUrl)
-                console.warn("editUrl не указан, кнопка редактирования не создана.");
-            @endif
+            return {
+                data: response.data,
+                last_page: response.last_page,
+            };
+        },
 
-            // ======= создаём кнопки для каждой строки =======
-            table.getRows().forEach(row => {
-                const cell = row.getCell("actions");
-                if(cell){
-                    cell.getElement().innerHTML = "";
+        columns: [
+            ...preparedColumns,
 
-                    // кнопка Редактировать
+            @if($editUrl || $deleteUrl)
+            {
+                title: "Действия",
+                field: "actions",
+                headerSort: false,
+                hozAlign: "center",
+                width: 160,
+                formatter: function(cell){
+                    const row = cell.getRow().getData();
+                    let buttons = '';
+
                     @if($editUrl)
-                        const btnEdit = document.createElement("a");
-                        btnEdit.href = "{{ $editUrl }}/" + row.getData().id;
-                        btnEdit.className = "btn btn-outline-warning btn-sm py-0 px-1";
-                        btnEdit.title = "Редактировать";
-                        btnEdit.innerHTML = '<i class="bi bi-pencil"></i>';
-                        cell.getElement().appendChild(btnEdit);
+                        buttons += `
+                            <a href="{{ $editUrl }}/${row.id}"
+                               class="btn btn-outline-warning btn-sm py-0 px-1 me-1">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                        `;
                     @endif
 
-                    // кнопка Удалить
                     @if($deleteUrl)
-                        const btnDelete = document.createElement("button");
-                        btnDelete.className = "btn btn-outline-danger btn-sm py-0 px-1";
-                        btnDelete.title = "Удалить";
-                        btnDelete.innerHTML = '<i class="bi bi-trash"></i>';
-                        btnDelete.addEventListener("click", function() {
-                            if(confirm("Удалить эту запись?")){
-                                fetch("{{ $deleteUrl }}/" + row.getData().id, {
-                                    method: "DELETE",
-                                    headers: {
-                                        "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                                        "Accept": "application/json",
-                                    },
-                                })
-                                .then(res => res.json())
-                                .then(res => {
-                                    if(res.success){
-                                        table.deleteRow(row);
-                                    } else {
-                                        alert("Ошибка при удалении");
-                                    }
-                                });
-                            }
-                        });
-                        cell.getElement().appendChild(btnDelete);
+                        buttons += `
+                            <button class="btn btn-outline-danger btn-sm py-0 px-1 delete-btn"
+                                    data-id="${row.id}">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        `;
                     @endif
+
+                    return buttons;
+                }
+            }
+            @endif
+        ],
+    });
+
+    @if($deleteUrl)
+    document.getElementById("{{ $id }}").addEventListener("click", function(e){
+        const btn = e.target.closest(".delete-btn");
+        if(!btn) return;
+
+        const id = btn.dataset.id;
+
+        if(confirm("Удалить запись?")){
+            fetch("{{ $deleteUrl }}/" + id, {
+                method: "DELETE",
+                headers: {
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                    "Accept": "application/json",
+                },
+            })
+            .then(res => res.json())
+            .then(res => {
+                if(res.success){
+                    table.replaceData();
                 }
             });
-
-        });
+        }
+    });
     @endif
 
 });

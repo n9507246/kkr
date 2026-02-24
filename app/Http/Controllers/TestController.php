@@ -11,7 +11,17 @@ class TestController extends Controller
      */
     public function __invoke(Request $request)
     {
-        $users = \App\Models\User::select('name', 'email')->get()->toArray();
-        return view('test', compact('users'));
+        if ($request->ajax()) {
+            $query = \App\Models\KadastrovieObekti::query()->with(['poruchenie', 'vidiRabot', 'tipObekta']);
+
+            $perPage = $request->size ?? 10;
+
+            $data = $query->paginate($perPage);
+            return response()->json([
+                'data' => $data->items(),
+                'last_page' => $data->lastPage(),
+            ]);
+        }
+        return view('test');
     }
 }
