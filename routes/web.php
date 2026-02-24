@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ObektiNedvizhimocti;
 use App\Http\Controllers\PorucheniyaUrr;
 
-Route::get('/test', App\Http\Controllers\TestController::class)->name('test.index');
+Route::get('/test', App\Http\Controllers\TestController::class)->name('test');
 
 Route::middleware(['auth'])->group(function () {
 

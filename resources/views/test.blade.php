@@ -4,7 +4,9 @@
 <div>
     <x-tabulator-table
         id="users-table"
-        ajax-url="{{ route('test.index') }}"
+        ajax-url="{{ route('test') }}"
+        edit-url="{{ route('test') }}"
+        delete-url="{{ route('test') }}"
         :columns="[
             ['title' => 'Кададстровый номер', 'field' => 'kadastroviy_nomer'],
             ['title' => 'Исполнитель', 'field' => 'ispolnitel'],
@@ -12,9 +14,7 @@
             ['title' => 'Вид работ','field' => 'vidi_rabot.nazvanie'],
             ['title' => 'Вид работ','field' => 'kommentariy'],
         ]"
-        :debug=true
-        {{-- edit-url="{{ route('users.edit', '') }}"
-        delete-url="{{ route('users.destroy', '') }}" --}}
+        {{-- :debug=true --}}
     />
 </div>
 @endsection

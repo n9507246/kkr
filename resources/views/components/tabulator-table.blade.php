@@ -17,14 +17,16 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
 
-    const defaultMinWidth = 200;
+    const defaultMinWidth = 120;
     const defaultMaxWidth = 300;
 
-    let preparedColumns = @json($columns).map(col => ({
-        minWidth: defaultMinWidth,
-        maxWidth: defaultMaxWidth,
-        ...col,
-    }));
+    let preparedColumns = @json($columns).map(col => {
+        return {
+            ...col,
+            minWidth: col.minWidth ?? defaultMinWidth,
+            maxWidth: col.maxWidth ?? defaultMaxWidth,
+        };
+    });
 
 
     const table = new Tabulator("#{{ $id }}", {
@@ -36,6 +38,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
         pagination: true,
         paginationMode: "remote",
+        paginationSizeSelector: [10, 20, 50, 100],
+        paginationCounter: "rows",
+
         sortMode: "remote",
         filterMode: "remote",
 
@@ -63,7 +68,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 field: "actions",
                 headerSort: false,
                 hozAlign: "center",
-                width: 160,
+                width: 120,
+                frozen: true,
                 formatter: function(cell){
                     const row = cell.getRow().getData();
                     let buttons = '';
@@ -91,6 +97,33 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             @endif
         ],
+        locale: "ru",
+        langs: {
+            "ru": {
+                "ajax": {
+                    "loading": "Загрузка...",
+                    "error": "Ошибка загрузки"
+                },
+                "pagination": {
+                    "page_size": "Показать",
+                    "first": "<<",
+                    "first_title": "Первая страница",
+                    "last": ">>",
+                    "last_title": "Последняя страница",
+                    "prev": "<",
+                    "prev_title": "Предыдущая страница",
+                    "next": ">",
+                    "next_title": "Следующая страница",
+                    "all": "Все",
+                    "counter": {
+                        "showing": "Показано",
+                        "of": "из",
+                        "rows": "записей",
+                        "pages": "страниц"
+                    }
+                }
+            }
+        },
     });
 
     @if($deleteUrl)

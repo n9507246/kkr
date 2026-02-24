@@ -8,7 +8,7 @@
     #report-table { border-radius: 8px; overflow: hidden; border: 1px solid #eaecf0; width: 100%; }
     .tabulator-header { text-transform: uppercase; font-size: 0.75rem !important; background-color: #f8f9fa !important; }
     .tabulator-cell { font-size: 0.85rem !important; vertical-align: middle !important; }
-    
+
     /* Стили выпадающего списка колонок */
     .dropdown-menu { max-height: 500px !important; overflow-y: auto; min-width: 180px !important;  padding: 12px; z-index: 1060; max-height: 250px !important;}
     .dropdown-item-checkbox { padding: 6px 10px; border-radius: 4px; transition: background 0.2s; cursor: pointer; display: flex; align-items: center; }
@@ -212,7 +212,7 @@ document.addEventListener("DOMContentLoaded", function() {
         persistenceID: "realEstateTable_vFinal",
 
         ajaxURL: "{{ url()->current() }}",
-        ajaxSorting: true, // ВКЛЮЧАЕМ СЕРВЕРНУЮ СОРТИРОВКУ
+        ajaxSorting: true,
         sortMode: "remote", // Добавьте эту строку в конфиг
         pagination: "remote",
         paginationMode: "remote",
@@ -239,7 +239,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 last_row: response.total || 0
             };
         },
-        
+
         langs: {
             "ru": {
                 "ajax": {
@@ -266,13 +266,13 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             }
         },
-        
+
         columns: [
             // Кадастровый номер
-            { 
-                title: "Кадастровый номер", 
-                field: "kadastroviy_nomer", 
-                minWidth: 200, 
+            {
+                title: "Кадастровый номер",
+                field: "kadastroviy_nomer",
+                minWidth: 200,
                 frozen: true,
                 sorter: "string", // Добавляем сортировку
                 formatter: (cell) => {
@@ -292,16 +292,16 @@ document.addEventListener("DOMContentLoaded", function() {
             },
 
             // Входящие реквизиты
-            { 
-                title: "Вх. номер", 
-                field: "poruchenie.vhod_nomer", 
+            {
+                title: "Вх. номер",
+                field: "poruchenie.vhod_nomer",
                 minWidth: 120,
                 sorter: "string", // Добавляем сортировку
                 formatter: (cell) => cell.getValue() || "-"
             },
-            { 
-                title: "Вх. дата", 
-                field: "poruchenie.vhod_data", 
+            {
+                title: "Вх. дата",
+                field: "poruchenie.vhod_data",
                 minWidth: 120,
                 sorter: "date", // Сортировка по дате
                 sorterParams: {
@@ -314,9 +314,9 @@ document.addEventListener("DOMContentLoaded", function() {
             },
 
             // Реквизиты УРР
-            { 
-                title: "Номер УРР", 
-                field: "poruchenie.urr_nomer", 
+            {
+                title: "Номер УРР",
+                field: "poruchenie.urr_nomer",
                 minWidth: 120,
                 sorter: "string", // Добавляем сортировку
                 formatter: function(cell) {
@@ -325,9 +325,9 @@ document.addEventListener("DOMContentLoaded", function() {
                     return `<a href="/porucheniya-urr/${d.poruchenie.id}/redaktirovat-poruchenie" class="text-decoration-none">${d.poruchenie.urr_nomer || ' '}</a>`;
                 }
             },
-            { 
-                title: "Дата УРР", 
-                field: "poruchenie.urr_data", 
+            {
+                title: "Дата УРР",
+                field: "poruchenie.urr_data",
                 minWidth: 120,
                 sorter: "date", // Сортировка по дате
                 sorterParams: {
@@ -340,26 +340,26 @@ document.addEventListener("DOMContentLoaded", function() {
             },
 
             // Вид работ
-            { 
-                title: "Тип работ", 
-                field: "vidi_rabot.nazvanie", 
+            {
+                title: "Тип работ",
+                field: "vidi_rabot.nazvanie",
                 minWidth: 150,
                 sorter: "string", // Добавляем сортировку
                 formatter: (cell) => cell.getValue() || "-"
             },
 
             // Исполнитель
-            { 
-                title: "Исполнитель", 
-                field: "ispolnitel", 
+            {
+                title: "Исполнитель",
+                field: "ispolnitel",
                 minWidth: 150,
                 sorter: "string" // Добавляем сортировку
             },
 
             // Дата завершения
-            { 
-                title: "Дата заверш.", 
-                field: "data_zaversheniya", 
+            {
+                title: "Дата заверш.",
+                field: "data_zaversheniya",
                 minWidth: 130,
                 sorter: "date", // Сортировка по дате
                 sorterParams: {
@@ -372,21 +372,21 @@ document.addEventListener("DOMContentLoaded", function() {
             },
 
             // Комментарий
-            { 
-                title: "Комментарии", 
-                field: "kommentariy", 
-                minWidth: 300, 
+            {
+                title: "Комментарии",
+                field: "kommentariy",
+                minWidth: 300,
                 widthGrow: 2,
                 sorter: "string" // Добавляем сортировку
             },
 
             // Действия (без сортировки)
-            { 
-                title: "Действия", 
-                field: "id", 
-                width: 100, 
+            {
+                title: "Действия",
+                field: "id",
+                width: 100,
                 headerSort: false, // Отключаем сортировку для действий
-                hozAlign: "center", 
+                hozAlign: "center",
                 frozen: true,
                 formatter: function(cell) {
                     const id = cell.getValue();
