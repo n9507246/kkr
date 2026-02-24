@@ -8,7 +8,7 @@
     #report-table { border-radius: 8px; overflow: hidden; border: 1px solid #eaecf0; width: 100%; }
     .tabulator-header { text-transform: uppercase; font-size: 0.75rem !important; background-color: #f8f9fa !important; }
     .tabulator-cell { font-size: 0.85rem !important; vertical-align: middle !important; }
-    /* .spisok-polonok { max-height: 500px !important;  } */
+    
     /* Стили выпадающего списка колонок */
     .dropdown-menu { max-height: 500px !important; overflow-y: auto; min-width: 180px !important;  padding: 12px; z-index: 1060; max-height: 250px !important;}
     .dropdown-item-checkbox { padding: 6px 10px; border-radius: 4px; transition: background 0.2s; cursor: pointer; display: flex; align-items: center; }
@@ -29,7 +29,7 @@
     }
 
     #filter-panel.show {
-        max-height: 500px; /* С запасом для контента */
+        max-height: 500px;
         opacity: 1;
         margin-bottom: 1.5rem;
         pointer-events: auto;
@@ -71,75 +71,75 @@
     </div>
 
     <!-- ПАНЕЛЬ ФИЛЬТРОВ -->
-        <div id="filter-panel" class="card border-0 shadow-sm">
-            <div class="card-body bg-light border-bottom">
-                <form id="filter-form" class="row g-3">
-                    <!-- Ряд 1 -->
-                        <div class="col-md-3">
-                            <label class="form-label small text-muted fw-bold">Кадастровый номер</label>
-                            <input type="text" name="cadastral_number" class="form-control form-control-sm" placeholder="Введите номер...">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label small text-muted fw-bold">Тип объекта</label>
-                            <select name="tip_obekta_id" class="form-select form-select-sm">
-                                <option value="">Все</option>
-                                @foreach($tipyObektov as $tip)
-                                    <option value="{{ $tip->id }}">{{ $tip->abbreviatura }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label small text-muted fw-bold">Вид работ</label>
-                            <select name="vid_rabot_id" class="form-select form-select-sm">
-                                <option value="">Все</option>
-                                @foreach($vidiRabot as $vid)
-                                    <option value="{{ $vid->id }}">{{ $vid->nazvanie }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label small text-muted fw-bold">Исполнитель</label>
-                            <input type="text" name="ispolnitel" class="form-control form-control-sm" placeholder="Введите имя...">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label small text-muted fw-bold">Дата завершения</label>
-                            <div class="input-group input-group-sm">
-                                <input type="date" name="completion_date_start" class="form-control" placeholder="С">
-                                <span class="input-group-text px-1">-</span>
-                                <input type="date" name="completion_date_end" class="form-control" placeholder="По">
-                            </div>
-                        </div>
+    <div id="filter-panel" class="card border-0 shadow-sm">
+        <div class="card-body bg-light border-bottom">
+            <form id="filter-form" class="row g-3">
+                <!-- Ряд 1 -->
+                <div class="col-md-3">
+                    <label class="form-label small text-muted fw-bold">Кадастровый номер</label>
+                    <input type="text" name="cadastral_number" class="form-control form-control-sm" placeholder="Введите номер...">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small text-muted fw-bold">Тип объекта</label>
+                    <select name="tip_obekta_id" class="form-select form-select-sm">
+                        <option value="">Все</option>
+                        @foreach($tipyObektov as $tip)
+                            <option value="{{ $tip->id }}">{{ $tip->abbreviatura }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small text-muted fw-bold">Вид работ</label>
+                    <select name="vid_rabot_id" class="form-select form-select-sm">
+                        <option value="">Все</option>
+                        @foreach($vidiRabot as $vid)
+                            <option value="{{ $vid->id }}">{{ $vid->nazvanie }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small text-muted fw-bold">Исполнитель</label>
+                    <input type="text" name="ispolnitel" class="form-control form-control-sm" placeholder="Введите имя...">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small text-muted fw-bold">Дата завершения</label>
+                    <div class="input-group input-group-sm">
+                        <input type="date" name="completion_date_start" class="form-control" placeholder="С">
+                        <span class="input-group-text px-1">-</span>
+                        <input type="date" name="completion_date_end" class="form-control" placeholder="По">
+                    </div>
+                </div>
 
-                    <!-- Ряд 2 -->
-                        <div class="col-md-2">
-                            <label class="form-label small text-muted fw-bold">Вх. номер</label>
-                            <input type="text" name="incoming_number" class="form-control form-control-sm" placeholder="Номер">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label small text-muted fw-bold">Вх. дата</label>
-                            <input type="date" name="incoming_date" class="form-control form-control-sm">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label small text-muted fw-bold">Номер УРР</label>
-                            <input type="text" name="urr_number" class="form-control form-control-sm" placeholder="Номер УРР">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label small text-muted fw-bold">Дата УРР</label>
-                            <input type="date" name="urr_date" class="form-control form-control-sm">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small text-muted fw-bold">Комментарий</label>
-                            <input type="text" name="comment" class="form-control form-control-sm" placeholder="Поиск по тексту...">
-                        </div>
+                <!-- Ряд 2 -->
+                <div class="col-md-2">
+                    <label class="form-label small text-muted fw-bold">Вх. номер</label>
+                    <input type="text" name="incoming_number" class="form-control form-control-sm" placeholder="Номер">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small text-muted fw-bold">Вх. дата</label>
+                    <input type="date" name="incoming_date" class="form-control form-control-sm">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small text-muted fw-bold">Номер УРР</label>
+                    <input type="text" name="urr_number" class="form-control form-control-sm" placeholder="Номер УРР">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small text-muted fw-bold">Дата УРР</label>
+                    <input type="date" name="urr_date" class="form-control form-control-sm">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small text-muted fw-bold">Комментарий</label>
+                    <input type="text" name="comment" class="form-control form-control-sm" placeholder="Поиск по тексту...">
+                </div>
 
-                    <!-- Кнопки -->
-                        <div class="col-12 text-end mt-2">
-                            <button type="button" id="reset-filters" class="btn btn-light btn-sm border me-2">Сбросить</button>
-                            <button type="submit" class="btn btn-primary btn-sm px-4">Найти</button>
-                        </div>
-                </form>
-            </div>
+                <!-- Кнопки -->
+                <div class="col-12 text-end mt-2">
+                    <button type="button" id="reset-filters" class="btn btn-light btn-sm border me-2">Сбросить</button>
+                    <button type="submit" class="btn btn-primary btn-sm px-4">Найти</button>
+                </div>
+            </form>
         </div>
+    </div>
 
     <div id="report-table"></div>
 </div>
@@ -172,7 +172,6 @@ document.addEventListener("DOMContentLoaded", function() {
                     if (data[key]) hasActiveFilters = true;
                 }
             });
-            // Если есть активные фильтры, открываем панель, чтобы пользователь видел контекст
             if (hasActiveFilters) {
                 shouldOpenPanel = true;
             }
@@ -190,8 +189,6 @@ document.addEventListener("DOMContentLoaded", function() {
         const isOpen = filterPanel.classList.toggle('show');
         this.classList.toggle('active', isOpen);
         localStorage.setItem(visibilityKey, isOpen);
-
-        // Небольшая задержка, чтобы таблица пересчитала высоту после анимации
         setTimeout(() => {
             if(typeof table !== 'undefined') table.redraw();
         }, 450);
@@ -204,7 +201,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    // 2. ИНИЦИАЛИЗАЦИЯ ТАБЛИЦЫ
+    // 2. ИНИЦИАЛИЗАЦИЯ ТАБЛИЦЫ С СОРТИРОВКОЙ
     const table = new Tabulator("#report-table", {
         height: "78vh",
         layout: "fitColumns",
@@ -215,6 +212,8 @@ document.addEventListener("DOMContentLoaded", function() {
         persistenceID: "realEstateTable_vFinal",
 
         ajaxURL: "{{ url()->current() }}",
+        ajaxSorting: true, // ВКЛЮЧАЕМ СЕРВЕРНУЮ СОРТИРОВКУ
+        sortMode: "remote", // Добавьте эту строку в конфиг
         pagination: "remote",
         paginationMode: "remote",
         paginationSize: 20,
@@ -223,11 +222,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
         ajaxParams: function() {
             const form = document.getElementById("filter-form");
-            return form ? Object.fromEntries(new FormData(form).entries()) : {};
+            const params = form ? Object.fromEntries(new FormData(form).entries()) : {};
+            console.log("Параметры запроса:", params);
+            return params;
         },
 
         ajaxResponse: function(url, params, response) {
-            // Обновляем счетчик количества записей
             console.log("Ответ сервера:", response);
             const countElement = document.getElementById('total-count');
             if (countElement) {
@@ -239,91 +239,155 @@ document.addEventListener("DOMContentLoaded", function() {
                 last_row: response.total || 0
             };
         },
-        // Русская локализация
-            langs: {
-                "ru": {
-                    "ajax": {
-                        "loading": "Загрузка...",
-                        "error": "Ошибка загрузки"
-                    },
-                    "pagination": {
-                        "page_size": "Показать",
-                        "first": "Первая",
-                        "first_title": "Первая страница",
-                        "last": "Последняя",
-                        "last_title": "Последняя страница",
-                        "prev": "Предыдущая",
-                        "prev_title": "Предыдущая страница",
-                        "next": "Следующая",
-                        "next_title": "Следующая страница",
-                        "all": "Все",
-                        "counter": {
-                            "showing": "Показано",
-                            "of": "из",
-                            "rows": "записей",
-                            "pages": "страниц"
-                        }
+        
+        langs: {
+            "ru": {
+                "ajax": {
+                    "loading": "Загрузка...",
+                    "error": "Ошибка загрузки"
+                },
+                "pagination": {
+                    "page_size": "Показать",
+                    "first": "Первая",
+                    "first_title": "Первая страница",
+                    "last": "Последняя",
+                    "last_title": "Последняя страница",
+                    "prev": "Предыдущая",
+                    "prev_title": "Предыдущая страница",
+                    "next": "Следующая",
+                    "next_title": "Следующая страница",
+                    "all": "Все",
+                    "counter": {
+                        "showing": "Показано",
+                        "of": "из",
+                        "rows": "записей",
+                        "pages": "страниц"
                     }
                 }
-            },
+            }
+        },
+        
         columns: [
             // Кадастровый номер
-            { title: "Кадастровый номер", field: "kadastroviy_nomer", minWidth: 200, frozen: true,
+            { 
+                title: "Кадастровый номер", 
+                field: "kadastroviy_nomer", 
+                minWidth: 200, 
+                frozen: true,
+                sorter: "string", // Добавляем сортировку
                 formatter: (cell) => {
                     const d = cell.getData();
                     return `<a href="/obekti-nedvizhimosti/${d.id}/redaktirovat-obekt" class="text-primary fw-bold text-decoration-none">${d.kadastroviy_nomer || '-'}</a>`;
                 }
             },
 
-            // Тип объекта (используем аббревиатуру из справочника + подсказка)
+            // Тип объекта
             {
                 title: "Тип",
                 field: "tip_obekta.abbreviatura",
                 minWidth: 80,
                 hozAlign: "center",
+                sorter: "string", // Добавляем сортировку
                 tooltip: (cell) => cell.getData().tip_obekta?.nazvanie || ""
             },
 
-            // Входящие реквизиты из связи poruchenie
-            { title: "Вх. номер", field: "poruchenie.vhod_nomer", minWidth: 120,
+            // Входящие реквизиты
+            { 
+                title: "Вх. номер", 
+                field: "poruchenie.vhod_nomer", 
+                minWidth: 120,
+                sorter: "string", // Добавляем сортировку
                 formatter: (cell) => cell.getValue() || "-"
             },
-            { title: "Вх. дата", field: "poruchenie.vhod_data", minWidth: 120,
-                formatter: (cell) => cell.getValue() || "-"
+            { 
+                title: "Вх. дата", 
+                field: "poruchenie.vhod_data", 
+                minWidth: 120,
+                sorter: "date", // Сортировка по дате
+                sorterParams: {
+                    format: "YYYY-MM-DD"
+                },
+                formatter: (cell) => {
+                    const val = cell.getValue();
+                    return val ? new Date(val).toLocaleDateString('ru-RU') : "-";
+                }
             },
 
             // Реквизиты УРР
-            { title: "Номер УРР", field: "poruchenie.urr_nomer", minWidth: 120,
+            { 
+                title: "Номер УРР", 
+                field: "poruchenie.urr_nomer", 
+                minWidth: 120,
+                sorter: "string", // Добавляем сортировку
                 formatter: function(cell) {
                     const d = cell.getData();
                     if (!d.poruchenie) return "-";
                     return `<a href="/porucheniya-urr/${d.poruchenie.id}/redaktirovat-poruchenie" class="text-decoration-none">${d.poruchenie.urr_nomer || ' '}</a>`;
                 }
             },
-            { title: "Дата УРР", field: "poruchenie.urr_data", minWidth: 120,
+            { 
+                title: "Дата УРР", 
+                field: "poruchenie.urr_data", 
+                minWidth: 120,
+                sorter: "date", // Сортировка по дате
+                sorterParams: {
+                    format: "YYYY-MM-DD"
+                },
+                formatter: (cell) => {
+                    const val = cell.getValue();
+                    return val ? new Date(val).toLocaleDateString('ru-RU') : "-";
+                }
+            },
+
+            // Вид работ
+            { 
+                title: "Тип работ", 
+                field: "vidi_rabot.nazvanie", 
+                minWidth: 150,
+                sorter: "string", // Добавляем сортировку
                 formatter: (cell) => cell.getValue() || "-"
             },
 
-            // Вид работ (из справочника vidi_rabot)
-            { title: "Тип работ", field: "vidi_rabot.nazvanie", minWidth: 150,
-                formatter: (cell) => cell.getValue() || "-"
+            // Исполнитель
+            { 
+                title: "Исполнитель", 
+                field: "ispolnitel", 
+                minWidth: 150,
+                sorter: "string" // Добавляем сортировку
             },
 
-            { title: "Исполнитель", field: "ispolnitel", minWidth: 150 },
-
-            // Дата завершения с форматированием
-            { title: "Дата заверш.", field: "data_zaversheniya", minWidth: 130,
+            // Дата завершения
+            { 
+                title: "Дата заверш.", 
+                field: "data_zaversheniya", 
+                minWidth: 130,
+                sorter: "date", // Сортировка по дате
+                sorterParams: {
+                    format: "YYYY-MM-DD"
+                },
                 formatter: function(cell) {
                     const val = cell.getValue();
                     return val ? new Date(val).toLocaleDateString('ru-RU') : "-";
                 }
             },
 
-            // Комментарий (исправлено поле с komentarii на kommentariy)
-            { title: "Комментарии", field: "kommentariy", minWidth: 300, widthGrow: 2 },
+            // Комментарий
+            { 
+                title: "Комментарии", 
+                field: "kommentariy", 
+                minWidth: 300, 
+                widthGrow: 2,
+                sorter: "string" // Добавляем сортировку
+            },
 
-            // Действия
-            { title: "Действия", field: "id", width: 100, headerSort: false, hozAlign: "center", frozen: true,
+            // Действия (без сортировки)
+            { 
+                title: "Действия", 
+                field: "id", 
+                width: 100, 
+                headerSort: false, // Отключаем сортировку для действий
+                hozAlign: "center", 
+                frozen: true,
                 formatter: function(cell) {
                     const id = cell.getValue();
                     return `
@@ -355,8 +419,8 @@ document.addEventListener("DOMContentLoaded", function() {
             const isVisible = column.isVisible();
 
             div.innerHTML = `
-                <input type="checkbox" id="check_${def.field}" ${isVisible ? "checked" : ""}>
-                <label for="check_${def.field}">${def.title}</label>
+                <input type="checkbox" id="check_${def.field.replace(/\./g, '_')}" ${isVisible ? "checked" : ""}>
+                <label for="check_${def.field.replace(/\./g, '_')}">${def.title}</label>
             `;
 
             div.querySelector("input").addEventListener("change", function() {
@@ -364,8 +428,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 else column.hide();
 
                 updateHiddenCount();
-
-                // Пересчет ширины после скрытия/показа
                 setTimeout(() => table.redraw(true), 10);
             });
             container.appendChild(div);
@@ -387,7 +449,6 @@ document.addEventListener("DOMContentLoaded", function() {
     filterForm.addEventListener("submit", (e) => {
         e.preventDefault();
 
-        // Сохраняем текущее состояние фильтров
         const formData = new FormData(filterForm);
         const data = {};
         formData.forEach((value, key) => {

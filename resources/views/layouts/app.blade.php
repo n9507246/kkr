@@ -14,6 +14,12 @@
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
+    <!-- Luxon для Tabulator (ОБЯЗАТЕЛЬНО для сортировки дат) -->
+    <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4/build/global/luxon.min.js"></script>
+
+    <!-- Tabulator CSS (используем Bootstrap 5 тему) -->
+    <link href="https://unpkg.com/tabulator-tables@6.2.1/dist/css/tabulator_bootstrap5.min.css" rel="stylesheet">
+
     <style>
         /* ===================================================
            БАЗА
@@ -113,6 +119,34 @@
                 max-width: 150rem;
             }
         }
+
+        /* Дополнительные стили для Tabulator */
+        .tabulator {
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .tabulator-header {
+            background-color: #f8fafc !important;
+            color: #334155;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+        }
+        
+        .tabulator-row {
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .tabulator-row:hover {
+            background-color: #f1f5f9;
+        }
+        
+        .tabulator-cell {
+            padding: 12px 8px;
+        }
     </style>
 
     @stack('styles')
@@ -141,16 +175,26 @@
                 </div>
             @endif
 
+            @if(session('warning'))
+                <div class="alert alert-warning alert-dismissible fade show">
+                    {{ session('warning') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
+
             @yield('content')
         </div>
     </div>
 </div>
 
+<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<link href="https://unpkg.com/tabulator-tables@5.5.0/dist/css/tabulator_bootstrap5.min.css" rel="stylesheet">
-<script src="https://unpkg.com/tabulator-tables@5.5.0/dist/js/tabulator.min.js"></script>
-<script type="text/javascript" src="https://unpkg.com/tabulator-tables@5.5.0/dist/js/tabulator.min.js"></script>
+<!-- Luxon уже подключен в HEAD, но для надежности можно и здесь -->
+<script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4/build/global/luxon.min.js"></script>
+
+<!-- Tabulator JS (только один раз!) -->
+<script src="https://unpkg.com/tabulator-tables@6.2.1/dist/js/tabulator.min.js"></script>
 
 @stack('scripts')
 
