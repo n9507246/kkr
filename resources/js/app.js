@@ -105,6 +105,38 @@ export function create_smart_table(properties) {
     }
 
     tableConfig.columns = columnsList;
+    
+    //-------- РУССКИЙ ЯЗЫК -----------------
+
+    tableConfig.locale = "ru",
+    tableConfig.langs =  {
+            "ru": {
+                "ajax": {
+                    "loading": "Загрузка...",
+                    "error": "Ошибка загрузки"
+                },
+                "pagination": {
+                    "page_size": "Показать",
+                    "first": "<<",
+                    "first_title": "Первая страница",
+                    "last": ">>",
+                    "last_title": "Последняя страница",
+                    "prev": "<",
+                    "prev_title": "Предыдущая страница",
+                    "next": ">",
+                    "next_title": "Следующая страница",
+                    "all": "Все",
+                    "counter": {
+                        "showing": "Показано",
+                        "of": "из",
+                        "rows": "записей",
+                        "pages": "страниц"
+                    }
+                }
+            }
+        }
+
+    //---------------------------------------
 
     // Создаем таблицу
     const table = new Tabulator(`#${properties.id}`, tableConfig);
