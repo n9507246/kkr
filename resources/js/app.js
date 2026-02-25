@@ -16,7 +16,7 @@ const controllColumnVisiable = {
 
         // Получаем элемент с нашим выпадающим списком колонок
         this.contoll_visiable_columns = document.querySelector(
-            `[to-smart-table="${properties.id}"][role="controll_column_visiable"]`
+            `[to-smart-table="${this.table.getElement().id}"][role="controll_column_visiable"]`
         );
     
         // Если элемент не найден - выводим предупреждение и завершаем инициализацию
@@ -26,8 +26,8 @@ const controllColumnVisiable = {
         }
         
         // Сохраняем состояние при изменениях колонок
-        this.table.on("columnMoved", () => this.saveColumnState());                 // При перемещении
-        this.table.on("columnResized", () => this.saveColumnState());               // При изменении размера
+        // this.table.on("columnMoved", () => this.saveColumnState());                 // При перемещении
+        // this.table.on("columnResized", () => this.saveColumnState());               // При изменении размера
         this.table.on("columnVisibilityChanged", () => this.saveColumnState());     // При изменении видимости
         
         // Инициализация после построения таблицы
@@ -79,7 +79,7 @@ const controllColumnVisiable = {
             const columnParams = tableColumn.getDefinition();  // Получаем параметры колонки
             
             // Пропускаем служебные колонки (id и действия)
-            if (!columnParams.title || columnParams.field === 'id' || columnParams.field === 'actions') return;
+            // if (!columnParams.title || columnParams.field === 'id' || columnParams.field === 'actions') return;
             
             // Создаем безопасное имя поля для использования в HTML-идентификаторах (заменяем точки на подчеркивания)
             const fieldName = columnParams.field.replace(/\./g, '_');
@@ -99,7 +99,7 @@ const controllColumnVisiable = {
                 }
                 
                 // Сохраняем состояние после изменения
-                this.saveColumnState();
+                // this.saveColumnState();
                 
                 // Перерисовываем таблицу с небольшой задержкой
                 setTimeout(() => this.table.redraw(true), 10);
@@ -184,17 +184,14 @@ const controllColumnVisiable = {
         
         // Показываем все колонки
         this.table.getColumns().forEach(column => {
-            const def = column.getDefinition();
-            if (def.title && def.field !== 'id' && def.field !== 'actions') {
-                column.show();
-            }
+            column.show();
         });
         
         // Обновляем чекбоксы (пересоздаем их)
         this.createColumnCheckboxes(this.table.getColumns());
         
         // Сохраняем новое состояние (все колонки видимы)
-        this.saveColumnState();
+        // this.saveColumnState();
         
         // Перерисовываем таблицу
         setTimeout(() => this.table.redraw(true), 50);
