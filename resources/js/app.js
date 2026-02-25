@@ -6,12 +6,13 @@ Alpine.start();
 
 export function create_smart_table(properties) {
 
-    // Определяем конфиг таблицы и устанавливаем некоторые поля
+    // Проверяем установлен ли id блока div для таблицы
     if (properties.debug && !properties.id) {
         console.warn(`CREATE_SMART_TABLE: Таблица не будет создана так как не указан id блока(div) в котором будет таблица`)
         return false;
     }
 
+    //основные параметры
     const tableConfig = {
         height: properties.height ?? '400px',
         layout: "fitColumns",
@@ -24,39 +25,56 @@ export function create_smart_table(properties) {
         filterMode: "remote",
     }
 
-    if (!properties.ajaxURL) console.warn('CREATE_SMART_TABLE: не указан URL для AJAX запроса, в таблице не будут отображаться строки')
-    tableConfig.ajaxURL = properties.ajaxURL,
-    tableConfig.ajaxResponse = function(url, params, response) {
-        if (properties.debug)
-            console.log('ajaxResponse', response);
-        return { data: response.data, last_page: response.last_page };
-    }
+    //---------- AJAX -------------
+        
+        //проверяем параметр ajaxURL и устанавливаем адрес и тип ответа
+        if (properties.ajaxURL){ 
+            
+            //URL с которого должны прийте данные таблицы
+            tableConfig.ajaxURL = properties.ajaxURL,
 
-    // Ключ для localStorage
-    const storageKey = `tabulator-${properties.id}-columns`;
-    
-    // Загружаем сохраненное состояние
-    let savedState = {};
-    try {
-        savedState = JSON.parse(localStorage.getItem(storageKey) || "{}");
-        if (properties.debug) console.log('Загруженное состояние:', savedState);
-    } catch (e) {
-        console.warn('Ошибка загрузки состояния колонок:', e);
-    }
+            // Тип ответа от серавера - сопоставляем JSON от сервера с полями таблицы
+            tableConfig.ajaxResponse = function(url, params, response) {
+                if (properties.debug)
+                    console.log('ajaxResponse', response);
+                return { data: response.data, last_page: response.last_page };
+            }
+        }     
 
-    // Формируем колонки с учетом сохраненного состояния
+        //если параметр ajaxURL не установлен выводим предупреждение
+        else{ 
+            console.warn('CREATE_SMART_TABLE: не указан URL для AJAX запроса, в таблице не будут отображаться строки')
+        }
+    //-------------------------------
+
+
+    //---------- Колонки ------------
+
+    // инициализируем список колонок
     let columnsList = [];
-    if (properties.columns) {
-        columnsList = properties.columns.map(col => ({
-            widthGrow: 1,
-            minWidth: 120,
+    // состояние видимости колонок хранится в localStorage 
+    const visiableStateColumns = JSON.parse(localStorage.getItem(`tabulator-${properties.id}-columns`) || "{}");
+
+    // Формируем колонки с унаказиние дополнительных параметров
+    if (properties.columns) { columnsList = properties.columns.map(col => (
+        {
+            // минимальная ширина колонки
+            minWidth: 120,    
+
+            // колонки всегда растягиваются (одинаково)
+            widthGrow: 1,     
+
+            // устанавливаем видимость колонки(информация из localStorage)
+            visible: visiableStateColumns[col.field] !== undefined ? visiableStateColumns[col.field] : true, 
+
+            // остальные параметры из колонки
             ...col,
-            // Используем сохраненное состояние, если оно есть
-            visible: savedState[col.field] !== undefined ? savedState[col.field] : true
-        }));
-    } else {
-        console.warn('CREATE_SMART_TABLE: Таблица не будет корректно отображаться т.к. не указаны колонки для таблицы')
-    }
+        }
+    ));
+    } 
+    //если пользователь не установил список колонок выводим ошибку
+    else console.warn('CREATE_SMART_TABLE: Таблица не будет корректно отображаться т.к. не указаны колонки для таблицы')
+    
 
     // Добавляем колонку действий
     if (properties.editUrl || properties.deleteUrl) {
@@ -106,7 +124,7 @@ export function create_smart_table(properties) {
                 }
             });
             
-            localStorage.setItem(storageKey, JSON.stringify(state));
+            localStorage.setItem(`tabulator-${properties.id}-columns`, JSON.stringify(state));
             
             if (properties.debug) {
                 console.log('Сохраненное состояние колонок:', state);
@@ -181,7 +199,7 @@ export function create_smart_table(properties) {
             if (resetBtn) {
                 resetBtn.addEventListener("click", function() {
                     // Очищаем сохраненное состояние
-                    localStorage.removeItem(storageKey);
+                    localStorage.removeItem(`tabulator-${properties.id}-columns`);
                     
                     // Показываем все колонки
                     table.getColumns().forEach(column => {
@@ -207,5 +225,6 @@ export function create_smart_table(properties) {
         table.on("columnResized", saveColumnState);
         table.on("columnVisibilityChanged", saveColumnState);
     }
+
     return table;
 }
