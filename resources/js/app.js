@@ -165,6 +165,15 @@ export function create_smart_table(properties) {
 
         // Функция обновления чекбоксов
         function updateColumnCheckboxes() {
+
+            const element = document.querySelector('[to-smart-table="test-smart-table"][role="controll_column_visiable"]');
+            if (element) {
+                element.style.display = 'block';
+                console.log('Элемент найден по селектору');
+            } else {
+                console.log('Элемент не найден');
+            }
+
             const container = document.getElementById("columnCheckboxes");
             if (!container) return;
             
