@@ -8,7 +8,7 @@
 
 @push('scripts')
 <script  type="module">
-     import { create_smart_table, eeeeeeeee } from '{{ Vite::asset('resources/js/app.js') }}';
+     import { create_smart_table} from '{{ Vite::asset('resources/js/app.js') }}';
     document.addEventListener('DOMContentLoaded', function() {
  
             create_smart_table({

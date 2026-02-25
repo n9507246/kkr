@@ -143,7 +143,5 @@
     .dropdown-item-checkbox input { cursor: pointer; margin-right: 12px; width: 16px; height: 16px; }
     .dropdown-item-checkbox label { cursor: pointer; flex: 1; margin: 0; font-size: 0.9rem; user-select: none; }
     .tabulator-page-size {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
+        padding: 5px 25px 5px 10px !important;
 }
