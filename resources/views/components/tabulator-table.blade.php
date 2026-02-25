@@ -188,18 +188,3 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 @endpush
 
-
-<style>
-    /* Основные стили таблицы */
-    #report-table { border-radius: 8px; overflow: hidden; border: 1px solid #eaecf0; width: 100%; }
-    /* */.tabulator-header { text-transform: uppercase; font-size: 0.75rem !important; background-color: #f8f9fa !important; }
-    .tabulator-cell { font-size: 0.85rem !important; vertical-align: middle !important; }
-
-    /* Стили выпадающего списка колонок */
-    .dropdown-menu { max-height: 500px !important; overflow-y: auto; min-width: 180px !important;  padding: 0; z-index: 1060; max-height: 250px !important;}
-    .dropdown-item-checkbox { padding: 6px 10px; border-radius: 4px; transition: background 0.2s; cursor: pointer; display: flex; align-items: center; }
-    .dropdown-item-checkbox:hover { background-color: #f8f9fa; }
-    .dropdown-item-checkbox input { cursor: pointer; margin-right: 12px; width: 16px; height: 16px; }
-    .dropdown-item-checkbox label { cursor: pointer; flex: 1; margin: 0; font-size: 0.9rem; user-select: none; }
-
-</style>

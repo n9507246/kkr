@@ -1,3 +1,149 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+    /* ===================================================
+        БАЗА
+    =================================================== */
+    html, body {
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+    }
+
+    #layout {
+        display: flex;
+        height: 100vh;
+    }
+
+    /* ===================================================
+        CONTENT
+    =================================================== */
+    #content {
+        flex: 1;
+        height: 100vh;
+        overflow-y: auto;
+        background: #f1f5f9;
+    }
+
+    .content-wrapper {
+        width: 100%;
+        max-width: 100%;
+        padding-left: 2rem;
+        padding-right: 2rem;
+        padding-top: 1.5rem;
+    }
+
+    /* Скроллбар контента */
+    #content::-webkit-scrollbar {
+        width: 0.6rem;
+    }
+
+    #content::-webkit-scrollbar-track {
+        background: #e2e8f0;
+    }
+
+    #content::-webkit-scrollbar-thumb {
+        background: #b8c4d6;
+        border-radius: 1rem;
+    }
+
+    #content::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
+
+    /* ===================================================
+        БРЕЙКПОИНТЫ
+    =================================================== */
+    @media (min-width: 48rem) {
+        .content-wrapper {
+            padding-left: 3rem;
+            padding-right: 3rem;
+        }
+    }
+
+    @media (min-width: 64rem) {
+        .content-wrapper {
+            padding-left: 4rem;
+            padding-right: 4rem;
+        }
+    }
+
+    @media (min-width: 80rem) {
+        .content-wrapper {
+            max-width: 75rem;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    }
+
+    @media (min-width: 100rem) {
+        .content-wrapper {
+            max-width: 87.5rem;
+        }
+    }
+
+    @media (min-width: 120rem) {
+        .content-wrapper {
+            max-width: 100rem;
+        }
+    }
+
+    @media (min-width: 160rem) {
+        .content-wrapper {
+            max-width: 118.75rem;
+        }
+    }
+
+    @media (min-width: 240rem) {
+        .content-wrapper {
+            max-width: 150rem;
+        }
+    }
+
+    /* Дополнительные стили для Tabulator */
+    .tabulator {
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+    }
+    
+    .tabulator-header {
+        background-color: #f8fafc !important;
+        color: #334155;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+    }
+    
+    .tabulator-row {
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .tabulator-row:hover {
+        background-color: #f1f5f9;
+    }
+    
+    .tabulator-cell {
+        padding: 12px 8px;
+    }
+
+
+        /* Основные стили таблицы */
+    #report-table { border-radius: 8px; overflow: hidden; border: 1px solid #eaecf0; width: 100%; }
+    /* */.tabulator-header { text-transform: uppercase; font-size: 0.75rem !important; background-color: #f8f9fa !important; }
+    .tabulator-cell { font-size: 0.85rem !important; vertical-align: middle !important; }
+
+    /* Стили выпадающего списка колонок */
+    .dropdown-menu { max-height: 500px !important; overflow-y: auto; min-width: 180px !important;  padding: 0; z-index: 1060; max-height: 250px !important;}
+    .dropdown-item-checkbox { padding: 6px 10px; border-radius: 4px; transition: background 0.2s; cursor: pointer; display: flex; align-items: center; }
+    .dropdown-item-checkbox:hover { background-color: #f8f9fa; }
+    .dropdown-item-checkbox input { cursor: pointer; margin-right: 12px; width: 16px; height: 16px; }
+    .dropdown-item-checkbox label { cursor: pointer; flex: 1; margin: 0; font-size: 0.9rem; user-select: none; }
+    .tabulator-page-size {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
