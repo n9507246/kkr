@@ -55,7 +55,7 @@
     </div>
 </div>
 
-<!-- Bootstrap JS -->
+<!-- Bootstrap JS + Popper (только ОДИН раз) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <!-- Luxon для Tabulator -->
@@ -64,10 +64,9 @@
 <!-- Tabulator JS -->
 <script src="https://unpkg.com/tabulator-tables@6.2.1/dist/js/tabulator.min.js"></script>
 
-<!-- Vite JS - подключаем ПОСЛЕ всех скриптов, но ДО @stack('scripts') -->
+<!-- Vite JS -->
 @vite(['resources/js/app.js'])
 
-<!-- Стек скриптов - выполняется ПОСЛЕ загрузки всех скриптов -->
 @stack('scripts')
 
 </body>
