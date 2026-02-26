@@ -232,19 +232,18 @@ export function create_smart_table(properties) {
         return false;
     }
 
-    // Основные параметры таблицы
-    const tableConfig = {
-        height: properties.height ?? '400px',          // Высота таблицы
-        layout: "fitDataStretch",                           // Автоматическое распределение колонок
-        pagination: true,                               // Включаем пагинацию
-        paginationMode: "remote",                       // Серверная пагинация
-        paginationSize: 10,                             // Записей на странице
-        paginationSizeSelector: [10, 20, 50, 100],      // Возможные варианты записей на странице
-        paginationCounter: "rows",                      // Отображение счетчика записей
-        sortMode: "remote",                             // Серверная сортировка
-        filterMode: "remote",                           // Серверная фильтрация
-    }
+    const tableConfig = {}
+    tableConfig.height = properties.height ?? '400px',          // Высота таблицы
+    tableConfig.layout = "fitColumns",                          // Автоматическое распределение колонок
 
+    tableConfig.pagination = true,                              // Включаем пагинацию
+    tableConfig.paginationMode = "remote"                       // Серверная пагинация
+    tableConfig.paginationSize = 10                             // Записей на странице
+    tableConfig.paginationSizeSelector = [10, 20, 50, 100]      // Возможные варианты записей на странице
+    tableConfig.paginationCounter = "rows"                      // Отображение счетчика записей
+    tableConfig.sortMode = "remote"                             // Серверная сортировка
+    tableConfig.filterMode = "remote"                           // Серверная фильтрация
+    
     //---------- AJAX НАСТРОЙКИ -------------
         
     // Проверяем параметр ajaxURL и устанавливаем адрес и тип ответа
