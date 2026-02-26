@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Builder;
 
 class KadastrovieObekti extends Model
 {
@@ -47,4 +48,39 @@ class KadastrovieObekti extends Model
     {
         return $this->belongsTo(VneshniePorucheniya::class, 'poruchenie_id');
     }
+
+
+    public function sortVariants(Builder $query, array $sort)
+    {
+        match ($sort['field']) {
+
+            'kadastroviy_nomer' =>
+                $query->orderBy('kadastroviy_nomer', $sort['dir']),
+
+            'ispolnitel' =>
+                $query->orderBy('ispolnitel', $sort['dir']),
+
+            'vidi_rabot.nazvanie' =>
+                $query->orderBy(
+                    \App\Models\VidiRabot::select('nazvanie')
+                        ->whereColumn('vidi_rabot.id', 'kadastrovie_obekti.vid_rabot_id')
+                        ->limit(1),
+                    $sort['dir']
+                ),
+
+            default => null,
+        };
+    }
+
+    public function scopeSort(Builder $query, $sort_fields_list)
+    {
+        foreach ($sort_fields_list as $sort) {
+
+            $this->sortVariants($query, $sort);                    
+        }
+    }
+
+
 }
+
+
