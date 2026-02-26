@@ -8,10 +8,10 @@ const controllColumnVisiable = {
      */
     init: function(table) {
         this.table = table;
-
+        console.log(table)
         // Получаем элемент с нашим выпадающим списком колонок
         this.contoll_visiable_columns = document.querySelector(
-            `[to-smart-table="${this.table.getElement().id}"][role="controll_column_visiable"]`
+            `[to-smart-table="${this.table.element.id}"][role="controll_column_visiable"]`
         );
 
         // Если элемент не найден - выводим предупреждение и завершаем инициализацию
@@ -49,23 +49,23 @@ const controllColumnVisiable = {
      * @param {Array} tableColumnList - массив колонок таблицы
      */
     createColumnCheckboxes: function(tableColumnList) {
+        
         // Находим выпадающее меню (в нем будем создавать чекбоксы)
-        const columnList = this.contoll_visiable_columns.querySelector("#columnCheckboxes");
+        const columnList = this.contoll_visiable_columns.querySelector(`[to-smart-table="${this.table.element.id}"][role="controll_column_visiable_list"]`);
         
         if (!columnList) {
             console.warn('CREATE_SMART_TABLE: Не найден элемент #columnCheckboxes');
             return;
         }
 
+        columnList.innerHTML = "";
+
         // Очищаем контейнер только при первом создании
         if (!columnList.hasChildNodes()) {
-            columnList.innerHTML = "";
+            
 
             tableColumnList.forEach(tableColumn => {
                 const columnParams = tableColumn.getDefinition();  // Получаем параметры колонки
-
-                // Пропускаем служебные колонки (id и действия)
-                if (!columnParams.title || columnParams.field === 'id' || columnParams.field === 'actions') return;
 
                 // Создаем безопасное имя поля для использования в HTML-идентификаторах
                 const fieldName = columnParams.field.replace(/\./g, '_');
@@ -83,9 +83,6 @@ const controllColumnVisiable = {
                     } else {
                         tableColumn.hide();
                     }
-
-                    // Сохраняем состояние после изменения
-                    this.saveColumnState();
                 });
 
                 // Добавляем чекбокс в список
@@ -126,25 +123,55 @@ const controllColumnVisiable = {
     },
 
     /**
-     * Сохраняет состояние видимости колонок в localStorage
+     * Сохраняет состояние видимости колонок в localStorage с debounce-механизмом
+     * 
+     * Зачем нужна задержка (debounce):
+     * 1. Событие columnVisibilityChanged может вызываться несколько раз подряд 
+     *    (например, при сбросе всех колонок или при групповых операциях)
+     * 2. Без задержки мы бы сохраняли промежуточные состояния, что неэффективно
+     * 3. Задержка позволяет дождаться завершения всех изменений и сохранить 
+     *    только финальное состояние
+     * 4. Уменьшает количество операций записи в localStorage (оптимизация)
+     * 5. Предотвращает лишние перерендеры и повышает производительность
+     * 
+     * Механизм работы:
+     * - При первом изменении устанавливается таймер на 100мс
+     * - Если за это время происходит новое изменение, предыдущий таймер сбрасывается
+     * - Только после того как изменения прекратились на 100мс, происходит сохранение
+     * - Это гарантирует, что сохранится именно последнее состояние
      */
     saveColumnState: function() {
-        const columns = this.table.getColumns();
-        const state = {};
-
-        columns.forEach(column => {
-            const def = column.getDefinition();
-            // Сохраняем состояние для всех колонок кроме служебных
-            if (def.field && def.field !== 'actions' && def.field !== 'id') {
-                state[def.field] = column.isVisible();
-            }
-        });
-
-        localStorage.setItem(`tabulator-${properties.id}-columns`, JSON.stringify(state));
-
-        if (properties.debug) {
-            console.log('Сохраненное состояние колонок:', state);
+        // Отменяем предыдущий вызов, если он был
+        // Это ключевая часть debounce-механизма: каждый новый вызов отменяет предыдущий таймер
+        if (this._saveTimeout) {
+            clearTimeout(this._saveTimeout);
         }
+        
+        // Устанавливаем новый таймер
+        // Если в течение 100мс не будет нового вызова, выполнится сохранение
+        this._saveTimeout = setTimeout(() => {
+            const columns = this.table.getColumns();
+            const state = {};
+
+            // Собираем состояние видимости для всех колонок
+            columns.forEach(column => {
+                const def = column.getDefinition();
+                // Исключаем служебные колонки из сохранения
+                if (def.field && def.field !== 'actions' && def.field !== 'id') {
+                    state[def.field] = column.isVisible();
+                }
+            });
+
+            // Сохраняем финальное состояние в localStorage
+            localStorage.setItem(`tabulator-${this.table.element.id}-columns`, JSON.stringify(state));
+
+            // Очищаем ссылку на таймер после выполнения
+            this._saveTimeout = null;
+
+            //перерисовываем таблицу
+            setTimeout(() => this.table.redraw(true), 10);
+
+        }, 100); // Задержка в 100мс после последнего изменения
     },
 
     /**
@@ -164,7 +191,7 @@ const controllColumnVisiable = {
      */
     resetColumns: function() {
         // Очищаем сохраненное состояние из localStorage
-        localStorage.removeItem(`tabulator-${properties.id}-columns`);
+        localStorage.removeItem(`tabulator-${this.table.element.id}-columns`);
 
         // Показываем все колонки
         this.table.getColumns().forEach(column => {
@@ -179,13 +206,6 @@ const controllColumnVisiable = {
     }
 };
 
-// Утилита для экранирования HTML
-function escapeHtml(text) {
-    if (!text) return '';
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
 
 /**
  * Экранирует HTML-спецсимволы для предотвращения XSS-атак
@@ -215,14 +235,14 @@ export function create_smart_table(properties) {
     // Основные параметры таблицы
     const tableConfig = {
         height: properties.height ?? '400px',          // Высота таблицы
-        layout: "fitColumns",                           // Автоматическое распределение колонок
+        layout: "fitDataStretch",                           // Автоматическое распределение колонок
         pagination: true,                               // Включаем пагинацию
         paginationMode: "remote",                       // Серверная пагинация
         paginationSize: 10,                             // Записей на странице
         paginationSizeSelector: [10, 20, 50, 100],      // Возможные варианты записей на странице
-        paginationCounter: "rows",                       // Отображение счетчика записей
-        sortMode: "remote",                              // Серверная сортировка
-        filterMode: "remote",                            // Серверная фильтрация
+        paginationCounter: "rows",                      // Отображение счетчика записей
+        sortMode: "remote",                             // Серверная сортировка
+        filterMode: "remote",                           // Серверная фильтрация
     }
 
     //---------- AJAX НАСТРОЙКИ -------------
@@ -267,7 +287,7 @@ export function create_smart_table(properties) {
             minWidth: 120,    
 
             // Колонки всегда растягиваются (одинаково)
-            widthGrow: 1,     
+            // widthGrow: 1,     
 
             // Устанавливаем видимость колонки (информация из localStorage)
             // Если в localStorage есть значение - используем его, иначе true
@@ -316,6 +336,8 @@ export function create_smart_table(properties) {
 
     // Добавляем колонки в конфигурацию таблицы
     tableConfig.columns = columnsList;
+    console.log(tableConfig.columns)
+
     
     //-------- РУССКАЯ ЛОКАЛИЗАЦИЯ -----------------
 

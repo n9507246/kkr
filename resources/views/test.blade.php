@@ -4,13 +4,13 @@
     
 
     <div class="d-flex gap-2 mb-3">
-        <div class="dropdown"  to-smart-table='test-smart-table' role='controll_column_visiable'  style='display:none;' >
+        <div class="dropdown" to-smart-table='test-smart-table' role='controll_column_visiable'>
             <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" id="columnDropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside">
                 <i class="bi bi-layout-three-columns me-1"></i> Колонки
             </button>
             <div class="spisok-polonok dropdown-menu shadow border-0" aria-labelledby="columnDropdown" >
                 <div class="fw-bold small mb-2 border-bottom px-3 py-2">Отображение полей:</div>
-                <div id="columnCheckboxes"></div>
+                <div id="columnCheckboxes" to-smart-table='test-smart-table' role='controll_column_visiable_list'></div>
                 <div class="dropdown-divider"></div>
                 <button type="button" class="btn btn-link btn-sm text-decoration-none w-100 text-start" id="resetColumnState">
                     <i class="bi bi-arrow-counterclockwise"></i> Сбросить вид
@@ -19,8 +19,8 @@
         </div>
     </div>
 
-    <div class='mt-2' style="overflow-x:auto;">
-        <div id="test-smart-table">
+    <div class='mt-2'>
+        <div id="test-smart-table"  style='overflow: hidden; width: 100%;'>
         </div>
     </div>
 @endsection
