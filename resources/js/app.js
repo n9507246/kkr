@@ -8,7 +8,7 @@ const controllColumnVisiable = {
      */
     init: function(table) {
         this.table = table;
-        console.log(table)
+
         // Получаем элемент с нашим выпадающим списком колонок
         this.contoll_visiable_columns = document.querySelector(
             `[to-smart-table="${this.table.element.id}"][role="controll_column_visiable"]`
@@ -206,7 +206,6 @@ const controllColumnVisiable = {
     }
 };
 
-
 /**
  * Экранирует HTML-спецсимволы для предотвращения XSS-атак
  * @param {string} text - текст для экранирования
@@ -283,10 +282,7 @@ export function create_smart_table(properties) {
     if (properties.columns) { 
         columnsList = properties.columns.map(col => ({
             // Минимальная ширина колонки
-            minWidth: 120,    
-
-            // Колонки всегда растягиваются (одинаково)
-            // widthGrow: 1,     
+            minWidth: 120,         
 
             // Устанавливаем видимость колонки (информация из localStorage)
             // Если в localStorage есть значение - используем его, иначе true
@@ -335,8 +331,6 @@ export function create_smart_table(properties) {
 
     // Добавляем колонки в конфигурацию таблицы
     tableConfig.columns = columnsList;
-    console.log(tableConfig.columns)
-
     
     //-------- РУССКАЯ ЛОКАЛИЗАЦИЯ -----------------
 
