@@ -362,34 +362,85 @@ export function create_smart_table(properties) {
         }
     };
 
-    //---------------------------------------
+    //----------------- ФИЛЬТРЫ (СДЕЛАТЬ РЕФАКТОРИНГ)----------------------
 
     const filterForm = document.querySelector(`[to-smart-table="${properties.id}"][role="fiters_table"]`);
+    // В функции create_smart_table, после определения filterForm добавьте:
 
+    // Ключ для хранения фильтров в localStorage
+    const storageKey = `tabulator-${properties.id}-filters`;
+
+    // Функция для сохранения фильтров
+    function saveFiltersToStorage(formElement) {
+        if (!formElement) return;
+        
+        const formData = new FormData(formElement);
+        const data = {};
+        formData.forEach((value, key) => {
+            if (value) data[key] = value;
+        });
+        localStorage.setItem(storageKey, JSON.stringify(data));
+    }
+
+    // Функция для загрузки фильтров из localStorage
+    function loadFiltersFromStorage(formElement) {
+        if (!formElement) return;
+        
+        const saved = localStorage.getItem(storageKey);
+        if (saved) {
+            try {
+                const data = JSON.parse(saved);
+                Object.keys(data).forEach(key => {
+                    const input = formElement.querySelector(`[name="${key}"]`);
+                    if (input) {
+                        input.value = data[key];
+                    }
+                });
+            } catch (e) {
+                console.warn('Ошибка загрузки фильтров из localStorage:', e);
+            }
+        }
+    }
+
+    // Загружаем сохраненные фильтры в форму
+    if (filterForm) {
+        loadFiltersFromStorage(filterForm);
+    }
+
+    // Обновленная настройка ajaxParams
     if (properties.apply_filters) {
         tableConfig.ajaxParams = function() {
             const params = filterForm ? Object.fromEntries(new FormData(filterForm).entries()) : {};
             console.log("Параметры запроса:", {
                 filters: params
             });
-            return  {
+            return {
                 filters: params
             };
         }
     }
 
-    filterForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-
-        const formData = new FormData(filterForm);
-        const data = {};
-        formData.forEach((value, key) => {
-            if (value) data[key] = value;
+    // Обновленный обработчик submit
+    if (filterForm) {
+        filterForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            saveFiltersToStorage(filterForm); // Сохраняем фильтры
+            table.setData(); // Перезагружаем таблицу
         });
-        // localStorage.setItem(storageKey, JSON.stringify(data));
 
-        table.setData();
-    });
+        // Добавляем кнопку сброса фильтров, если её нет в форме
+        const resetBtn = filterForm.querySelector('[type="reset"]') || filterForm.querySelector('#reset-filters');
+        if (resetBtn) {
+            resetBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                filterForm.reset(); // Сбрасываем форму
+                localStorage.removeItem(storageKey); // Удаляем сохраненные фильтры
+                table.setData(); // Перезагружаем таблицу
+            });
+        }
+    }
+
+    // -----------------------------------------------------------------------------
 
     // Создаем экземпляр таблицы Tabulator
     const table = new Tabulator(`#${properties.id}`, tableConfig);
