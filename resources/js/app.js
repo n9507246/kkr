@@ -348,7 +348,7 @@ export function create_smart_table(properties) {
                 "last": ">>",                                 // Кнопка последней страницы
                 "last_title": "Последняя страница",          // Подсказка для последней страницы
                 "prev": "<",                                  // Кнопка предыдущей страницы
-                "prev_title": "Предыдущая страница",         // Подсказка для предыдущей страницы
+                "prev_title": "Предыдущая страница",          // Подсказка для предыдущей страницы
                 "next": ">",                                  // Кнопка следующей страницы
                 "next_title": "Следующая страница",          // Подсказка для следующей страницы
                 "all": "Все",                                 // Текст "Все" для показа всех записей
@@ -364,6 +364,33 @@ export function create_smart_table(properties) {
 
     //---------------------------------------
 
+    const filterForm = document.querySelector(`[to-smart-table="${properties.id}"][role="fiters_table"]`);
+
+    if (properties.apply_filters) {
+        tableConfig.ajaxParams = function() {
+            const params = filterForm ? Object.fromEntries(new FormData(filterForm).entries()) : {};
+            console.log("Параметры запроса:", {
+                filters: params
+            });
+            return  {
+                filters: params
+            };
+        }
+    }
+
+    filterForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(filterForm);
+        const data = {};
+        formData.forEach((value, key) => {
+            if (value) data[key] = value;
+        });
+        // localStorage.setItem(storageKey, JSON.stringify(data));
+
+        table.setData();
+    });
+
     // Создаем экземпляр таблицы Tabulator
     const table = new Tabulator(`#${properties.id}`, tableConfig);
 
@@ -371,6 +398,8 @@ export function create_smart_table(properties) {
     if (properties.controll_column_visiable) {
         controllColumnVisiable.init(table);
     }
+
+    
 
     // Возвращаем экземпляр таблицы
     return table;

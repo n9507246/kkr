@@ -80,6 +80,22 @@ class KadastrovieObekti extends Model
         }
     }
 
+    public function scopeFilter(Builder $query, array $filters)
+    {
+        if (isset($filters['kadastroviy_nomer'])) {
+            $query->where('kadastroviy_nomer', 'like', "%{$filters['kadastroviy_nomer']}%");
+        }
+
+        if (isset($filters['ispolnitel'])) {
+            $query->where('ispolnitel', 'like', "%{$filters['ispolnitel']}%");
+        }
+
+        if (isset($filters['vid_rabot.nazvanie'])) {
+            $query->whereHas('vidiRabot', function ($q) use ($filters) {
+                $q->where('nazvanie', 'like', "%{$filters['vid_rabot.nazvanie']}%");
+            });
+        }
+    }
 
 }
 

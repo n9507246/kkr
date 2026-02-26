@@ -2,6 +2,19 @@
 
 @section('content')
     
+    <form to-smart-table='test-smart-table' role='fiters_table' class="mb-3">
+        <div class="row g-2">
+            <div class="col-md-4">
+                <input type="text" name="kadastroviy_nomer" class="form-control form-control-sm" placeholder="Кадастровый номер">
+            </div>
+            <div class="col-md-4">
+                <input type="text" name="ispolnitel" class="form-control form-control-sm" placeholder="ФИО исполнителя">
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-primary btn-sm w-100">Применить фильтр</button>
+            </div>
+        </div>
+    </form>
 
     <div class="d-flex gap-2 mb-3">
         <div class="dropdown" to-smart-table='test-smart-table' role='controll_column_visiable'>
@@ -45,6 +58,7 @@
                     { title: 'Вид работ', field: 'vidi_rabot.nazvanie' },
                 ],
                 controll_column_visiable: true,
+                apply_filters: true,
             });
     });
 </script>
