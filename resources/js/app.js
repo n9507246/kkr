@@ -205,7 +205,162 @@ const controllColumnVisiable = {
         setTimeout(() => this.table.redraw(true), 50);
     }
 };
+/**
+ * Объект для экспорта таблицы Tabulator в Excel с автоподбором ширины колонок
+ */
+const xlsxExporter = {
+    /**
+     * Инициализирует экспортер и навешивает обработчик на кнопку
+     * @param {Object} table - экземпляр таблицы Tabulator
+     */
+    export: function(table) {
+        // Сохраняем ссылку на таблицу для использования в обработчике
+        this.table = table;
+        
+        // Находим кнопку экспорта по ID
+        const exportButton = document.getElementById('test-button-excel');
+        
+        // Проверяем, существует ли кнопка на странице
+        if (!exportButton) {
+            console.warn('Кнопка экспорта с ID "test-button-excel" не найдена');
+            return;
+        }
+        
+        // Навешиваем обработчик клика на кнопку
+        exportButton.addEventListener('click', () => {
+            this.exportToExcel();
+        });
+        
+        console.log('Экспортер инициализирован, обработчик навешен на кнопку');
+    },
+    
+    /**
+     * Выполняет экспорт таблицы в Excel с автоподбором ширины колонок
+     */
+    exportToExcel: function() {
+        
+        // Проверяем, существует ли таблица
+        if (!this.table) {
+            console.error('Таблица не инициализирована');
+            return;
+        }
+        
+        // Вызываем метод download таблицы Tabulator
+        this.table.download("xlsx", "данные.xlsx", {
+            // Название листа в Excel-файле
+            sheetName: "Лист1",
+            
+            /**
+             * Обработчик для модификации книги Excel перед сохранением
+             * @param {Object} workbook - объект книги Excel от SheetJS
+             * @returns {Object} модифицированная книга
+             */
+            documentProcessing: (workbook) => this.autoFitColumns(workbook)
+        });
+        
+        console.log('Экспорт в Excel запущен');
+    },
+    
+    /**
+     * Автоматически подбирает ширину колонок по содержимому
+     * @param {Object} workbook - объект книги Excel от SheetJS
+     * @returns {Object} модифицированная книга с настроенными колонками
+     */
+    autoFitColumns: function(workbook) {
+        try {
+            // Получаем название первого листа в книге
+            const firstSheetName = workbook.SheetNames[0];
+            
+            // Получаем сам лист по названию
+            const sheet = workbook.Sheets[firstSheetName];
+            
+            // Проверяем, существует ли лист
+            if (!sheet) {
+                console.warn('Лист не найден, пропускаем автоподбор');
+                return workbook;
+            }
+            
+            // Проверяем, есть ли в листе данные
+            if (!sheet['!ref']) {
+                console.warn('Лист пустой, пропускаем автоподбор');
+                return workbook;
+            }
+            
+            // ============================================================
+            // Определяем диапазон данных в листе
+            // ============================================================
+            // !ref содержит ссылку на диапазон, например "A1:C10"
+            const range = XLSX.utils.decode_range(sheet['!ref']);
+            
+            // Массив для хранения настроек ширины колонок
+            const columnWidths = [];
+            
+            // ============================================================
+            // Проходим по каждой колонке
+            // ============================================================
+            for (let colIndex = range.s.c; colIndex <= range.e.c; colIndex++) {
+                // Переменная для хранения максимальной длины в текущей колонке
+                let maxLength = 0;
+                
+                // ============================================================
+                // Проходим по каждой строке в текущей колонке
+                // ============================================================
+                for (let rowIndex = range.s.r; rowIndex <= range.e.r; rowIndex++) {
+                    // Создаем объект с координатами ячейки
+                    const cellCoordinates = {
+                        c: colIndex, // колонка (0-индекс)
+                        r: rowIndex  // строка (0-индекс)
+                    };
+                    
+                    // Получаем ссылку на ячейку в формате "A1", "B2" и т.д.
+                    const cellAddress = XLSX.utils.encode_cell(cellCoordinates);
+                    
+                    // Получаем ячейку из листа
+                    const cell = sheet[cellAddress];
+                    
+                    // Если ячейка существует и содержит значение
+                    if (cell && cell.v !== undefined && cell.v !== null) {
+                        // Преобразуем значение в строку и считаем длину
+                        const cellValue = String(cell.v);
+                        const valueLength = cellValue.length;
+                        
+                        // Обновляем максимальную длину, если нашли более длинное значение
+                        if (valueLength > maxLength) {
+                            maxLength = valueLength;
+                        }
+                    }
+                }
+                
+                // ============================================================
+                // Устанавливаем ширину колонки
+                // ============================================================
+                // Добавляем запас в 2 символа для лучшей читаемости
+                // Минимальная ширина - 5 символов, чтобы колонка не схлопнулась
+                const columnWidth = Math.max(maxLength + 2, 5);
+                columnWidths[colIndex] = { wch: columnWidth };
+            }
+            
+            // ============================================================
+            // Применяем настройки ширины к листу
+            // ============================================================
+            // Специальное свойство !cols отвечает за ширину колонок в Excel
+            sheet['!cols'] = columnWidths;
+            
+            console.log('Автоподбор ширины колонок выполнен успешно');
+            
+        } catch (error) {
+            // Ловим и логируем ошибки, чтобы не прерывать экспорт
+            console.error('Ошибка при автоподборе ширины колонок:', error);
+        }
+        
+        // Всегда возвращаем workbook, даже если была ошибка
+        return workbook;
+    }
+};
 
+// Пример использования:
+// const table = new Tabulator(...);
+// xlsxExporter.export(table);
 /**
  * Экранирует HTML-спецсимволы для предотвращения XSS-атак
  * @param {string} text - текст для экранирования
@@ -243,6 +398,8 @@ export function create_smart_table(properties) {
     tableConfig.sortMode = "remote"                             // Серверная сортировка
     tableConfig.filterMode = "remote"                           // Серверная фильтрация
     
+    tableConfig.dependencies = properties.dependencies
+
     //---------- AJAX НАСТРОЙКИ -------------
         
     // Проверяем параметр ajaxURL и устанавливаем адрес и тип ответа
@@ -450,6 +607,10 @@ export function create_smart_table(properties) {
         controllColumnVisiable.init(table);
     }
 
+    // Запускаем экспорт в Excel, если это указано в параметрах
+    if (properties.export_to_excel) {
+        xlsxExporter.export(table);
+    }
     
 
     // Возвращаем экземпляр таблицы

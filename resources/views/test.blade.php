@@ -32,6 +32,9 @@
         </div>
     </div>
 
+    <button id='test-button-excel' class='btn btn-primary btn-sm w-100' type='button'>Exel</button>
+
+
     <div class='mt-2'>
         <div id="test-smart-table"  style='overflow: hidden; width: 100%;'>
         </div>
@@ -43,11 +46,12 @@
     import { create_smart_table} from '{{ Vite::asset('resources/js/app.js') }}';
     document.addEventListener('DOMContentLoaded', function() {
  
-            create_smart_table({
+            const table = create_smart_table({
                 debug: true,
                 height: '80vh',
                 id: 'test-smart-table',
                 ajaxURL: "{{ route('test') }}",
+                export_to_excel: true,  
                 columns: [
                     { 
                         title: 'кадастровый номер', 
@@ -60,6 +64,9 @@
                 controll_column_visiable: true,
                 apply_filters: true,
             });
+
+        document.getElementById('test-button-excel')
+            
     });
 </script>
 @endpush

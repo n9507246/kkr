@@ -60,7 +60,7 @@
 
 <!-- Luxon для Tabulator -->
 <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4/build/global/luxon.min.js"></script>
-
+<script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
 <!-- Tabulator JS -->
 <script src="https://unpkg.com/tabulator-tables@6.2.1/dist/js/tabulator.min.js"></script>
 
