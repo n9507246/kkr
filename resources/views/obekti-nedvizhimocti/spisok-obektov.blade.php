@@ -35,7 +35,7 @@
                 <!-- Ряд 1 -->
                 <div class="col-md-3">
                     <label class="form-label small text-muted fw-bold">Кадастровый номер</label>
-                    <input type="text" name="cadastral_number" class="form-control form-control-sm" placeholder="Введите номер...">
+                    <input type="text" name="kadastroviy_nomer" class="form-control form-control-sm" placeholder="Введите номер...">
                 </div>
                 <div class="col-md-2">
                     <label class="form-label small text-muted fw-bold">Тип объекта</label>
@@ -113,7 +113,7 @@
                 debug: true,
                 height: '80vh',
                 id: 'report-table',
-                ajaxURL: "{{ route('test') }}",
+                ajaxURL: "{{ route('obekti-nedvizhimosti.spisok-obektov') }}",
                 export_to_excel: true,  
                 columns: [
                     // Кадастровый номер
