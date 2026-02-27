@@ -1,48 +1,211 @@
+/**
+ * Логгер с гибкой настройкой вывода сообщений
+ */
+const logger = {
+    config: {
+        enabled: false,           // Включен/выключен
+        prefix: '',                // Префикс для всех сообщений
+        showTimestamp: true,       // Показывать время
+        showLevel: true,           // Показывать уровень сообщения
+        levels: {                  // Какие уровни выводить
+            log: true,
+            info: true,
+            warn: true,
+            error: true,
+            debug: true
+        },
+        timestampFormat: {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            fractionalSecondDigits: 3
+        }
+    },
+
+    /**
+     * Настройка логгера
+     * @param {Object} options - параметры конфигурации
+     */
+    configure: function(options = {}) {
+        // Рекурсивно обновляем конфигурацию
+        this.config = this.mergeDeep(this.config, options);
+        return this;
+    },
+
+    /**
+     * Создает новый экземпляр логгера с собственной конфигурацией
+     * @param {Object} options - параметры конфигурации для нового экземпляра
+     * @returns {Object} новый экземпляр логгера
+     */
+    createInstance: function(options = {}) {
+        const instance = Object.create(this);
+        instance.config = this.mergeDeep({}, this.config);
+        instance.configure(options);
+        return instance;
+    },
+
+    /**
+     * Глубокое слияние объектов
+     * @param {Object} target - целевой объект
+     * @param {Object} source - источник
+     * @returns {Object} результат слияния
+     */
+    mergeDeep: function(target, source) {
+        const result = { ...target };
+        
+        for (const key in source) {
+            if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+                result[key] = this.mergeDeep(target[key] || {}, source[key]);
+            } else {
+                result[key] = source[key];
+            }
+        }
+        
+        return result;
+    },
+
+    /**
+     * Форматирует сообщение для вывода
+     * @param {string} level - уровень сообщения
+     * @param {string} message - текст сообщения
+     * @returns {string} отформатированное сообщение
+     */
+    formatMessage: function(level, message) {
+        const parts = [];
+        
+        // Добавляем префикс
+        if (this.config.prefix) {
+            parts.push(this.config.prefix);
+        }
+        
+        // Добавляем временную метку
+        if (this.config.showTimestamp) {
+            const timestamp = new Date().toLocaleTimeString('ru-RU', this.config.timestampFormat);
+            parts.push(`[${timestamp}]`);
+        }
+        
+        // Добавляем уровень сообщения
+        if (this.config.showLevel) {
+            parts.push(`[${level.toUpperCase()}]`);
+        }
+        
+        // Добавляем само сообщение
+        parts.push(message);
+        
+        return parts.join(' ');
+    },
+
+    /**
+     * Проверяет, нужно ли выводить сообщение данного уровня
+     * @param {string} level - уровень сообщения
+     * @returns {boolean} true если нужно выводить
+     */
+    shouldLog: function(level) {
+        return this.config.enabled && this.config.levels[level] === true;
+    },
+
+    // Методы логирования для разных уровней
+    log: function(message) {
+        if (this.shouldLog('log')) {
+            console.log(this.formatMessage('log', message));
+        }
+    },
+
+    info: function(message) {
+        if (this.shouldLog('info')) {
+            console.info(this.formatMessage('info', message));
+        }
+    },
+
+    warn: function(message) {
+        if (this.shouldLog('warn')) {
+            console.warn(this.formatMessage('warn', message));
+        }
+    },
+
+    error: function(message) {
+        if (this.shouldLog('error')) {
+            console.error(this.formatMessage('error', message));
+        }
+    },
+
+    debug: function(message) {
+        if (this.shouldLog('debug')) {
+            console.debug(this.formatMessage('debug', message));
+        }
+    },
+
+    /**
+     * Универсальный метод логирования
+     * @param {string} level - уровень сообщения
+     * @param {string} message - текст сообщения
+     */
+    logLevel: function(level, message) {
+        if (this.shouldLog(level)) {
+            const method = console[level] || console.log;
+            method.call(console, this.formatMessage(level, message));
+        }
+    }
+};
+
+/**
+ * Управление видимостью колонок таблицы Tabulator
+ */
 const controllColumnVisiable = {
     table: null,                          // Ссылка на таблицу Tabulator
     contoll_visiable_columns: null,       // DOM-элемент с чекбоксами для управления видимостью
     resetButton: null,                    // DOM-элемент кнопки сброса настроек
-    debug: false,                         // Режим отладки (по умолчанию выключен)
+    logger: null,                          // Экземпляр логгера
 
     /**
      * Инициализация управления видимостью колонок
      * @param {Object} table - экземпляр таблицы Tabulator
-     * @param {boolean} debug - включить режим отладки
+     * @param {Object} options - дополнительные параметры
+     * @param {boolean} options.debug - включить режим отладки (все сообщения)
+     * @param {Object} options.loggerConfig - конфигурация логгера
      */
-    init: function(table, debug = false) {
-        this.table = table;
-        this.debug = debug; // Устанавливаем режим отладки
+    init: function(table, options = {}) {
         
-        this.log('Инициализация управления видимостью колонок');
-        this.log(`ID таблицы: ${this.table.element.id}`);
-        this.log(`Режим отладки: ${this.debug ? 'включен' : 'выключен'}`);
+          this.table = table;
+        // Создаем экземпляр логгера с конфигурацией
+          
+    
+        const debug = options.debug ?? false;
+        
+        // Создаем экземпляр логгера с конфигурацией
+        this.initLogger({ debug });
+        
+        
+        this.logger.debug('Инициализация управления видимостью колонок');
+        this.logger.debug(`ID таблицы: ${this.table.element.id}`);
+        this.logger.debug(`Режим отладки: ${options.debug ? 'включен' : 'выключен'}`);
 
         // Получаем элемент с нашим выпадающим списком колонок
         this.contoll_visiable_columns = document.querySelector(
             `[to-smart-table="${this.table.element.id}"][role="controll_column_visiable"]`
         );
 
-        // Если элемент не найден - выводим предупреждение (только в режиме отладки) и завершаем инициализацию
+        // Если элемент не найден - логируем предупреждение и завершаем инициализацию
         if (!this.contoll_visiable_columns) {
-            this.logWarning(
-                'CREATE SMART TABLE COLUMN VISIABLE: Список отображения колонок не может быть создан, ' +
+            this.logger.warn(
+                'Список отображения колонок не может быть создан, ' +
                 `так как не найден элемент в HTML role="controll_column_visiable" ` +
                 `to-smart-table="${this.table.element.id}"`
             );
             return;
         }
 
-        this.log('Элемент управления видимостью найден');
+        this.logger.debug('Элемент управления видимостью найден');
 
         // Сохраняем состояние при изменении видимости
         this.table.on("columnVisibilityChanged", () => {
-            this.log('Событие columnVisibilityChanged');
+            this.logger.debug('Событие columnVisibilityChanged');
             this.saveColumnState();
         });
 
         // Инициализация после построения таблицы
         this.onTableBuilt(() => {   
-            this.log('Таблица построена, создаем чекбоксы для колонок');
+            this.logger.debug('Таблица построена, создаем чекбоксы для колонок');
             this.createColumnCheckboxes(this.table.getColumns());
         });
         
@@ -51,39 +214,25 @@ const controllColumnVisiable = {
     },
 
     /**
-     * Логирование (только в режиме отладки)
-     * @param {string} message - сообщение для логирования
+     * Инициализация логгера с настройками
+     * @param {Object} options - параметры инициализации
      */
-    log: function(message) {
-        if (!this.debug) return;
+    initLogger: function(options) {
+        const debug = options.debug || false;
         
-        const prefix = '[ColumnVisibility]';
-        const timestamp = new Date().toLocaleTimeString('ru-RU', {
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            fractionalSecondDigits: 3
+        this.logger = logger.createInstance({
+            enabled: debug,
+            prefix: '[CREATE SMART TABLE] [COLUMN VISIABLE]',
+            showTimestamp: true,
+            showLevel: true,
+            levels: {
+                log: false,
+                info: false,
+                warn: debug,
+                error: debug,
+                debug: false
+            }
         });
-        
-        console.log(`${prefix} [${timestamp}] ${message}`);
-    },
-
-    /**
-     * Предупреждение (только в режиме отладки)
-     * @param {string} message - сообщение для предупреждения
-     */
-    logWarning: function(message) {
-        if (!this.debug) return;
-        
-        const prefix = '[ColumnVisibility]';
-        const timestamp = new Date().toLocaleTimeString('ru-RU', {
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            fractionalSecondDigits: 3
-        });
-        
-        console.warn(`${prefix} [${timestamp}] ${message}`);
     },
 
     /**
@@ -91,13 +240,13 @@ const controllColumnVisiable = {
      * @param {Function} callback - функция, которая выполнится после построения таблицы
      */
     onTableBuilt: function(callback) {
-        this.log('Ожидание события tableBuilt...');
+        this.logger.debug('Ожидание события tableBuilt...');
         
         this.table.on("tableBuilt", () => {
-            this.log('Событие tableBuilt получено');
+            this.logger.debug('Событие tableBuilt получено');
             
             setTimeout(() => {
-                this.log('Выполнение callback после задержки 100мс');
+                this.logger.debug('Выполнение callback после задержки 100мс');
                 callback.call(this);
             }, 100);
         });
@@ -108,7 +257,7 @@ const controllColumnVisiable = {
      * @param {Array} tableColumnList - массив колонок таблицы
      */
     createColumnCheckboxes: function(tableColumnList) {
-        this.log(`Создание чекбоксов для ${tableColumnList.length} колонок`);
+        this.logger.info(`Создание чекбоксов для ${tableColumnList.length} колонок`);
         
         // Находим выпадающее меню (в нем будем создавать чекбоксы)
         const columnList = this.contoll_visiable_columns.querySelector(
@@ -116,7 +265,7 @@ const controllColumnVisiable = {
         );
         
         if (!columnList) {
-            this.logWarning(
+            this.logger.warn(
                 'CREATE SMART TABLE COLUMN VISIABLE: Список отображения колонок не может быть создан, ' +
                 `так как не найден элемент в HTML ` +
                 `to-smart-table="${this.table.element.id}" ` +
@@ -126,17 +275,17 @@ const controllColumnVisiable = {
             return;
         }
 
-        this.log('Контейнер для чекбоксов найден');
+        this.logger.debug('Контейнер для чекбоксов найден');
 
         // Очищаем контейнер
         columnList.innerHTML = "";
-        this.log('Контейнер чекбоксов очищен');
+        this.logger.debug('Контейнер чекбоксов очищен');
 
         // Создаем чекбоксы для каждой колонки
         tableColumnList.forEach((tableColumn, index) => {
             const columnParams = tableColumn.getDefinition();
             
-            this.log(
+            this.logger.debug(
                 `Обработка колонки ${index + 1}: ` +
                 `field="${columnParams.field}", ` +
                 `title="${columnParams.title}"`
@@ -146,7 +295,7 @@ const controllColumnVisiable = {
             const fieldName = columnParams.field.replace(/\./g, '_');
             const isVisible = tableColumn.isVisible();
             
-            this.log(`Колонка "${columnParams.title}" видимость: ${isVisible}`);
+            this.logger.debug(`Колонка "${columnParams.title}" видимость: ${isVisible}`);
             
             // Создаем элемент чекбокса
             const checkboxItem = this.createCheckboxItem(columnParams, fieldName, isVisible);
@@ -154,7 +303,7 @@ const controllColumnVisiable = {
 
             // Обработчик изменения состояния чекбокса
             checkbox.addEventListener('change', (event) => {
-                this.log(
+                this.logger.info(
                     `Изменение видимости колонки "${columnParams.title}": ` +
                     `${event.target.checked ? 'показать' : 'скрыть'}`
                 );
@@ -169,10 +318,10 @@ const controllColumnVisiable = {
 
             // Добавляем чекбокс в список
             columnList.appendChild(checkboxItem);
-            this.log(`Чекбокс для колонки "${columnParams.title}" добавлен`);
+            this.logger.debug(`Чекбокс для колонки "${columnParams.title}" добавлен`);
         });
 
-        this.log(`Создано ${tableColumnList.length} чекбоксов`);
+        this.logger.info(`Создано ${tableColumnList.length} чекбоксов`);
     },
 
     /**
@@ -208,39 +357,22 @@ const controllColumnVisiable = {
 
     /**
      * Сохраняет состояние видимости колонок в localStorage с debounce-механизмом
-     * 
-     * Зачем нужна задержка (debounce):
-     * 1. Событие columnVisibilityChanged может вызываться несколько раз подряд 
-     *    (например, при сбросе всех колонок или при групповых операциях)
-     * 2. Без задержки мы бы сохраняли промежуточные состояния, что неэффективно
-     * 3. Задержка позволяет дождаться завершения всех изменений и сохранить 
-     *    только финальное состояние
-     * 4. Уменьшает количество операций записи в localStorage (оптимизация)
-     * 5. Предотвращает лишние перерендеры и повышает производительность
-     * 
-     * Механизм работы:
-     * - При первом изменении устанавливается таймер на 100мс
-     * - Если за это время происходит новое изменение, предыдущий таймер сбрасывается
-     * - Только после того как изменения прекратились на 100мс, происходит сохранение
-     * - Это гарантирует, что сохранится именно последнее состояние
      */
     saveColumnState: function() {
-        this.log('saveColumnState вызван');
+        this.logger.debug('saveColumnState вызван');
         
         // Отменяем предыдущий вызов, если он был
-        // Это ключевая часть debounce-механизма: каждый новый вызов отменяет предыдущий таймер
         if (this._saveTimeout) {
-            this.log('Отмена предыдущего таймера сохранения');
+            this.logger.debug('Отмена предыдущего таймера сохранения');
             clearTimeout(this._saveTimeout);
         }
         
         // Устанавливаем новый таймер
-        // Если в течение 100мс не будет нового вызова, выполнится сохранение
         this._saveTimeout = setTimeout(() => {
-            this.log('Таймер сохранения сработал, начинаем сбор состояния');
+            this.logger.debug('Таймер сохранения сработал, начинаем сбор состояния');
             
             const columns = this.table.getColumns();
-            this.log(`Получено ${columns.length} колонок для сохранения`);
+            this.logger.debug(`Получено ${columns.length} колонок для сохранения`);
             
             const state = {};
 
@@ -251,7 +383,7 @@ const controllColumnVisiable = {
                 // Исключаем служебные колонки из сохранения
                 if (def.field && def.field !== 'actions' && def.field !== 'id') {
                     state[def.field] = column.isVisible();
-                    this.log(
+                    this.logger.debug(
                         `Колонка "${def.field}": ${state[def.field] ? 'видима' : 'скрыта'}`
                     );
                 }
@@ -263,110 +395,107 @@ const controllColumnVisiable = {
             
             localStorage.setItem(storageKey, stateJson);
             
-            this.log(`Состояние колонок сохранено в localStorage: ${storageKey}`);
-            this.log(`Размер сохраненных данных: ${stateJson.length} байт`);
-            this.log(`Сохраненные данные: ${stateJson}`);
+            this.logger.info(`Состояние колонок сохранено в localStorage: ${storageKey}`);
+            this.logger.debug(`Размер сохраненных данных: ${stateJson.length} байт`);
+            this.logger.debug(`Сохраненные данные: ${stateJson}`);
 
             // Очищаем ссылку на таймер после выполнения
             this._saveTimeout = null;
 
             // Перерисовываем таблицу
             setTimeout(() => {
-                this.log('Перерисовка таблицы');
+                this.logger.debug('Перерисовка таблицы');
                 this.table.redraw(true);
             }, 10);
 
-        }, 100); // Задержка в 100мс после последнего изменения
+        }, 100);
     },
 
     /**
      * Инициализирует кнопку сброса настроек видимости колонок
-     * Использует тот же паттерн селекторов, что и для других элементов управления
      */
     initResetButton: function() {
-        this.log('Инициализация кнопки сброса');
+        this.logger.debug('Инициализация кнопки сброса');
         
-        // Находим кнопку сброса, используя тот же паттерн атрибутов, что и для других элементов
-        // Формат: [to-smart-table="ID_ТАБЛИЦЫ"][role="reset_column_visibility"]
+        // Находим кнопку сброса
         this.resetButton = document.querySelector(
             `[to-smart-table="${this.table.element.id}"][role="reset_column_visibility"]`
         );
         
         // Проверяем, найдена ли кнопка
         if (!this.resetButton) {
-            this.logWarning(
-                'CREATE SMART TABLE COLUMN VISIABLE: Кнопка сброса настроек колонок не найдена. ' +
+            this.logger.warn(
+                'Кнопка сброса настроек колонок не найдена. ' +
                 `Убедитесь, что в HTML присутствует элемент с атрибутами: ` +
                 `to-smart-table="${this.table.element.id}" и role="reset_column_visibility"`
             );
-            return; // Завершаем инициализацию, если кнопка не найдена
+            return;
         }
         
-        this.log('Кнопка сброса найдена');
+        this.logger.debug('Кнопка сброса найдена');
         
         // Навешиваем обработчик клика на кнопку
         this.resetButton.addEventListener("click", (event) => {
-            this.log('Клик по кнопке сброса');
+            this.logger.info('Клик по кнопке сброса');
             
-            // Предотвращаем стандартное поведение кнопки (если она внутри формы)
+            // Предотвращаем стандартное поведение кнопки
             event.preventDefault();
             
             // Вызываем сброс настроек колонок
             this.resetColumns();
         });
         
-        this.log(`Кнопка сброса для таблицы "${this.table.element.id}" инициализирована`);
+        this.logger.info(`Кнопка сброса для таблицы "${this.table.element.id}" инициализирована`);
     },
 
     /**
      * Сбрасывает настройки видимости колонок к состоянию по умолчанию
      */
     resetColumns: function() {
-        this.log('Начат сброс настроек колонок');
+        this.logger.info('Начат сброс настроек колонок');
         
         try {
             // Очищаем сохраненное состояние из localStorage
             const storageKey = `tabulator-${this.table.element.id}-columns`;
             localStorage.removeItem(storageKey);
             
-            this.log(`Сохраненное состояние колонок удалено из localStorage: ${storageKey}`);
+            this.logger.info(`Сохраненное состояние колонок удалено из localStorage: ${storageKey}`);
 
             // Показываем все колонки
             const columns = this.table.getColumns();
-            this.log(`Найдено ${columns.length} колонок для отображения`);
+            this.logger.debug(`Найдено ${columns.length} колонок для отображения`);
             
             columns.forEach((column, index) => {
                 const def = column.getDefinition();
-                this.log(`Отображение колонки ${index + 1}: ${def.field}`);
+                this.logger.debug(`Отображение колонки ${index + 1}: ${def.field}`);
                 column.show();
             });
             
-            this.log(`Все ${columns.length} колонок таблицы отображены`);
+            this.logger.info(`Все ${columns.length} колонок таблицы отображены`);
 
             // Обновляем состояние чекбоксов в UI
             this.updateCheckboxesState();
 
-            // Перерисовываем таблицу с небольшой задержкой для применения изменений
+            // Перерисовываем таблицу
             setTimeout(() => {
-                this.log('Перерисовка таблицы после сброса');
+                this.logger.debug('Перерисовка таблицы после сброса');
                 this.table.redraw(true);
-                this.log(`Таблица перерисована`);
+                this.logger.info(`Таблица перерисована`);
             }, 50);
 
         } catch (error) {
-            this.logWarning(
+            this.logger.error(
                 `CREATE SMART TABLE COLUMN VISIABLE: Ошибка при сбросе колонок: ${error.message}`
             );
-            this.log(`Стек ошибки: ${error.stack}`);
+            this.logger.debug(`Стек ошибки: ${error.stack}`);
         }
     },
 
     /**
      * Обновляет состояние чекбоксов в соответствии с текущей видимостью колонок
-     * Этот метод синхронизирует UI с фактическим состоянием таблицы
      */
     updateCheckboxesState: function() {
-        this.log('Обновление состояния чекбоксов');
+        this.logger.debug('Обновление состояния чекбоксов');
         
         // Получаем контейнер со списком чекбоксов
         const columnList = this.contoll_visiable_columns?.querySelector(
@@ -374,13 +503,13 @@ const controllColumnVisiable = {
         );
         
         if (!columnList) {
-            this.logWarning('CREATE SMART TABLE COLUMN VISIABLE: Список чекбоксов не найден для обновления');
+            this.logger.warn('CREATE SMART TABLE COLUMN VISIABLE: Список чекбоксов не найден для обновления');
             return;
         }
 
-        // Получаем все колонки таблицы для проверки их видимости
+        // Получаем все колонки таблицы
         const tableColumns = this.table.getColumns();
-        this.log(`Найдено ${tableColumns.length} колонок для синхронизации с чекбоксами`);
+        this.logger.debug(`Найдено ${tableColumns.length} колонок для синхронизации с чекбоксами`);
         
         let updatedCount = 0;
         
@@ -388,7 +517,7 @@ const controllColumnVisiable = {
         tableColumns.forEach(tableColumn => {
             const def = tableColumn.getDefinition();
             if (!def.field) {
-                this.log(`Колонка без field пропущена`);
+                this.logger.debug(`Колонка без field пропущена`);
                 return;
             }
             
@@ -399,23 +528,23 @@ const controllColumnVisiable = {
                 const isVisible = tableColumn.isVisible();
                 const oldState = checkbox.checked;
                 
-                // Устанавливаем состояние чекбокса в соответствии с видимостью колонки
+                // Устанавливаем состояние чекбокса
                 checkbox.checked = isVisible;
                 
                 if (oldState !== isVisible) {
                     updatedCount++;
-                    this.log(
+                    this.logger.debug(
                         `Чекбокс для колонки "${def.field}" изменен: ` +
                         `${oldState ? 'видима' : 'скрыта'} -> ` +
                         `${isVisible ? 'видима' : 'скрыта'}`
                     );
                 }
             } else {
-                this.log(`Чекбокс для колонки "${def.field}" не найден`);
+                this.logger.debug(`Чекбокс для колонки "${def.field}" не найден`);
             }
         });
         
-        this.log(
+        this.logger.info(
             `Состояние чекбоксов обновлено ` +
             `(изменено ${updatedCount} из ${tableColumns.length})`
         );
@@ -628,8 +757,6 @@ export function create_smart_table(properties) {
 
         // Обработка ответа от сервера - преобразуем JSON в формат Tabulator
         tableConfig.ajaxResponse = function(url, params, response) {
-            if (properties.debug)
-                console.log('ajaxResponse', response);
             // Возвращаем данные и информацию о последней странице
             return { 
                 data: response.data, 
@@ -786,9 +913,6 @@ export function create_smart_table(properties) {
     if (properties.apply_filters) {
         tableConfig.ajaxParams = function() {
             const params = filterForm ? Object.fromEntries(new FormData(filterForm).entries()) : {};
-            console.log("Параметры запроса:", {
-                filters: params
-            });
             return {
                 filters: params
             };
@@ -822,7 +946,7 @@ export function create_smart_table(properties) {
 
     // Запускаем управление видимостью колонок, если это указано в параметрах
     if (properties.controll_column_visiable) {
-        controllColumnVisiable.init(table, properties.debug);
+        controllColumnVisiable.init(table, { debug: properties.debug });
     }
 
     // Запускаем экспорт в Excel, если это указано в параметрах
