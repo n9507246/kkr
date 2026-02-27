@@ -131,7 +131,7 @@ const logger = {
 
     debug: function(message) {
         if (this.shouldLog('debug')) {
-            console.debug(this.formatMessage('debug', message));
+            console.info(this.formatMessage('debug', message));
         }
     },
 
@@ -713,18 +713,24 @@ const excelExporter = {
 };
 export function create_smart_table(properties) {
     
+    // properties.debug = true
+    const isDebug = !!properties.debug;
+    
     // Создаем ЕДИНЫЙ экземпляр логгера для всей таблицы
     const mainLogger = logger.createInstance({
+        
         enabled: true,
         prefix: '[SmartTable]',
         showTimestamp: true,
         showLevel: true,
         levels: {
-            log: properties.debug || true,
-            info: properties.debug || true,
-            warn: true, // Предупреждения показываем всегда, даже без debug
-            error: true, // Ошибки показываем всегда, даже без debug
-            debug: properties.debug || true
+            // Если isDebug === false, эти уровни станут false и не будут выводиться
+            log: isDebug,
+            info: isDebug,
+            debug: isDebug,
+            // Предупреждения и ошибки оставляем включенными всегда
+            warn: true, 
+            error: true
         }
     });
 
@@ -733,12 +739,12 @@ export function create_smart_table(properties) {
 
     // Проверяем установлен ли id блока div для таблицы
     if (!properties.id) {
-        mainLogger.warn('CREATE_SMART_TABLE: Таблица не будет создана так как не указан id блока(div) в котором будет таблица');
+        mainLogger.warn('Таблица не будет создана так как не указан id блока(div) в котором будет таблица');
         return false;
     }
 
     if (document.getElementById(properties.id) === null) {
-        mainLogger.warn(`CREATE_SMART_TABLE: Таблица не будет создана так как не найден элемент с id="${properties.id}" в котором должна быть таблица`);
+        mainLogger.warn(`Таблица не будет создана так как не найден элемент с id="${properties.id}" в котором должна быть таблица`);
         return false;
     }
 
@@ -780,7 +786,7 @@ export function create_smart_table(properties) {
             };
         }
     } else { 
-        mainLogger.warn('CREATE_SMART_TABLE: не указан URL для AJAX запроса, в таблице не будут отображаться строки');
+        mainLogger.warn('Не указан URL для AJAX запроса, в таблице не будут отображаться строки');
     }
     //-------------------------------
 
@@ -809,7 +815,7 @@ export function create_smart_table(properties) {
         
         mainLogger.debug(`Сформировано ${columnsList.length} колонок`);
     } else {
-        mainLogger.warn('CREATE_SMART_TABLE: Таблица не будет корректно отображаться т.к. не указаны колонки для таблицы');
+        mainLogger.warn('Таблица не будет корректно отображаться т.к. не указаны колонки для таблицы');
     }
 
     // Добавляем колонку с действиями (редактирование/удаление)
@@ -880,22 +886,6 @@ export function create_smart_table(properties) {
 
     mainLogger.debug('Русская локализация применена');
 
-    //----------------- ФИЛЬТРЫ ----------------------
-
-    // Создаем локальный логгер для фильтров с тем же enabled, что и у mainLogger
-    // const mainLogger = logger.createInstance({
-    //     enabled: properties.debug || false,
-    //     prefix: '[SmartTable Filters]',
-    //     showTimestamp: true,
-    //     showLevel: true,
-    //     levels: {
-    //         log: properties.debug || false,
-    //         info: properties.debug || false,
-    //         warn: true, // Предупреждения показываем всегда
-    //         error: true, // Ошибки показываем всегда
-    //         debug: properties.debug || false
-    //     }
-    // });
 
     mainLogger.debug('Инициализация фильтров');
 

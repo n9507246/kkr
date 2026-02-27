@@ -117,7 +117,7 @@
 
     document.addEventListener('DOMContentLoaded', function() {
         const table = create_smart_table({
-            debug: true,
+            // debug: true,
             height: '80vh',
             id: 'report-table',
             ajaxURL: "{{ route('obekti-nedvizhimosti.spisok-obektov') }}",
