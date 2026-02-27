@@ -17,7 +17,7 @@
                 <div class="fw-bold small mb-2 border-bottom px-3 py-2">Отображение полей:</div>
                 <div id="columnCheckboxes" to-smart-table="report-table" role="controll_column_visiable_list" ></div>
                 <div class="dropdown-divider"></div>
-                <button type="button" class="btn btn-link btn-sm text-decoration-none w-100 text-start" id="resetColumnState" to-smart-table="report-table" и role="reset_column_visibility1">
+                <button type="button" class="btn btn-link btn-sm text-decoration-none w-100 text-start" id="resetColumnState" to-smart-table="report-table" role="reset_column_visibility">
                     <i class="bi bi-arrow-counterclockwise"></i> Сбросить вид
                 </button>
             </div>
@@ -31,7 +31,7 @@
     <!-- ПАНЕЛЬ ФИЛЬТРОВ -->
     <div id="filter-panel" class="card border-0 shadow-sm">
         <div class="card-body bg-light border-bottom">
-            <form id="filter-form" class="row g-3">
+            <form id="filter-form" class="row g-3" to-smart-table="report-table" role="fiters_table" >
                 <!-- Ряд 1 -->
                 <div class="col-md-3">
                     <label class="form-label small text-muted fw-bold">Кадастровый номер</label>

@@ -712,26 +712,38 @@ const xlsxExporter = {
         return workbook;
     }
 };
-
-
-/**
- * Создает умную таблицу с использованием Tabulator
- * @param {Object} properties - параметры таблицы
- * @returns {Object|boolean} - экземпляр таблицы Tabulator или false в случае ошибки
- */
 export function create_smart_table(properties) {
+    
+    // Создаем экземпляр логгера для таблицы
+    const tableLogger = logger.createInstance({
+        enabled: properties.debug || false,
+        prefix: '[SmartTable]',
+        showTimestamp: true,
+        showLevel: true,
+        levels: {
+            log: properties.debug || false,
+            info: properties.debug || false,
+            warn: properties.debug || false,
+            error: properties.debug || false,
+            debug: properties.debug || false
+        }
+    });
+
+    tableLogger.debug('Начало создания таблицы');
+    tableLogger.debug(`Параметры: ${JSON.stringify(properties)}`);
 
     // Проверяем установлен ли id блока div для таблицы
-    if (properties.debug && !properties.id) {
-        console.warn(`CREATE_SMART_TABLE: Таблица не будет создана так как не указан id блока(div) в котором будет таблица`)
-        
+    if (!properties.id) {
+        tableLogger.warn('CREATE_SMART_TABLE: Таблица не будет создана так как не указан id блока(div) в котором будет таблица');
         return false;
     }
 
-    if(properties.id && document.getElementById(properties.id) === null) {
-        console.warn(`CREATE_SMART_TABLE: Таблица не будет создана так как не найден элемент с id="${properties.id}" в котором должна быть таблица`)
+    if (document.getElementById(properties.id) === null) {
+        tableLogger.warn(`CREATE_SMART_TABLE: Таблица не будет создана так как не найден элемент с id="${properties.id}" в котором должна быть таблица`);
         return false;
     }
+
+    tableLogger.debug(`Элемент с id="${properties.id}" найден`);
 
     const tableConfig = {}
     tableConfig.height = properties.height ?? '400px',          // Высота таблицы
@@ -750,27 +762,28 @@ export function create_smart_table(properties) {
     //---------- AJAX НАСТРОЙКИ -------------
         
     // Проверяем параметр ajaxURL и устанавливаем адрес и тип ответа
-    if (properties.ajaxURL){ 
+    if (properties.ajaxURL) { 
         
         // URL с которого должны прийти данные таблицы
         tableConfig.ajaxURL = properties.ajaxURL;
+        tableLogger.debug(`AJAX URL установлен: ${properties.ajaxURL}`);
 
         // Обработка ответа от сервера - преобразуем JSON в формат Tabulator
         tableConfig.ajaxResponse = function(url, params, response) {
+            tableLogger.debug('Получен ответ от сервера');
+            tableLogger.debug(`Параметры запроса: ${JSON.stringify(params)}`);
+            tableLogger.debug(`Размер ответа: ${response.data?.length || 0} записей`);
+            
             // Возвращаем данные и информацию о последней странице
             return { 
                 data: response.data, 
                 last_page: response.last_page 
             };
         }
-    }     
-
-    // Если параметр ajaxURL не установлен выводим предупреждение
-    else { 
-        console.warn('CREATE_SMART_TABLE: не указан URL для AJAX запроса, в таблице не будут отображаться строки')
+    } else { 
+        tableLogger.warn('CREATE_SMART_TABLE: не указан URL для AJAX запроса, в таблице не будут отображаться строки');
     }
     //-------------------------------
-
 
     //---------- НАСТРОЙКА КОЛОНОК ------------
 
@@ -779,6 +792,7 @@ export function create_smart_table(properties) {
     
     // Загружаем сохраненное состояние видимости колонок из localStorage
     const visiableStateColumns = JSON.parse(localStorage.getItem(`tabulator-${properties.id}-columns`) || "{}");
+    tableLogger.debug(`Загружено состояние видимости колонок: ${JSON.stringify(visiableStateColumns)}`);
 
     // Формируем колонки с указанием дополнительных параметров
     if (properties.columns) { 
@@ -793,15 +807,16 @@ export function create_smart_table(properties) {
             // Остальные параметры из переданной конфигурации колонки
             ...col,
         }));
-    } 
-    // Если пользователь не установил список колонок выводим ошибку
-    else {
-        console.warn('CREATE_SMART_TABLE: Таблица не будет корректно отображаться т.к. не указаны колонки для таблицы');
+        
+        tableLogger.debug(`Сформировано ${columnsList.length} колонок`);
+    } else {
+        tableLogger.warn('CREATE_SMART_TABLE: Таблица не будет корректно отображаться т.к. не указаны колонки для таблицы');
     }
-    
 
     // Добавляем колонку с действиями (редактирование/удаление)
     if (properties.editUrl || properties.deleteUrl) {
+        tableLogger.debug('Добавление колонки с действиями');
+        
         columnsList.push({
             title: "Действия",                           // Заголовок колонки
             field: "actions",                             // Поле в данных
@@ -864,97 +879,184 @@ export function create_smart_table(properties) {
         }
     };
 
-    //----------------- ФИЛЬТРЫ (СДЕЛАТЬ РЕФАКТОРИНГ)----------------------
+    tableLogger.debug('Русская локализация применена');
 
+    //----------------- ФИЛЬТРЫ ----------------------
+
+    // Создаем локальный логгер для фильтров
+    const filterLogger = logger.createInstance({
+        enabled: properties.debug || false,
+        prefix: '[SmartTable Filters]',
+        showTimestamp: true,
+        showLevel: true,
+        levels: {
+            log: properties.debug || false,
+            info: properties.debug || false,
+            warn: properties.debug || false,
+            error: properties.debug || false,
+            debug: properties.debug || false
+        }
+    });
+
+    filterLogger.debug('Инициализация фильтров');
+
+    // Находим форму фильтров
     const filterForm = document.querySelector(`[to-smart-table="${properties.id}"][role="fiters_table"]`);
-    // В функции create_smart_table, после определения filterForm добавьте:
+    
+    if (!filterForm) {
+        filterLogger.warn(
+            'CREATE_SMART_TABLE: Форма фильтров не найдена. ' +
+            `Убедитесь, что в HTML присутствует элемент с атрибутами: ` +
+            `to-smart-table="${properties.id}" и role="fiters_table"`
+        );
+    } else {
+        filterLogger.debug('Форма фильтров найдена');
 
-    // Ключ для хранения фильтров в localStorage
-    const storageKey = `tabulator-${properties.id}-filters`;
+        // Ключ для хранения фильтров в localStorage
+        const storageKey = `tabulator-${properties.id}-filters`;
+        filterLogger.debug(`Ключ localStorage для фильтров: ${storageKey}`);
 
-    // Функция для сохранения фильтров
-    function saveFiltersToStorage(formElement) {
-        if (!formElement) return;
-        
-        const formData = new FormData(formElement);
-        const data = {};
-        formData.forEach((value, key) => {
-            if (value) data[key] = value;
-        });
-        localStorage.setItem(storageKey, JSON.stringify(data));
-    }
+        // Функция для сохранения фильтров
+        function saveFiltersToStorage() {
+            filterLogger.debug('Сохранение фильтров в localStorage');
+            
+            const formData = new FormData(filterForm);
+            const data = {};
+            
+            formData.forEach((value, key) => {
+                if (value) {
+                    data[key] = value;
+                    filterLogger.debug(`Поле фильтра: ${key} = ${value}`);
+                }
+            });
 
-    // Функция для загрузки фильтров из localStorage
-    function loadFiltersFromStorage(formElement) {
-        if (!formElement) return;
-        
-        const saved = localStorage.getItem(storageKey);
-        if (saved) {
+            const dataJson = JSON.stringify(data);
+            localStorage.setItem(storageKey, dataJson);
+            
+            filterLogger.info(`Фильтры сохранены в localStorage: ${storageKey}`);
+            filterLogger.debug(`Размер сохраненных данных: ${dataJson.length} байт`);
+            
+            return data;
+        }
+
+        // Функция для загрузки фильтров из localStorage
+        function loadFiltersFromStorage() {
+            filterLogger.debug('Загрузка фильтров из localStorage');
+            
+            const saved = localStorage.getItem(storageKey);
+            
+            if (!saved) {
+                filterLogger.debug('Сохраненные фильтры не найдены');
+                return null;
+            }
+
             try {
                 const data = JSON.parse(saved);
+                filterLogger.debug(`Загруженные данные: ${JSON.stringify(data)}`);
+                
+                let loadedCount = 0;
+                
                 Object.keys(data).forEach(key => {
-                    const input = formElement.querySelector(`[name="${key}"]`);
+                    const input = filterForm.querySelector(`[name="${key}"]`);
                     if (input) {
                         input.value = data[key];
+                        loadedCount++;
+                        filterLogger.debug(`Поле "${key}" загружено: ${data[key]}`);
+                    } else {
+                        filterLogger.warn(`Поле "${key}" не найдено в форме фильтров`);
                     }
                 });
+                
+                filterLogger.info(`Загружено ${loadedCount} фильтров из localStorage`);
+                return data;
+                
             } catch (e) {
-                console.warn('Ошибка загрузки фильтров из localStorage:', e);
+                filterLogger.error(`Ошибка загрузки фильтров из localStorage: ${e.message}`);
+                return null;
             }
         }
-    }
 
-    // Загружаем сохраненные фильтры в форму
-    if (filterForm) {
-        loadFiltersFromStorage(filterForm);
-    }
+        // Загружаем сохраненные фильтры в форму
+        loadFiltersFromStorage();
 
-    // Обновленная настройка ajaxParams
-    if (properties.apply_filters) {
-        tableConfig.ajaxParams = function() {
-            const params = filterForm ? Object.fromEntries(new FormData(filterForm).entries()) : {};
-            return {
-                filters: params
-            };
+        // Настройка ajaxParams для включения фильтров
+        if (properties.apply_filters) {
+            filterLogger.debug('Настройка ajaxParams для фильтров');
+            
+            tableConfig.ajaxParams = function() {
+                const formData = new FormData(filterForm);
+                const params = {};
+                
+                formData.forEach((value, key) => {
+                    if (value) params[key] = value;
+                });
+                
+                filterLogger.debug(`Параметры фильтров для запроса: ${JSON.stringify(params)}`);
+                
+                return {
+                    filters: params
+                };
+            }
         }
-    }
 
-    // Обновленный обработчик submit
-    if (filterForm) {
+        // Обработчик отправки формы
         filterForm.addEventListener("submit", (e) => {
             e.preventDefault();
-            saveFiltersToStorage(filterForm); // Сохраняем фильтры
-            table.setData(); // Перезагружаем таблицу
+            filterLogger.info('Отправка формы фильтров');
+            
+            saveFiltersToStorage();
+            filterLogger.debug('Фильтры сохранены, перезагрузка таблицы');
+            
+            table.setData();
         });
 
-        // Добавляем кнопку сброса фильтров, если её нет в форме
+        // Поиск кнопки сброса
         const resetBtn = filterForm.querySelector('[type="reset"]') || filterForm.querySelector('#reset-filters');
+        
         if (resetBtn) {
+            filterLogger.debug('Кнопка сброса фильтров найдена');
+            
             resetBtn.addEventListener('click', (e) => {
                 e.preventDefault();
-                filterForm.reset(); // Сбрасываем форму
-                localStorage.removeItem(storageKey); // Удаляем сохраненные фильтры
-                table.setData(); // Перезагружаем таблицу
+                filterLogger.info('Сброс фильтров');
+                
+                filterForm.reset();
+                localStorage.removeItem(storageKey);
+                filterLogger.debug(`Фильтры удалены из localStorage: ${storageKey}`);
+                
+                table.setData();
+                filterLogger.info('Фильтры сброшены, таблица перезагружена');
             });
+        } else {
+            filterLogger.debug('Кнопка сброса фильтров не найдена');
         }
+
+        filterLogger.debug('Инициализация фильтров завершена');
     }
 
     // -----------------------------------------------------------------------------
 
+    tableLogger.debug('Создание экземпляра таблицы Tabulator');
+    
     // Создаем экземпляр таблицы Tabulator
     const table = new Tabulator(`#${properties.id}`, tableConfig);
 
+    tableLogger.debug('Таблица Tabulator создана');
+
     // Запускаем управление видимостью колонок, если это указано в параметрах
     if (properties.controll_column_visiable) {
+        tableLogger.debug('Инициализация управления видимостью колонок');
         controllColumnVisiable.init(table, { debug: properties.debug });
     }
 
     // Запускаем экспорт в Excel, если это указано в параметрах
     if (properties.export_to_excel) {
+        tableLogger.debug('Инициализация экспорта в Excel');
         xlsxExporter.export(table);
     }
     
-
+    tableLogger.info(`Таблица с id="${properties.id}" успешно создана`);
+    
     // Возвращаем экземпляр таблицы
     return table;
 }
