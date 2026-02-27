@@ -131,7 +131,7 @@ const logger = {
 
     debug: function(message) {
         if (this.shouldLog('debug')) {
-            console.info(this.formatMessage('debug', message));
+            console.debug(this.formatMessage('debug', message));
         }
     },
 
@@ -713,7 +713,7 @@ const excelExporter = {
 };
 export function create_smart_table(properties) {
     
-    // properties.debug = true
+    properties.debug = true
     const isDebug = !!properties.debug;
     
     // Создаем ЕДИНЫЙ экземпляр логгера для всей таблицы
