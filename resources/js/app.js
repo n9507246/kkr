@@ -255,7 +255,7 @@ const controllColumnVisiable = {
         
         if (!columnList) {
             this.logger.warn(
-                'CREATE SMART TABLE COLUMN VISIABLE: Список отображения колонок не может быть создан, ' +
+                'Список отображения колонок не может быть создан, ' +
                 `так как не найден элемент в HTML ` +
                 `to-smart-table="${this.table.element.id}" ` +
                 `role="controll_column_visiable_list который будет содержать чекбоксы ` +
@@ -492,7 +492,7 @@ const controllColumnVisiable = {
         );
         
         if (!columnList) {
-            this.logger.warn('CREATE SMART TABLE COLUMN VISIABLE: Список чекбоксов не найден для обновления');
+            this.logger.warn('Список чекбоксов не найден для обновления');
             return;
         }
 
@@ -548,13 +548,6 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-
-/**
- * Объект для экспорта таблицы Tabulator в Excel с автоподбором ширины колонок
- */
-/**
- * Объект для экспорта таблицы Tabulator в Excel с автоподбором ширины колонок
- */
 /**
  * Объект для экспорта таблицы Tabulator в Excel с автоподбором ширины колонок
  */
@@ -711,9 +704,10 @@ const excelExporter = {
         return path.split('.').reduce((acc, key) => acc ? acc[key] : null, obj);
     }
 };
+
 export function create_smart_table(properties) {
     
-    properties.debug = true
+    // properties.debug = true
     const isDebug = !!properties.debug;
     
     // Создаем ЕДИНЫЙ экземпляр логгера для всей таблицы
