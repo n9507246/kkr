@@ -599,28 +599,65 @@ const excelExporter = {
         }
     },
 
-async fetchAllData() {
-
-    if (!this.ajaxURL) {
-        return this.table.getData();
-    }
-
-    const response = await fetch(this.ajaxURL + '?page=1&size=100000', {
-        method: 'GET',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-            'Accept': 'application/json'
+    async fetchAllData() {
+        if (!this.ajaxURL) {
+            return this.table.getData();
         }
-    });
 
-    if (!response.ok) {
-        throw new Error('Server responded with ' + response.status);
-    }
+        const params = new URLSearchParams();
+        let currentParams = {};
 
-    const json = await response.json();
+        // 1. Извлекаем динамические параметры (фильтры) из настроек таблицы
+        // В твоем логе это функция, которая собирает FormData из filterForm
+        if (typeof this.table.options.ajaxParams === "function") {
+            currentParams = this.table.options.ajaxParams();
+        } else if (this.table.options.ajaxParams) {
+            currentParams = this.table.options.ajaxParams;
+        }
 
-    return json.data || [];
-},
+        // 2. Добавляем фильтры в URL
+        // Если твоя функция возвращает { filters: { field: value } }, обрабатываем это
+        if (currentParams.filters) {
+            Object.keys(currentParams.filters).forEach(key => {
+                const value = currentParams.filters[key];
+                if (value) {
+                    params.append(`filters[${key}]`, value);
+                }
+            });
+        } else {
+            // На случай, если параметры лежат в корне объекта
+            Object.keys(currentParams).forEach(key => {
+                if (currentParams[key]) params.append(key, currentParams[key]);
+            });
+        }
+
+        // 3. Добавляем параметры пагинации для выгрузки "всего"
+        params.set('page', 1);
+        params.set('size', 9999999999);
+
+        const finalUrl = this.ajaxURL.includes('?') 
+            ? `${this.ajaxURL}&${params.toString()}` 
+            : `${this.ajaxURL}?${params.toString()}`;
+
+        this.logger?.info('Final export URL with filters: ' + finalUrl);
+
+        const response = await fetch(finalUrl, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Ошибка сервера: ${response.status}`);
+        }
+
+        const json = await response.json();
+        
+        // Возвращаем данные (учитывая структуру ответа Laravel/Tabulator)
+        return json.data || [];
+    },
     buildWorkbook(columns, data) {
 
         const header = columns.map(c => c.title || c.field);
