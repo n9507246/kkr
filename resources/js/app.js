@@ -552,196 +552,128 @@ function escapeHtml(text) {
 /**
  * Объект для экспорта таблицы Tabulator в Excel с автоподбором ширины колонок
  */
-const xlsxExporter = {
+/**
+ * Объект для экспорта таблицы Tabulator в Excel с автоподбором ширины колонок
+ */
+/**
+ * Объект для экспорта таблицы Tabulator в Excel с автоподбором ширины колонок
+ */
+const excelExporter = {
     table: null,
     logger: null,
+    ajaxURL: null,
+    exportButtonId: 'export-excel-btn',
 
-    /**
-     * Инициализирует экспортер и навешивает обработчик на кнопку
-     * @param {Object} table - экземпляр таблицы Tabulator
-     * @param {Object} options - дополнительные параметры
-     * @param {Object} options.logger - экземпляр логгера
-     */
-    export: function(table, options = {}) {
-        // Сохраняем ссылку на таблицу для использования в обработчике
+    init(table, options = {}) {
         this.table = table;
-        
-        // Используем переданный логгер
         this.logger = options.logger || null;
-        
-        // Находим кнопку экспорта по ID
-        const exportButton = document.getElementById('test-button-excel');
-        
-        // Проверяем, существует ли кнопка на странице
-        if (!exportButton) {
-            if (this.logger) {
-                this.logger.warn('CREATE_SMART_TABLE: Кнопка экспорта с ID "test-button-excel" не найдена');
-            } else {
-                console.warn('CREATE_SMART_TABLE: Кнопка экспорта с ID "test-button-excel" не найдена');
-            }
+        this.ajaxURL = options.ajaxURL || null;
+
+        if (options.exportButtonId) {
+            this.exportButtonId = options.exportButtonId;
+        }
+
+        const btn = document.getElementById(this.exportButtonId);
+        if (!btn) {
+            this.logger?.warn(`Excel export button "${this.exportButtonId}" not found`);
             return;
         }
-        
-        // Навешиваем обработчик клика на кнопку
-        exportButton.addEventListener('click', () => {
-            this.exportToExcel();
-        });
-        
-        if (this.logger) {
-            this.logger.info('Экспортер инициализирован, обработчик навешен на кнопку');
-        } else {
-            console.log('Экспортер инициализирован, обработчик навешен на кнопку');
-        }
+
+        btn.addEventListener('click', () => this.export());
+        this.logger?.info('Excel exporter initialized');
     },
-    
-    /**
-     * Выполняет экспорт таблицы в Excel с автоподбором ширины колонок
-     */
-    exportToExcel: function() {
-        
-        // Проверяем, существует ли таблица
-        if (!this.table) {
-            if (this.logger) {
-                this.logger.error('Таблица не инициализирована');
-            } else {
-                console.error('Таблица не инициализирована');
-            }
-            return;
-        }
-        
-        // Вызываем метод download таблицы Tabulator
-        this.table.download("xlsx", "данные.xlsx", {
-            // Название листа в Excel-файле
-            sheetName: "Лист1",
-            
-            /**
-             * Обработчик для модификации книги Excel перед сохранением
-             * @param {Object} workbook - объект книги Excel от SheetJS
-             * @returns {Object} модифицированная книга
-             */
-            documentProcessing: (workbook) => this.autoFitColumns(workbook)
-        });
-        
-        if (this.logger) {
-            this.logger.info('Экспорт в Excel запущен');
-        } else {
-            console.log('Экспорт в Excel запущен');
-        }
-    },
-    
-    /**
-     * Автоматически подбирает ширину колонок по содержимому
-     * @param {Object} workbook - объект книги Excel от SheetJS
-     * @returns {Object} модифицированная книга с настроенными колонками
-     */
-    autoFitColumns: function(workbook) {
+
+    async export() {
         try {
-            // Получаем название первого листа в книге
-            const firstSheetName = workbook.SheetNames[0];
-            
-            // Получаем сам лист по названию
-            const sheet = workbook.Sheets[firstSheetName];
-            
-            // Проверяем, существует ли лист
-            if (!sheet) {
-                if (this.logger) {
-                    this.logger.warn('Лист не найден, пропускаем автоподбор');
-                } else {
-                    console.warn('Лист не найден, пропускаем автоподбор');
-                }
-                return workbook;
-            }
-            
-            // Проверяем, есть ли в листе данные
-            if (!sheet['!ref']) {
-                if (this.logger) {
-                    this.logger.warn('Лист пустой, пропускаем автоподбор');
-                } else {
-                    console.warn('Лист пустой, пропускаем автоподбор');
-                }
-                return workbook;
-            }
-            
-            // ============================================================
-            // Определяем диапазон данных в листе
-            // ============================================================
-            // !ref содержит ссылку на диапазон, например "A1:C10"
-            const range = XLSX.utils.decode_range(sheet['!ref']);
-            
-            // Массив для хранения настроек ширины колонок
-            const columnWidths = [];
-            
-            // ============================================================
-            // Проходим по каждой колонке
-            // ============================================================
-            for (let colIndex = range.s.c; colIndex <= range.e.c; colIndex++) {
-                // Переменная для хранения максимальной длины в текущей колонке
-                let maxLength = 0;
-                
-                // ============================================================
-                // Проходим по каждой строке в текущей колонке
-                // ============================================================
-                for (let rowIndex = range.s.r; rowIndex <= range.e.r; rowIndex++) {
-                    // Создаем объект с координатами ячейки
-                    const cellCoordinates = {
-                        c: colIndex, // колонка (0-индекс)
-                        r: rowIndex  // строка (0-индекс)
-                    };
-                    
-                    // Получаем ссылку на ячейку в формате "A1", "B2" и т.д.
-                    const cellAddress = XLSX.utils.encode_cell(cellCoordinates);
-                    
-                    // Получаем ячейку из листа
-                    const cell = sheet[cellAddress];
-                    
-                    // Если ячейка существует и содержит значение
-                    if (cell && cell.v !== undefined && cell.v !== null) {
-                        // Преобразуем значение в строку и считаем длину
-                        const cellValue = String(cell.v);
-                        const valueLength = cellValue.length;
-                        
-                        // Обновляем максимальную длину, если нашли более длинное значение
-                        if (valueLength > maxLength) {
-                            maxLength = valueLength;
-                        }
-                    }
-                }
-                
-                // ============================================================
-                // Устанавливаем ширину колонки
-                // ============================================================
-                // Добавляем запас в 2 символа для лучшей читаемости
-                // Минимальная ширина - 5 символов, чтобы колонка не схлопнулась
-                const columnWidth = Math.max(maxLength + 2, 5);
-                columnWidths[colIndex] = { wch: columnWidth };
-            }
-            
-            // ============================================================
-            // Применяем настройки ширины к листу
-            // ============================================================
-            // Специальное свойство !cols отвечает за ширину колонок в Excel
-            sheet['!cols'] = columnWidths;
-            
-            if (this.logger) {
-                this.logger.info('Автоподбор ширины колонок выполнен успешно');
-            } else {
-                console.log('Автоподбор ширины колонок выполнен успешно');
-            }
-            
-        } catch (error) {
-            // Ловим и логируем ошибки, чтобы не прерывать экспорт
-            if (this.logger) {
-                this.logger.error('Ошибка при автоподборе ширины колонок:', error);
-            } else {
-                console.error('Ошибка при автоподборе ширины колонок:', error);
-            }
+            this.logger?.info('Starting Excel export');
+
+            const columns = this.table.getColumnLayout()
+                .filter(col => col.visible !== false && col.field && col.field !== 'actions');
+
+            const data = await this.fetchAllData();
+
+            this.buildWorkbook(columns, data);
+
+        } catch (e) {
+            this.logger?.error('Export error: ' + e.message);
         }
-        
-        // Всегда возвращаем workbook, даже если была ошибка
-        return workbook;
+    },
+
+async fetchAllData() {
+
+    if (!this.ajaxURL) {
+        return this.table.getData();
+    }
+
+    const response = await fetch(this.ajaxURL + '?page=1&size=100000', {
+        method: 'GET',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+        }
+    });
+
+    if (!response.ok) {
+        throw new Error('Server responded with ' + response.status);
+    }
+
+    const json = await response.json();
+
+    return json.data || [];
+},
+    buildWorkbook(columns, data) {
+
+        const header = columns.map(c => c.title || c.field);
+        const rows = data.map(row =>
+            columns.map(c => this.getNestedValue(row, c.field))
+        );
+
+        const worksheetData = [header, ...rows];
+
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.aoa_to_sheet(worksheetData);
+
+        ws['!cols'] = this.calculateWidths(columns, data);
+
+        XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+        XLSX.writeFile(wb, 'export.xlsx');
+
+        this.logger?.info('Excel file saved');
+    },
+
+    calculateWidths(columns, data) {
+        return columns.map(col => {
+
+            let max = this.visualLength(col.title || '');
+
+            data.forEach(row => {
+                const value = this.getNestedValue(row, col.field);
+                if (value !== null && value !== undefined) {
+                    const len = this.visualLength(String(value));
+                    if (len > max) max = len;
+                }
+            });
+
+            return { wch: Math.min(Math.max(max + 3, 10), 80) };
+        });
+    },
+
+    visualLength(text) {
+        let length = 0;
+
+        for (let char of text) {
+            if (/[А-Яа-яЁё]/.test(char)) length += 1.5;
+            else if (/[A-Z]/.test(char)) length += 1.2;
+            else length += 1;
+        }
+
+        return Math.ceil(length);
+    },
+
+    getNestedValue(obj, path) {
+        return path.split('.').reduce((acc, key) => acc ? acc[key] : null, obj);
     }
 };
-
 export function create_smart_table(properties) {
     
     // Создаем ЕДИНЫЙ экземпляр логгера для всей таблицы
@@ -751,11 +683,11 @@ export function create_smart_table(properties) {
         showTimestamp: true,
         showLevel: true,
         levels: {
-            log: properties.debug || false,
-            info: properties.debug || false,
+            log: properties.debug || true,
+            info: properties.debug || true,
             warn: true, // Предупреждения показываем всегда, даже без debug
             error: true, // Ошибки показываем всегда, даже без debug
-            debug: properties.debug || false
+            debug: properties.debug || true
         }
     });
 
@@ -1084,10 +1016,12 @@ export function create_smart_table(properties) {
     }
 
     // Запускаем экспорт в Excel, если это указано в параметрах
-    if (properties.export_to_excel) {
-        mainLogger.debug('Инициализация экспорта в Excel');
-        // Передаем основной логгер в экспортер
-        xlsxExporter.export(table, { logger: mainLogger });
+    if  (properties.export_to_excel) {
+excelExporter.init(table, {
+    logger: mainLogger,
+    ajaxURL: properties.ajaxURL || null,
+    exportButtonId: properties.exportButtonId || 'export-excel-btn'
+});
     }
     
     mainLogger.info(`Таблица с id="${properties.id}" успешно создана`);

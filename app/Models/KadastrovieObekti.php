@@ -30,11 +30,17 @@ class KadastrovieObekti extends Model
         'data_zaversheniya' => 'date',
         'data_okonchaniya_rabot' => 'date',
     ];
-    public function tipObekta() {
+
+    /**
+     * Связь с типом объекта
+     */
+    public function tipObekta()
+    {
         return $this->belongsTo(TipyObektov::class, 'tip_obekta_id');
     }
+
     /**
-     * Связь с видом работ (справочник)
+     * Связь с видом работ
      */
     public function vidiRabot()
     {
@@ -49,54 +55,138 @@ class KadastrovieObekti extends Model
         return $this->belongsTo(VneshniePorucheniya::class, 'poruchenie_id');
     }
 
-
-    public function sortVariants(Builder $query, array $sort)
+    /**
+     * Применение сортировки к запросу
+     */
+    public function scopeSort(Builder $query, ?array $sortFields): Builder
     {
-        match ($sort['field']) {
+        if (empty($sortFields)) {
+            return $query->orderBy('kadastrovie_obekti.created_at', 'desc');
+        }
 
-            'kadastroviy_nomer' =>
-                $query->orderBy('kadastroviy_nomer', $sort['dir']),
+        foreach ($sortFields as $sort) {
+            $field = $sort['field'] ?? null;
+            $direction = $sort['dir'] ?? 'asc';
 
-            'ispolnitel' =>
-                $query->orderBy('ispolnitel', $sort['dir']),
+            if (!$field) {
+                continue;
+            }
 
-            'vidi_rabot.nazvanie' =>
-                $query->orderBy(
-                    \App\Models\VidiRabot::select('nazvanie')
-                        ->whereColumn('vidi_rabot.id', 'kadastrovie_obekti.vid_rabot_id')
-                        ->limit(1),
-                    $sort['dir']
-                ),
+            $this->applySortField($query, $field, $direction);
+        }
+
+        return $query;
+    }
+
+    /**
+     * Применение сортировки по конкретному полю
+     */
+    private function applySortField(Builder $query, string $field, string $direction): void
+    {
+        match ($field) {
+            // Поля из основной таблицы
+            'kadastroviy_nomer',
+            'ispolnitel',
+            'data_zaversheniya',
+            'kommentariy' => $query->orderBy($field, $direction),
+
+            // Поле из связанной таблицы tipObekta
+            'tip_obekta.abbreviatura' => $query->orderBy(
+                TipyObektov::select('abbreviatura')
+                    ->whereColumn('tipy_obektov.id', 'kadastrovie_obekti.tip_obekta_id')
+                    ->limit(1),
+                $direction
+            ),
+
+            // Поле из связанной таблицы vidiRabot
+            'vidi_rabot.nazvanie' => $query->orderBy(
+                VidiRabot::select('nazvanie')
+                    ->whereColumn('vidi_rabot.id', 'kadastrovie_obekti.vid_rabot_id')
+                    ->limit(1),
+                $direction
+            ),
+
+            // Поля из связанной таблицы poruchenie
+            'poruchenie.vhod_nomer' => $this->orderByPoruchenieField($query, 'vhod_nomer', $direction),
+            'poruchenie.vhod_data' => $this->orderByPoruchenieField($query, 'vhod_data', $direction),
+            'poruchenie.urr_nomer' => $this->orderByPoruchenieField($query, 'urr_nomer', $direction),
+            'poruchenie.urr_data' => $this->orderByPoruchenieField($query, 'urr_data', $direction),
 
             default => null,
         };
     }
 
-    public function scopeSort(Builder $query, $sort_fields_list)
+    /**
+     * Сортировка по полю поручения
+     */
+    private function orderByPoruchenieField(Builder $query, string $field, string $direction): void
     {
-        foreach ($sort_fields_list as $sort) {
-
-            $this->sortVariants($query, $sort);                    
-        }
+        $query->orderBy(
+            VneshniePorucheniya::select($field)
+                ->whereColumn('vneshnie_porucheniya.id', 'kadastrovie_obekti.poruchenie_id')
+                ->limit(1),
+            $direction
+        );
     }
 
-    public function scopeFilter(Builder $query, array $filters)
+    /**
+     * Применение фильтров к запросу
+     * Ожидает структуру: $filters = ['field_name' => 'value', ...]
+     */
+    public function scopeFilter(Builder $query, array $filters): Builder
     {
-        if (isset($filters['kadastroviy_nomer'])) {
-            $query->where('kadastroviy_nomer', 'like', "%{$filters['kadastroviy_nomer']}%");
-        }
+        // Фильтры по полям основной таблицы
+        $query->when($filters['kadastroviy_nomer'] ?? null, fn($q, $value) => 
+                $q->where('kadastroviy_nomer', 'like', "%{$value}%"))
+                
+            ->when($filters['ispolnitel'] ?? null, fn($q, $value) => 
+                $q->where('ispolnitel', 'like', "%{$value}%"))
+                
+            ->when($filters['tip_obekta_id'] ?? null, fn($q, $value) => 
+                $q->where('tip_obekta_id', $value))
+                
+            ->when($filters['vid_rabot_id'] ?? null, fn($q, $value) => 
+                $q->where('vid_rabot_id', $value))
+                
+            ->when($filters['kommentariy'] ?? null, fn($q, $value) => 
+                $q->where('kommentariy', 'like', "%{$value}%"));
 
-        if (isset($filters['ispolnitel'])) {
-            $query->where('ispolnitel', 'like', "%{$filters['ispolnitel']}%");
-        }
+        // Фильтры по датам
+        $query->when($filters['data_nachala'] ?? null, fn($q, $value) => 
+                $q->whereDate('data_nachala', $value))
+                
+            ->when($filters['data_nachala_start'] ?? null, fn($q, $value) => 
+                $q->whereDate('data_nachala', '>=', $value))
+                
+            ->when($filters['data_nachala_end'] ?? null, fn($q, $value) => 
+                $q->whereDate('data_nachala', '<=', $value))
+                
+            ->when($filters['data_zaversheniya'] ?? null, fn($q, $value) => 
+                $q->whereDate('data_zaversheniya', $value))
+                
+            ->when($filters['data_zaversheniya_start'] ?? null, fn($q, $value) => 
+                $q->whereDate('data_zaversheniya', '>=', $value))
+                
+            ->when($filters['data_zaversheniya_end'] ?? null, fn($q, $value) => 
+                $q->whereDate('data_zaversheniya', '<=', $value));
 
-        if (isset($filters['vid_rabot.nazvanie'])) {
-            $query->whereHas('vidiRabot', function ($q) use ($filters) {
-                $q->where('nazvanie', 'like', "%{$filters['vid_rabot.nazvanie']}%");
-            });
-        }
+        // Фильтры по связанной таблице poruchenie
+        $query->when($filters['vhod_nomer'] ?? null, fn($q, $value) => 
+                $q->whereHas('poruchenie', fn($subQ) => 
+                    $subQ->where('vhod_nomer', 'like', "%{$value}%")))
+                    
+            ->when($filters['vhod_data'] ?? null, fn($q, $value) => 
+                $q->whereHas('poruchenie', fn($subQ) => 
+                    $subQ->whereDate('vhod_data', $value)))
+                    
+            ->when($filters['urr_nomer'] ?? null, fn($q, $value) => 
+                $q->whereHas('poruchenie', fn($subQ) => 
+                    $subQ->where('urr_nomer', 'like', "%{$value}%")))
+                    
+            ->when($filters['urr_data'] ?? null, fn($q, $value) => 
+                $q->whereHas('poruchenie', fn($subQ) => 
+                    $subQ->whereDate('urr_data', $value)));
+
+        return $query;
     }
-
 }
-
-
