@@ -1,8 +1,10 @@
 
-@php $id_table = 'test-smart-table'; @endphp
+
 
 <x-layout>
 
+    @php $id_table = 'test-smart-table'; @endphp
+    
     <x-smart-table.component :id="$id_table">
         <x-slot:control-panel>
             <div class='d-flex gap-2 mb-2'>
@@ -18,6 +20,8 @@
                     
                 </x-smart-table.column-controller>
                 <x-smart-table.filter-panel-btn :id="$id_table"/>
+                
+                <x-smart-table.export-excel :id="$id_table"/>
             </div>
             <x-smart-table.filter-panel :id="$id_table">
                 <x-slot:filters>
@@ -90,8 +94,6 @@
             import { create_smart_table } from '{{ Vite::asset('resources/js/app.js') }}';
 
             document.addEventListener('DOMContentLoaded', function() {
-
-
                 const table = create_smart_table({
                     // debug: true,
                     height: '80vh',

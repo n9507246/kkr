@@ -537,20 +537,27 @@ const excelExporter = {
     table: null,
     logger: null,
     ajaxURL: null,
-    exportButtonId: 'export-excel-btn',
+    exportButtonId: null,
 
     init(table, options = {}) {
         this.table = table;
         this.logger = options.logger || null;
         this.ajaxURL = options.ajaxURL || null;
 
-        if (options.exportButtonId) {
-            this.exportButtonId = options.exportButtonId;
-        }
+        const tableId = this.table?.element?.id;
+        this.exportButtonId = options.exportButtonId || `export-excel-btn-${tableId}`;
 
-        const btn = document.getElementById(this.exportButtonId);
+        const btn = document.getElementById(this.exportButtonId)
+            || document.querySelector(
+                `[to-smart-table="${tableId}"][role="export_excel"], ` +
+                `[to-smart-table="${tableId}"][role="export-to-excel"]`
+            );
+
         if (!btn) {
-            this.logger?.warn(`Excel export button "${this.exportButtonId}" not found`);
+            this.logger?.warn(
+                `Excel export button not found for table "${tableId}". ` +
+                `Expected id "${this.exportButtonId}" or [to-smart-table="${tableId}"][role="export_excel"]`
+            );
             return;
         }
 
@@ -1081,7 +1088,7 @@ export function create_smart_table(properties) {
         excelExporter.init(table, {
             logger: mainLogger,
             ajaxURL: properties.ajaxURL || null,
-            exportButtonId: properties.exportButtonId || 'export-excel-btn'
+            exportButtonId: properties.exportButtonId
         });
     }
     
