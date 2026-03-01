@@ -156,6 +156,7 @@ const columnVisibilityController = {
     columnCheckboxesContainer: null,      // Контейнер с чекбоксами для управления видимостью колонок
     resetButton: null,                    // Кнопка сброса настроек
     logger: null,                         // Экземпляр логгера
+    storageKeyBase: null,                 // Базовый ключ для localStorage
 
     /**
      * Инициализация управления видимостью колонок
@@ -167,6 +168,7 @@ const columnVisibilityController = {
     init: function(table, options = {}) {
         
         this.table = table;
+        this.storageKeyBase = options.storageKeyBase || this.table.element.id;
         
         // Используем переданный логгер или создаем новый
         if (options.logger) {
@@ -363,7 +365,7 @@ const columnVisibilityController = {
             });
 
             // Сохраняем финальное состояние в localStorage
-            const storageKey = `tabulator-${this.table.element.id}-columns`;
+            const storageKey = `tabulator-${this.storageKeyBase}-columns`;
             const stateJson = JSON.stringify(state);
             
             localStorage.setItem(storageKey, stateJson);
@@ -429,7 +431,7 @@ const columnVisibilityController = {
         
         try {
             // Очищаем сохраненное состояние из localStorage
-            const storageKey = `tabulator-${this.table.element.id}-columns`;
+            const storageKey = `tabulator-${this.storageKeyBase}-columns`;
             localStorage.removeItem(storageKey);
             
             this.logger.info(`Сохраненное состояние колонок удалено из localStorage: ${storageKey}`);
@@ -778,12 +780,27 @@ export function create_smart_table(properties) {
         return false;
     }
 
-    if (document.getElementById(properties.id) === null) {
+    const escapedId = typeof CSS !== 'undefined' && typeof CSS.escape === 'function'
+        ? CSS.escape(properties.id)
+        : properties.id.replace(/([ #;?%&,.+*~\\':"!^$[\]()=>|/@])/g, '\\$1');
+    const tableElements = document.querySelectorAll(`#${escapedId}`);
+
+    if (tableElements.length === 0) {
         mainLogger.warn(`Таблица не будет создана так как не найден элемент с id="${properties.id}" в котором должна быть таблица`);
         return false;
     }
 
+    if (tableElements.length > 1) {
+        mainLogger.error(
+            `Таблица не будет создана: найдено ${tableElements.length} элементов с одинаковым id="${properties.id}". ` +
+            'id должен быть уникальным.'
+        );
+        return false;
+    }
+
     mainLogger.debug(`Элемент с id="${properties.id}" найден`);
+    const storageKeyBase = properties.storageKey || properties.id;
+    mainLogger.debug(`Базовый ключ localStorage: ${storageKeyBase}`);
 
     const shouldPersistFilterPanelState =
         properties.persist_filter_panel_state ?? properties.apply_filters ?? false;
@@ -843,7 +860,7 @@ export function create_smart_table(properties) {
     let columnsList = [];
     
     // Загружаем сохраненное состояние видимости колонок из localStorage
-    const visiableStateColumns = JSON.parse(localStorage.getItem(`tabulator-${properties.id}-columns`) || "{}");
+    const visiableStateColumns = JSON.parse(localStorage.getItem(`tabulator-${storageKeyBase}-columns`) || "{}");
     mainLogger.debug(`Загружено состояние видимости колонок: ${JSON.stringify(visiableStateColumns)}`);
 
     // Формируем колонки с указанием дополнительных параметров
@@ -953,7 +970,7 @@ export function create_smart_table(properties) {
             mainLogger.debug('Форма фильтров найдена');
 
             // Ключ для хранения фильтров в localStorage
-            const storageKey = `tabulator-${properties.id}-filters`;
+            const storageKey = `tabulator-${storageKeyBase}-filters`;
             mainLogger.debug(`Ключ localStorage для фильтров: ${storageKey}`);
 
             // Функция для сохранения фильтров
@@ -1092,7 +1109,8 @@ export function create_smart_table(properties) {
         // Передаем основной логгер в управление видимостью
         columnVisibilityController.init(table, {
             debug: properties.debug,
-            logger: mainLogger
+            logger: mainLogger,
+            storageKeyBase: storageKeyBase,
         });
     }
 
