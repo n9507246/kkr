@@ -613,7 +613,20 @@ const excelExporter = {
             });
         }
 
-        // 3. Добавляем параметры пагинации для выгрузки "всего"
+        // 3. Добавляем текущую сортировку таблицы в формате backend: sort[index][field|dir]
+        const sorters = typeof this.table.getSorters === 'function' ? this.table.getSorters() : [];
+        if (Array.isArray(sorters) && sorters.length > 0) {
+            sorters.forEach((sorter, index) => {
+                if (!sorter?.field) {
+                    return;
+                }
+
+                params.append(`sort[${index}][field]`, sorter.field);
+                params.append(`sort[${index}][dir]`, sorter.dir || 'asc');
+            });
+        }
+
+        // 4. Добавляем параметры пагинации для выгрузки "всего"
         params.set('page', 1);
         params.set('size', 9999999999);
 
