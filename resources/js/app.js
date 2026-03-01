@@ -151,11 +151,11 @@ const logger = {
 /**
  * Управление видимостью колонок таблицы Tabulator
  */
-const controllColumnVisiable = {
+const columnVisibilityController = {
     table: null,                          // Ссылка на таблицу Tabulator
-    contoll_visiable_columns: null,       // DOM-элемент с чекбоксами для управления видимостью
-    resetButton: null,                    // DOM-элемент кнопки сброса настроек
-    logger: null,                          // Экземпляр логгера
+    columnCheckboxesContainer: null,      // Контейнер с чекбоксами для управления видимостью колонок
+    resetButton: null,                    // Кнопка сброса настроек
+    logger: null,                         // Экземпляр логгера
 
     /**
      * Инициализация управления видимостью колонок
@@ -174,7 +174,7 @@ const controllColumnVisiable = {
         } else {
             this.logger = logger.createInstance({
                 enabled: options.debug || false,
-                prefix: '[CREATE SMART TABLE] [COLUMN VISIABLE]',
+                prefix: '[CREATE SMART TABLE] [COLUMN VISIBILITY]',
                 showTimestamp: true,
                 showLevel: true,
                 levels: {
@@ -191,22 +191,22 @@ const controllColumnVisiable = {
         this.logger.debug(`ID таблицы: ${this.table.element.id}`);
         this.logger.debug(`Режим отладки: ${options.debug ? 'включен' : 'выключен'}`);
 
-        // Получаем элемент с нашим выпадающим списком колонок
-        this.contoll_visiable_columns = document.querySelector(
-            `[to-smart-table="${this.table.element.id}"][role="controll_column_visiable"]`
+        // Находим и сохраняем контейнер для чекбоксов
+        const tableId = this.table.element.id;
+        this.columnCheckboxesContainer = document.querySelector(
+            `[to-smart-table="${tableId}"][role="controll_column_visiable"], ` +
+            `[to-smart-table="${tableId}"][role="control_column_visibility"]`
         );
 
-        // Если элемент не найден - логируем предупреждение и завершаем инициализацию
-        if (!this.contoll_visiable_columns) {
+        if (!this.columnCheckboxesContainer) {
             this.logger.warn(
-                'Список отображения колонок не может быть создан, ' +
-                `так как не найден элемент в HTML role="controll_column_visiable" ` +
-                `to-smart-table="${this.table.element.id}"`
+                'Контейнер для чекбоксов не найден. Убедитесь, что создан элемент с атрибутами ' +
+                `role="controll_column_visiable" (или role="control_column_visibility") ` +
+                `и to-smart-table="${tableId}"`
             );
             return;
         }
-
-        this.logger.debug('Элемент управления видимостью найден');
+        this.logger.debug('Контейнер для чекбоксов найден и сохранен');
 
         // Сохраняем состояние при изменении видимости
         this.table.on("columnVisibilityChanged", () => {
@@ -247,27 +247,11 @@ const controllColumnVisiable = {
      */
     createColumnCheckboxes: function(tableColumnList) {
         this.logger.info(`Создание чекбоксов для ${tableColumnList.length} колонок`);
-        
-        // Находим выпадающее меню (в нем будем создавать чекбоксы)
-        const columnList = this.contoll_visiable_columns.querySelector(
-            `[to-smart-table="${this.table.element.id}"][role="controll_column_visiable_list"]`
-        );
-        
-        if (!columnList) {
-            this.logger.warn(
-                'Список отображения колонок не может быть создан, ' +
-                `так как не найден элемент в HTML ` +
-                `to-smart-table="${this.table.element.id}" ` +
-                `role="controll_column_visiable_list который будет содержать чекбоксы ` +
-                `для управления видимостью колонок`
-            );
-            return;
-        }
 
         this.logger.debug('Контейнер для чекбоксов найден');
 
         // Очищаем контейнер
-        columnList.innerHTML = "";
+        this.columnCheckboxesContainer.innerHTML = "";
         this.logger.debug('Контейнер чекбоксов очищен');
 
         // Создаем чекбоксы для каждой колонки
@@ -306,7 +290,7 @@ const controllColumnVisiable = {
             });
 
             // Добавляем чекбокс в список
-            columnList.appendChild(checkboxItem);
+            this.columnCheckboxesContainer.appendChild(checkboxItem);
             this.logger.debug(`Чекбокс для колонки "${columnParams.title}" добавлен`);
         });
 
@@ -474,7 +458,7 @@ const controllColumnVisiable = {
 
         } catch (error) {
             this.logger.error(
-                `CREATE SMART TABLE COLUMN VISIABLE: Ошибка при сбросе колонок: ${error.message}`
+                `CREATE SMART TABLE COLUMN VISIBILITY: Ошибка при сбросе колонок: ${error.message}`
             );
             this.logger.debug(`Стек ошибки: ${error.stack}`);
         }
@@ -487,9 +471,7 @@ const controllColumnVisiable = {
         this.logger.debug('Обновление состояния чекбоксов');
         
         // Получаем контейнер со списком чекбоксов
-        const columnList = this.contoll_visiable_columns?.querySelector(
-            `[to-smart-table="${this.table.element.id}"][role="controll_column_visiable_list"]`
-        );
+        const columnList = this.columnCheckboxesContainer;
         
         if (!columnList) {
             this.logger.warn('Список чекбоксов не найден для обновления');
@@ -707,9 +689,9 @@ const excelExporter = {
 
 export function create_smart_table(properties) {
     
-    // properties.debug = true
+    properties.debug = true
     const isDebug = !!properties.debug;
-    
+    console.log(isDebug)
     // Создаем ЕДИНЫЙ экземпляр логгера для всей таблицы
     const mainLogger = logger.createInstance({
         
@@ -883,140 +865,144 @@ export function create_smart_table(properties) {
 
     mainLogger.debug('Инициализация фильтров');
 
-    // Находим форму фильтров
-    const filterForm = document.querySelector(`[to-smart-table="${properties.id}"][role="fiters_table"]`);
-    
-    if (!filterForm) {
-        mainLogger.warn(
-            'Форма фильтров не найдена. ' +
-            `Убедитесь, что в HTML присутствует элемент с атрибутами: ` +
-            `to-smart-table="${properties.id}" и role="fiters_table"`
+    if(properties.apply_filters) {
+        // Находим форму фильтров
+        const filterForm = document.querySelector(
+            `[to-smart-table="${properties.id}"][role="fiters_table"], ` +
+            `[to-smart-table="${properties.id}"][role="filters_table"]`
         );
-    } else {
-        mainLogger.debug('Форма фильтров найдена');
+        
+        if (!filterForm) {
+            mainLogger.warn(
+                'Форма фильтров не найдена. ' +
+                `Убедитесь, что в HTML присутствует элемент с атрибутами: ` +
+                `to-smart-table="${properties.id}" и role="fiters_table" (или role="filters_table")`
+            );
+        } else {
+            mainLogger.debug('Форма фильтров найдена');
 
-        // Ключ для хранения фильтров в localStorage
-        const storageKey = `tabulator-${properties.id}-filters`;
-        mainLogger.debug(`Ключ localStorage для фильтров: ${storageKey}`);
+            // Ключ для хранения фильтров в localStorage
+            const storageKey = `tabulator-${properties.id}-filters`;
+            mainLogger.debug(`Ключ localStorage для фильтров: ${storageKey}`);
 
-        // Функция для сохранения фильтров
-        function saveFiltersToStorage() {
-            mainLogger.debug('Сохранение фильтров в localStorage');
-            
-            const formData = new FormData(filterForm);
-            const data = {};
-            
-            formData.forEach((value, key) => {
-                if (value) {
-                    data[key] = value;
-                    mainLogger.debug(`Поле фильтра: ${key} = ${value}`);
-                }
-            });
-
-            const dataJson = JSON.stringify(data);
-            localStorage.setItem(storageKey, dataJson);
-            
-            mainLogger.info(`Фильтры сохранены в localStorage: ${storageKey}`);
-            mainLogger.debug(`Размер сохраненных данных: ${dataJson.length} байт`);
-            
-            return data;
-        }
-
-        // Функция для загрузки фильтров из localStorage
-        function loadFiltersFromStorage() {
-            mainLogger.debug('Загрузка фильтров из localStorage');
-            
-            const saved = localStorage.getItem(storageKey);
-            
-            if (!saved) {
-                mainLogger.debug('Сохраненные фильтры не найдены');
-                return null;
-            }
-
-            try {
-                const data = JSON.parse(saved);
-                mainLogger.debug(`Загруженные данные: ${JSON.stringify(data)}`);
+            // Функция для сохранения фильтров
+            function saveFiltersToStorage() {
+                mainLogger.debug('Сохранение фильтров в localStorage');
                 
-                let loadedCount = 0;
-                
-                Object.keys(data).forEach(key => {
-                    const input = filterForm.querySelector(`[name="${key}"]`);
-                    if (input) {
-                        input.value = data[key];
-                        loadedCount++;
-                        mainLogger.debug(`Поле "${key}" загружено: ${data[key]}`);
-                    } else {
-                        mainLogger.warn(`Поле "${key}" не найдено в форме фильтров`);
-                    }
-                });
-                
-                mainLogger.info(`Загружено ${loadedCount} фильтров из localStorage`);
-                return data;
-                
-            } catch (e) {
-                mainLogger.error(`Ошибка загрузки фильтров из localStorage: ${e.message}`);
-                return null;
-            }
-        }
-
-        // Загружаем сохраненные фильтры в форму
-        loadFiltersFromStorage();
-
-        // Настройка ajaxParams для включения фильтров
-        if (properties.apply_filters) {
-            mainLogger.debug('Настройка ajaxParams для фильтров');
-            
-            tableConfig.ajaxParams = function() {
                 const formData = new FormData(filterForm);
-                const params = {};
+                const data = {};
                 
                 formData.forEach((value, key) => {
-                    if (value) params[key] = value;
+                    if (value) {
+                        data[key] = value;
+                        mainLogger.debug(`Поле фильтра: ${key} = ${value}`);
+                    }
                 });
+
+                const dataJson = JSON.stringify(data);
+                localStorage.setItem(storageKey, dataJson);
                 
-                mainLogger.debug(`Параметры фильтров для запроса: ${JSON.stringify(params)}`);
+                mainLogger.info(`Фильтры сохранены в localStorage: ${storageKey}`);
+                mainLogger.debug(`Размер сохраненных данных: ${dataJson.length} байт`);
                 
-                return {
-                    filters: params
-                };
+                return data;
             }
-        }
 
-        // Обработчик отправки формы
-        filterForm.addEventListener("submit", (e) => {
-            e.preventDefault();
-            mainLogger.info('Отправка формы фильтров');
-            
-            saveFiltersToStorage();
-            mainLogger.debug('Фильтры сохранены, перезагрузка таблицы');
-            
-            table.setData();
-        });
-
-        // Поиск кнопки сброса
-        const resetBtn = filterForm.querySelector('[type="reset"]') || filterForm.querySelector('#reset-filters');
-        
-        if (resetBtn) {
-            mainLogger.debug('Кнопка сброса фильтров найдена');
-            
-            resetBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                mainLogger.info('Сброс фильтров');
+            // Функция для загрузки фильтров из localStorage
+            function loadFiltersFromStorage() {
+                mainLogger.debug('Загрузка фильтров из localStorage');
                 
-                filterForm.reset();
-                localStorage.removeItem(storageKey);
-                mainLogger.debug(`Фильтры удалены из localStorage: ${storageKey}`);
+                const saved = localStorage.getItem(storageKey);
+                
+                if (!saved) {
+                    mainLogger.debug('Сохраненные фильтры не найдены');
+                    return null;
+                }
+
+                try {
+                    const data = JSON.parse(saved);
+                    mainLogger.debug(`Загруженные данные: ${JSON.stringify(data)}`);
+                    
+                    let loadedCount = 0;
+                    
+                    Object.keys(data).forEach(key => {
+                        const input = filterForm.querySelector(`[name="${key}"]`);
+                        if (input) {
+                            input.value = data[key];
+                            loadedCount++;
+                            mainLogger.debug(`Поле "${key}" загружено: ${data[key]}`);
+                        } else {
+                            mainLogger.warn(`Поле "${key}" не найдено в форме фильтров`);
+                        }
+                    });
+                    
+                    mainLogger.info(`Загружено ${loadedCount} фильтров из localStorage`);
+                    return data;
+                    
+                } catch (e) {
+                    mainLogger.error(`Ошибка загрузки фильтров из localStorage: ${e.message}`);
+                    return null;
+                }
+            }
+
+            // Загружаем сохраненные фильтры в форму
+            loadFiltersFromStorage();
+
+            // Настройка ajaxParams для включения фильтров
+            if (properties.apply_filters) {
+                mainLogger.debug('Настройка ajaxParams для фильтров');
+                
+                tableConfig.ajaxParams = function() {
+                    const formData = new FormData(filterForm);
+                    const params = {};
+                    
+                    formData.forEach((value, key) => {
+                        if (value) params[key] = value;
+                    });
+                    
+                    mainLogger.debug(`Параметры фильтров для запроса: ${JSON.stringify(params)}`);
+                    
+                    return {
+                        filters: params
+                    };
+                }
+            }
+
+            // Обработчик отправки формы
+            filterForm.addEventListener("submit", (e) => {
+                e.preventDefault();
+                mainLogger.info('Отправка формы фильтров');
+                
+                saveFiltersToStorage();
+                mainLogger.debug('Фильтры сохранены, перезагрузка таблицы');
                 
                 table.setData();
-                mainLogger.info('Фильтры сброшены, таблица перезагружена');
             });
-        } else {
-            mainLogger.debug('Кнопка сброса фильтров не найдена');
+
+            // Поиск кнопки сброса
+            const resetBtn = filterForm.querySelector('[type="reset"]') || filterForm.querySelector('#reset-filters');
+            
+            if (resetBtn) {
+                mainLogger.debug('Кнопка сброса фильтров найдена');
+                
+                resetBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    mainLogger.info('Сброс фильтров');
+                    
+                    filterForm.reset();
+                    localStorage.removeItem(storageKey);
+                    mainLogger.debug(`Фильтры удалены из localStorage: ${storageKey}`);
+                    
+                    table.setData();
+                    mainLogger.info('Фильтры сброшены, таблица перезагружена');
+                });
+            } else {
+                mainLogger.debug('Кнопка сброса фильтров не найдена');
+            }
+
+            mainLogger.debug('Инициализация фильтров завершена');
         }
-
-        mainLogger.debug('Инициализация фильтров завершена');
     }
-
     // -----------------------------------------------------------------------------
 
     mainLogger.debug('Создание экземпляра таблицы Tabulator');
@@ -1027,22 +1013,25 @@ export function create_smart_table(properties) {
     mainLogger.debug('Таблица Tabulator создана');
 
     // Запускаем управление видимостью колонок, если это указано в параметрах
-    if (properties.controll_column_visiable) {
+    const isColumnVisibilityEnabled =
+        properties.control_column_visibility ?? properties.controll_column_visiable;
+
+    if (isColumnVisibilityEnabled) {
         mainLogger.debug('Инициализация управления видимостью колонок');
         // Передаем основной логгер в управление видимостью
-        controllColumnVisiable.init(table, { 
+        columnVisibilityController.init(table, {
             debug: properties.debug,
-            logger: mainLogger 
+            logger: mainLogger
         });
     }
 
     // Запускаем экспорт в Excel, если это указано в параметрах
     if  (properties.export_to_excel) {
-excelExporter.init(table, {
-    logger: mainLogger,
-    ajaxURL: properties.ajaxURL || null,
-    exportButtonId: properties.exportButtonId || 'export-excel-btn'
-});
+        excelExporter.init(table, {
+            logger: mainLogger,
+            ajaxURL: properties.ajaxURL || null,
+            exportButtonId: properties.exportButtonId || 'export-excel-btn'
+        });
     }
     
     mainLogger.info(`Таблица с id="${properties.id}" успешно создана`);

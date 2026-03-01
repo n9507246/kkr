@@ -27,7 +27,9 @@ class TestController extends Controller
             ]);
         }
 
+        $tipyObektov = \App\Models\TipyObektov::where('activno', true)->get();
+        $vidiRabot = \App\Models\VidiRabot::where('activno', true)->get();
 
-        return view('test');
+        return view('test', compact('tipyObektov', 'vidiRabot'));
     }
 }

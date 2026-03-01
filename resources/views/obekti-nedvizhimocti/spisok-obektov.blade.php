@@ -239,20 +239,6 @@
             apply_filters: true,
         });
 
-        // Обработчик для кнопки экспорта в Excel
-        document.getElementById('export-excel-btn').addEventListener('click', function() {
-            if (table && typeof table.download === 'function') {
-                table.download('xlsx', 'obekti-nedvizhimosti.xlsx', {
-                    sheet: {
-                        name: 'Объекты недвижимости'
-                    }
-                });
-            } else {
-                // Альтернативный метод если download не работает
-                console.log('Попытка экспорта через таблицу');
-                // Можно добавить дополнительную логику экспорта
-            }
-        });
 
         // Дополнительный JavaScript для управления иконкой при сворачивании/разворачивании
         const filterPanel = document.getElementById('filterPanel');
