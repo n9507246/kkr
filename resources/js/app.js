@@ -686,7 +686,7 @@ const excelExporter = {
                 }
             });
 
-            return { wch: Math.min(Math.max(max + 3, 10), 80) };
+            return { wch: Math.min(Math.max(max + 2, 10), 80) };
         });
     },
 
@@ -694,8 +694,8 @@ const excelExporter = {
         let length = 0;
 
         for (let char of text) {
-            if (/[А-Яа-яЁё]/.test(char)) length += 1.5;
-            else if (/[A-Z]/.test(char)) length += 1.2;
+            if (/[А-Яа-яЁё]/.test(char)) length += 1;
+            else if (/[A-Z]/.test(char)) length += 1.1;
             else length += 1;
         }
 
