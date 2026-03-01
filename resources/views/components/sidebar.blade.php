@@ -1,5 +1,19 @@
 @props(['user' => null])
 
+<script>
+(function () {
+    try {
+        if (localStorage.getItem('sidebarCollapsed') === 'true') {
+            document.documentElement.classList.add('sidebar-collapsed');
+        } else {
+            document.documentElement.classList.remove('sidebar-collapsed');
+        }
+    } catch (e) {
+        // localStorage может быть недоступен — в этом случае оставляем состояние по умолчанию
+    }
+})();
+</script>
+
 <nav id="sidebar"
      class="bg-primary text-white vh-100 d-flex flex-column shadow"
      style="width: 17.5rem; min-width: 17.5rem; border-right: 1px solid rgba(255,255,255,0.1); transition: width 0.3s ease, min-width 0.3s ease;">
@@ -68,21 +82,26 @@
 
 <style>
 /* COLLAPSED STATE */
-#sidebar.collapsed {
+#sidebar.collapsed,
+html.sidebar-collapsed #sidebar {
     width: 5.5rem !important;
     min-width: 5.5rem !important;
 }
 
 #sidebar.collapsed .sidebar-title,
-#sidebar.collapsed .nav-text {
+#sidebar.collapsed .nav-text,
+html.sidebar-collapsed #sidebar .sidebar-title,
+html.sidebar-collapsed #sidebar .nav-text {
     display: none;
 }
 
-#sidebar.collapsed .d-flex.align-items-center.gap-3 {
+#sidebar.collapsed .d-flex.align-items-center.gap-3,
+html.sidebar-collapsed #sidebar .d-flex.align-items-center.gap-3 {
     gap: 0 !important;
 }
 
-#sidebar.collapsed .d-flex.align-items-center.gap-3 i {
+#sidebar.collapsed .d-flex.align-items-center.gap-3 i,
+html.sidebar-collapsed #sidebar .d-flex.align-items-center.gap-3 i {
     margin: 0 auto;
 }
 
@@ -104,6 +123,10 @@
 .toggle-icon.rotated {
     transform: rotate(180deg);
 }
+
+html.sidebar-collapsed #sidebar .toggle-icon {
+    transform: rotate(180deg);
+}
 </style>
 
 <script>
@@ -111,25 +134,26 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const sidebar = document.getElementById('sidebar');
     const toggleBtn = document.getElementById('toggleSidebar');
+    if (!sidebar || !toggleBtn) return;
+
     const icon = toggleBtn.querySelector('.toggle-icon');
 
     // восстановление состояния
-    const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+    const isCollapsed =
+        document.documentElement.classList.contains('sidebar-collapsed') ||
+        localStorage.getItem('sidebarCollapsed') === 'true';
 
     if (isCollapsed) {
         sidebar.classList.add('collapsed');
-        icon.classList.add('rotated');
+        icon?.classList.add('rotated');
     }
 
     toggleBtn.addEventListener('click', function () {
-
-        sidebar.classList.toggle('collapsed');
-        icon.classList.toggle('rotated');
-
-        localStorage.setItem(
-            'sidebarCollapsed',
-            sidebar.classList.contains('collapsed')
-        );
+        const collapsed = sidebar.classList.toggle('collapsed');
+        icon?.classList.toggle('rotated', collapsed);
+        document.documentElement.classList.toggle('sidebar-collapsed', collapsed);
+        
+        localStorage.setItem('sidebarCollapsed', collapsed);
     });
 });
 </script>
