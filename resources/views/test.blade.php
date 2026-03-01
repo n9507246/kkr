@@ -90,39 +90,12 @@
             import { create_smart_table } from '{{ Vite::asset('resources/js/app.js') }}';
 
             document.addEventListener('DOMContentLoaded', function() {
-                const tableId = '{{ $id_table }}';
-                const panelId = `filterPanel_${tableId}`;
-                const panelStateKey = `smart-table:${tableId}:filter-panel-open`;
-                const panelEl = document.getElementById(panelId);
 
-                if (panelEl) {
-                    const savedState = localStorage.getItem(panelStateKey);
-                    const shouldOpen = savedState === null ? true : savedState === 'true';
-
-                    if (typeof bootstrap !== 'undefined') {
-                        const collapse = new bootstrap.Collapse(panelEl, { toggle: false });
-                        if (shouldOpen) {
-                            collapse.show();
-                        } else {
-                            collapse.hide();
-                        }
-                    } else {
-                        panelEl.classList.toggle('show', shouldOpen);
-                    }
-
-                    panelEl.addEventListener('shown.bs.collapse', () => {
-                        localStorage.setItem(panelStateKey, 'true');
-                    });
-
-                    panelEl.addEventListener('hidden.bs.collapse', () => {
-                        localStorage.setItem(panelStateKey, 'false');
-                    });
-                }
 
                 const table = create_smart_table({
                     // debug: true,
                     height: '80vh',
-                    id: tableId,
+                    id: '{{ $id_table }}',
                     ajaxURL: "{{ route('obekti-nedvizhimosti.spisok-obektov') }}",
                     export_to_excel: true,
                     columns: [

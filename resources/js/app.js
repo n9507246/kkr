@@ -687,6 +687,45 @@ const excelExporter = {
     }
 };
 
+export function init_filter_panel_state(options = {}) {
+    const tableId = options.tableId || options.id;
+
+    if (!tableId) {
+        return;
+    }
+
+    const panelId = options.panelId || `filterPanel_${tableId}`;
+    const stateKey = options.storageKey || `smart-table:${tableId}:filter-panel-open`;
+    const defaultOpen = options.defaultOpen ?? true;
+    const panelEl = document.getElementById(panelId);
+
+    if (!panelEl) {
+        return;
+    }
+
+    const savedState = localStorage.getItem(stateKey);
+    const shouldOpen = savedState === null ? defaultOpen : savedState === 'true';
+
+    if (typeof bootstrap !== 'undefined') {
+        const collapse = new bootstrap.Collapse(panelEl, { toggle: false });
+        if (shouldOpen) {
+            collapse.show();
+        } else {
+            collapse.hide();
+        }
+    } else {
+        panelEl.classList.toggle('show', shouldOpen);
+    }
+
+    panelEl.addEventListener('shown.bs.collapse', () => {
+        localStorage.setItem(stateKey, 'true');
+    });
+
+    panelEl.addEventListener('hidden.bs.collapse', () => {
+        localStorage.setItem(stateKey, 'false');
+    });
+}
+
 export function create_smart_table(properties) {
     
     properties.debug = true
@@ -725,6 +764,18 @@ export function create_smart_table(properties) {
     }
 
     mainLogger.debug(`Элемент с id="${properties.id}" найден`);
+
+    const shouldPersistFilterPanelState =
+        properties.persist_filter_panel_state ?? properties.apply_filters ?? false;
+
+    if (shouldPersistFilterPanelState) {
+        init_filter_panel_state({
+            tableId: properties.id,
+            panelId: properties.filter_panel_id,
+            storageKey: properties.filter_panel_storage_key,
+            defaultOpen: properties.filter_panel_default_open ?? true,
+        });
+    }
 
     const tableConfig = {}
     tableConfig.height = properties.height ?? '400px',          // Высота таблицы
