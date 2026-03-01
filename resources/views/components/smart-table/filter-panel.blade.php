@@ -15,3 +15,21 @@
         </div>
     </div>
 </div>
+
+<script>
+(function () {
+    try {
+        const tableId = @json($id);
+        const panel = document.getElementById(`filterPanel_${tableId}`);
+        const stateKey = `smart-table:${tableId}:filter-panel-open`;
+        const savedState = localStorage.getItem(stateKey);
+        const shouldOpen = savedState === null ? true : savedState === 'true';
+
+        if (panel) {
+            panel.classList.toggle('show', shouldOpen);
+        }
+    } catch (e) {
+        // ignore localStorage access issues
+    }
+})();
+</script>
