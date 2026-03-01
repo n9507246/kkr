@@ -659,7 +659,7 @@ const excelExporter = {
 
         const header = columns.map(c => c.title || c.field);
         const rows = data.map(row =>
-            columns.map(c => this.getNestedValue(row, c.field))
+            columns.map(c => this.formatCellValueForExport(this.getNestedValue(row, c.field)))
         );
 
         const worksheetData = [header, ...rows];
@@ -681,7 +681,7 @@ const excelExporter = {
             let max = this.visualLength(col.title || '');
 
             data.forEach(row => {
-                const value = this.getNestedValue(row, col.field);
+                const value = this.formatCellValueForExport(this.getNestedValue(row, col.field));
                 if (value !== null && value !== undefined) {
                     const len = this.visualLength(String(value));
                     if (len > max) max = len;
@@ -706,6 +706,28 @@ const excelExporter = {
 
     getNestedValue(obj, path) {
         return path.split('.').reduce((acc, key) => acc ? acc[key] : null, obj);
+    },
+
+    formatCellValueForExport(value) {
+        if (value === null || value === undefined || value === '') {
+            return value;
+        }
+
+        if (typeof value !== 'string') {
+            return value;
+        }
+
+        const dateOnlyMatch = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+        if (dateOnlyMatch) {
+            return `${dateOnlyMatch[3]}-${dateOnlyMatch[2]}-${dateOnlyMatch[1]}`;
+        }
+
+        const isoLikeMatch = value.match(/^(\d{4})-(\d{2})-(\d{2})[T\s]/);
+        if (isoLikeMatch) {
+            return `${isoLikeMatch[3]}-${isoLikeMatch[2]}-${isoLikeMatch[1]}`;
+        }
+
+        return value;
     }
 };
 
