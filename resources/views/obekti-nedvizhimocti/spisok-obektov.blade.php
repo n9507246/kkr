@@ -127,7 +127,12 @@
                         sorter: "string",
                         formatter: (cell) => {
                             const d = cell.getData();
-                            return `<a href="/obekti-nedvizhimosti/${d.id}/redaktirovat-obekt" class=" text-primary fw-bold text-decoration-none">${d.kadastroviy_nomer || '-'}</a>`;
+                            const isChild = !!d.roditelskiy_obekt_id;
+                            const url = isChild
+                                ? `/fake/dopolnitelniy-obekt/${d.id}`
+                                : `/obekti-nedvizhimosti/${d.id}/redaktirovat-obekt`;
+
+                            return `<a href="${url}" class=" text-primary fw-bold text-decoration-none">${d.kadastroviy_nomer || '-'}</a>`;
                         }
                     },
                     { title: "Тип",
