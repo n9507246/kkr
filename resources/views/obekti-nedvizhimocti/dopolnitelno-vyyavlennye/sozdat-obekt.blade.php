@@ -25,7 +25,7 @@
                 </div>
 
                 <div class="card-body">
-                    <form method="POST" action="" id="createForm">
+                    <form method="POST" action="{{ route('obekty-nedvizhimosti.dopolnitelno-vyyavlennye.sohranit-obekt', ['id_obekta' => $roditelskiyObekt->id]) }}" id="createForm">
                         @csrf
 
                         <div class="row">
@@ -117,7 +117,7 @@
                                 <i class="bi bi-arrow-left"></i> Назад
                             </a>
                             <div class="btn-group">
-                                <button type="submit" class="btn btn-success" disabled title="Маршрут сохранения будет подключен следующим шагом">
+                                <button type="submit" class="btn btn-success">
                                     <i class="bi bi-save"></i> Создать объект
                                 </button>
                             </div>

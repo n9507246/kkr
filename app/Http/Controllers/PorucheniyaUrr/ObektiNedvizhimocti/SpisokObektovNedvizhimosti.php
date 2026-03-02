@@ -13,7 +13,10 @@ class SpisokObektovNedvizhimosti extends Controller
     public function __invoke(Request $request, string $id_poruchenie)
     {
         $spisok_obektov = \App\Models\KadastrovieObekti::query()
-            ->where('poruchenie_id', $id_poruchenie)
+            ->where('poruchenie_id',  $id_poruchenie)
+            ->with([
+                'tipObekta',
+            ])    
             ->orderBy('created_at', 'desc')
             ->get();
 

@@ -94,7 +94,7 @@
                                     <td>{{ $item->kadastroviy_nomer }}</td>
                                     <td>
                                         <span class="">
-                                            {{ $item->tip_obekta_nedvizhimosti }}
+                                            {{ $item->tipObekta->abbreviatura }}
                                         </span>
                                     </td>
                                     <td>{{ $item->created_at ? $item->created_at->format('d.m.Y') : '-' }}</td>

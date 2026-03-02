@@ -15,7 +15,7 @@ class UdalitObektNedvizhimosti extends Controller
     {
         // Находим объект по ID и проверяем, что он принадлежит данному поручению
         $obekt = KadastrovieObekti::query()
-            ->where('id_porucheniya_urr', $poruchenie_urr)
+            ->where('poruchenie_id', $poruchenie_urr)
             ->findOrFail($obekt);
 
         // Мягкое удаление (если используется SoftDeletes)

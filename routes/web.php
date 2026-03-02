@@ -30,6 +30,14 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/obekty-nedvizhimosti/{id_obekta}/dopolnitelno-vyyavlennye/sozdat-obekt',
             ObektiNedvizhimocti\DopolnitelnoVyyavlennye\SozdatObekt::class)
             ->name('obekty-nedvizhimosti.dopolnitelno-vyyavlennye.sozdat-obekt');
+
+        Route::post('/obekty-nedvizhimosti/{id_obekta}/dopolnitelno-vyyavlennye/sozdat-obekt',
+            ObektiNedvizhimocti\DopolnitelnoVyyavlennye\SohranitObekt::class)
+            ->name('obekty-nedvizhimosti.dopolnitelno-vyyavlennye.sozdat-obekt.post');
+
+        Route::post('/obekty-nedvizhimosti/{id_obekta}/dopolnitelno-vyyavlennye',
+            ObektiNedvizhimocti\DopolnitelnoVyyavlennye\SohranitObekt::class)
+            ->name('obekty-nedvizhimosti.dopolnitelno-vyyavlennye.sohranit-obekt');
     // ---------------------------------------------------------------------------------------------------
 
     // 
@@ -52,7 +60,7 @@ Route::middleware(['auth'])->group(function () {
                 ->name('porucheniya-urr.redaktirovat-poruchenie');
 
         // Обновление поручения
-            Route::put('/porucheniya-urr/{poruchenie_urr}', function() {
+            Route::post('/porucheniya-urr/{poruchenie_urr}', function() {
                 return 'ok';
             })->name('porucheniya-urr.obnovit-poruchenie');
 
@@ -68,7 +76,7 @@ Route::middleware(['auth'])->group(function () {
                 ->name('porucheniya-urr.obekti-nedvizhimosti.spisok-obektov');
 
         // Создание объекта (сохранение)
-            Route::put('/porucheniya-urr/{poruchenie_urr}/obekty-nedvizhimosti',
+            Route::match(['post', 'put'], '/porucheniya-urr/{poruchenie_urr}/obekty-nedvizhimosti',
                 PorucheniyaUrr\ObektiNedvizhimocti\SohranitObektNedvizhimosti::class)
                 ->name('porucheniya-urr.obekti-nedvizhimosti.sozdat-obekt');
 

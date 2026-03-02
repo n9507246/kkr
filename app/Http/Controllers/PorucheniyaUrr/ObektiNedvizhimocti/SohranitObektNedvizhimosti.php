@@ -5,17 +5,17 @@ namespace App\Http\Controllers\PorucheniyaUrr\ObektiNedvizhimocti;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\KadastrovieObekti;
-use Illuminate\Support\Facades\DB;
+use App\Models\TipyObektov;
 use App\Rules\UniqueCadastralWithSoftDelete;
 
 class SohranitObektNedvizhimosti extends Controller
 {
-    public function __invoke(Request $request, $id_porucheniya_urr)
+    public function __invoke(Request $request, $poruchenie_urr)
     {
         // Валидация с кастомным правилом
             $obekt = $request->validate([
-                'kadastroviy_nomer' => ['required', 'string', 'max:50', new UniqueCadastralWithSoftDelete($id_porucheniya_urr)],
-                'tip_obekta_nedvizhimosti' => 'required|string|max:100',
+                'kadastroviy_nomer' => ['required', 'string', 'max:50', new UniqueCadastralWithSoftDelete($poruchenie_urr)],
+                'tip_obekta_nedvizhimosti' => 'required|string|exists:tipy_obektov,abbreviatura',
                 'vid_rabot' => 'nullable|string|max:100',
                 'data_zaversheniya' => 'nullable|date',
                 'kommentariy' => 'nullable|string',
@@ -28,14 +28,20 @@ class SohranitObektNedvizhimosti extends Controller
             ]);
 
 
-        $obekt['id_porucheniya_urr'] = $id_porucheniya_urr;
+        $tipObektaId = TipyObektov::query()
+            ->where('abbreviatura', $obekt['tip_obekta_nedvizhimosti'])
+            ->value('id');
+
+        $obekt['poruchenie_id'] = $poruchenie_urr;
+        $obekt['tip_obekta_id'] = $tipObektaId;
+        unset($obekt['tip_obekta_nedvizhimosti'], $obekt['vid_rabot']);
 
         // Создание нового объекта
         $obekt = KadastrovieObekti::create($obekt);
 
         return redirect()
             ->route('porucheniya-urr.obekti-nedvizhimosti.spisok-obektov', [
-                'poruchenie_urr' => $id_porucheniya_urr
+                'poruchenie_urr' => $poruchenie_urr
             ])
             ->with('success', 'Объект успешно добавлен');
     }

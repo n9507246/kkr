@@ -8,19 +8,19 @@ use App\Models\KadastrovieObekti;
 
 class UniqueCadastralWithSoftDelete implements ValidationRule
 {
-    protected $id_porucheniya_urr;
+    protected $poruchenieId;
     protected $ignoreId;
 
-    public function __construct($id_porucheniya_urr, $ignoreId = null)
+    public function __construct($poruchenieId, $ignoreId = null)
     {
-        $this->id_porucheniya_urr = $id_porucheniya_urr;
+        $this->poruchenieId = $poruchenieId;
         $this->ignoreId = $ignoreId;
     }
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         $query = KadastrovieObekti::query()
-            ->where('id_porucheniya_urr', $this->id_porucheniya_urr)
+            ->where('poruchenie_id', $this->poruchenieId)
             ->where('kadastroviy_nomer', $value);
 
         // Если нужно игнорировать текущую запись (при обновлении)
