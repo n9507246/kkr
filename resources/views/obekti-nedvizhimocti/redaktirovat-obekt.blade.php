@@ -6,26 +6,24 @@
         <div class="col-md-10">
             <div class="card">
                 <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">
-                        <i class="bi bi-pencil-square"></i> Редактирование кадастрового объекта
-                    </h4>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">
+                            <i class="bi bi-pencil"></i> Редактирование объекта
+                        </h4>
+                        <div class="text-end">
+                            <span class="badge bg-light text-primary me-2" title="Дата регистрации">
+                                <i class="bi bi-calendar3"></i> {{ $obekt->poruchenie->vhod_nomer}}
+                            </span>
+                            <span class="badge bg-light text-primary" title="Дата письма УРР">
+                                <i class="bi bi-envelope"></i> УРР: {{ $obekt->poruchenie->vhod_data }}
+                            </span>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="card-body">
                     <form method="POST" action="{{ route('obekti-nedvizhimosti.obnovit-obekt', $obekt->id) }}" id="editForm">
                         @csrf
-
-                        <!-- Информация о поручении (только для чтения) -->
-                        <div class="alert alert-info">
-                            <div class="d-flex align-items-center">
-                                <i class="bi bi-info-circle fs-4 me-2"></i>
-                                <div>
-                                    <strong>Поручение УРР:</strong>
-                                    {{ $obekt->poruchenie->vhod_nomer ?? 'Не указано' }}
-                                    от {{ $obekt->poruchenie->vhod_data ? \Carbon\Carbon::parse($obekt->poruchenie->vhod_data)->format('d.m.Y') : 'неизвестно' }}
-                                </div>
-                            </div>
-                        </div>
 
                         <div class="row">
                             <!-- Левая колонка -->
@@ -105,6 +103,12 @@
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
+                                    <div class="d-flex justify-content-start mt-3">
+                                        <a href="{{ route('obekty-nedvizhimosti.dopolnitelno-vyyavlennye.sozdat-obekt', ['id_obekta' => $obekt->id]) }}"
+                                        class="btn btn-primary btn-sm">
+                                            <i class="bi bi-plus-circle me-1"></i> Создать дополнительно выявленный объект
+                                        </a>
+                                    </div>
                         </div>
 
                         <!-- Скрытое поле ID поручения -->
@@ -125,6 +129,8 @@
                             </div>
                         </div>
                     </form>
+
+                    
                 </div>
             </div>
         </div>

@@ -127,9 +127,12 @@
                         sorter: "string",
                         formatter: (cell) => {
                             const d = cell.getData();
+
+                            console.log(d)
+                            console.log(d.id)
                             const isChild = !!d.roditelskiy_obekt_id;
                             const url = isChild
-                                ? `/fake/dopolnitelniy-obekt/${d.id}`
+                                ? `/obekti-nedvizhimosti/${d.roditelskiy_obekt_id}/dopolnitelno-vyyavlennye/${d.id}/redaktirovat-obekt`
                                 : `/obekti-nedvizhimosti/${d.id}/redaktirovat-obekt`;
 
                             return `<a href="${url}" class=" text-primary fw-bold text-decoration-none">${d.kadastroviy_nomer || '-'}</a>`;
