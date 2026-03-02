@@ -540,11 +540,25 @@ const excelExporter = {
     logger: null,
     ajaxURL: null,
     exportButtonId: null,
+    extraExportColumns: [],
+    treeExport: {
+        enabled: true,
+        childField: 'dopolnitelnie_obekti',
+        labelField: 'name',
+        childPrefix: '↳ ',
+        collapseChildrenByDefault: true,
+        childRowFillColor: 'E7F1FF',
+    },
 
     init(table, options = {}) {
         this.table = table;
         this.logger = options.logger || null;
         this.ajaxURL = options.ajaxURL || null;
+        this.extraExportColumns = Array.isArray(options.extraExportColumns) ? options.extraExportColumns : [];
+        this.treeExport = {
+            ...this.treeExport,
+            ...(options.treeExport || {}),
+        };
 
         const tableId = this.table?.element?.id;
         this.exportButtonId = options.exportButtonId || `export-excel-btn-${tableId}`;
@@ -570,21 +584,40 @@ const excelExporter = {
     async export() {
         try {
             this.logger?.info('Starting Excel export');
+            this.logger?.debug?.(`[EXPORT] ajaxURL=${this.ajaxURL || 'local-data'}`);
+            this.logger?.debug?.(`[EXPORT] extraExportColumns=${JSON.stringify(this.extraExportColumns.map(c => ({ title: c.title, field: c.field })))} `);
 
-            const columns = this.table.getColumnLayout()
+            const baseColumns = this.table.getColumnLayout()
                 .filter(col => col.visible !== false && col.field && col.field !== 'actions');
+            const extraColumns = this.extraExportColumns.filter(col => col && col.field);
+            const columns = [...baseColumns, ...extraColumns];
+            this.logger?.info(`[EXPORT] baseColumns=${baseColumns.length}, extraColumns=${extraColumns.length}, totalColumns=${columns.length}`);
+            this.logger?.debug?.(`[EXPORT] columns=${JSON.stringify(columns.map(c => ({ title: c.title, field: c.field, hasFormatter: typeof c.exportFormatter === 'function' })))} `);
 
             const data = await this.fetchAllData();
+            this.logger?.info(`[EXPORT] rows fetched=${Array.isArray(data) ? data.length : 0}`);
+            if (Array.isArray(data) && data.length > 0) {
+                this.logger?.debug?.(`[EXPORT] first row keys=${Object.keys(data[0]).join(', ')}`);
+            }
 
-            this.buildWorkbook(columns, data);
+            const exportData = this.treeExport.enabled
+                ? this.groupTreeRowsForExport(data)
+                : data;
+
+            this.logger?.info(`[EXPORT] rows prepared for worksheet=${Array.isArray(exportData) ? exportData.length : 0}`);
+            this.buildWorkbook(columns, exportData);
+            this.logger?.info('[EXPORT] workbook build completed');
 
         } catch (e) {
             this.logger?.error('Export error: ' + e.message);
+            this.logger?.error('[EXPORT] stack: ' + (e?.stack || 'no-stack'));
         }
     },
 
     async fetchAllData() {
+        this.logger?.debug?.('[EXPORT] fetchAllData started');
         if (!this.ajaxURL) {
+            this.logger?.debug?.('[EXPORT] no ajaxURL, using table.getData()');
             return this.table.getData();
         }
 
@@ -595,13 +628,16 @@ const excelExporter = {
         // В твоем логе это функция, которая собирает FormData из filterForm
         if (typeof this.table.options.ajaxParams === "function") {
             currentParams = this.table.options.ajaxParams();
+            this.logger?.debug?.('[EXPORT] ajaxParams loaded from function');
         } else if (this.table.options.ajaxParams) {
             currentParams = this.table.options.ajaxParams;
+            this.logger?.debug?.('[EXPORT] ajaxParams loaded from object');
         }
 
         // 2. Добавляем фильтры в URL
         // Если твоя функция возвращает { filters: { field: value } }, обрабатываем это
         if (currentParams.filters) {
+            this.logger?.debug?.(`[EXPORT] filters count=${Object.keys(currentParams.filters).length}`);
             Object.keys(currentParams.filters).forEach(key => {
                 const value = currentParams.filters[key];
                 if (value) {
@@ -617,6 +653,7 @@ const excelExporter = {
 
         // 3. Добавляем текущую сортировку таблицы в формате backend: sort[index][field|dir]
         const sorters = typeof this.table.getSorters === 'function' ? this.table.getSorters() : [];
+        this.logger?.debug?.(`[EXPORT] sorters count=${Array.isArray(sorters) ? sorters.length : 0}`);
         if (Array.isArray(sorters) && sorters.length > 0) {
             sorters.forEach((sorter, index) => {
                 if (!sorter?.field) {
@@ -645,29 +682,60 @@ const excelExporter = {
                 'Accept': 'application/json'
             }
         });
+        this.logger?.info(`[EXPORT] fetch status=${response.status}`);
 
         if (!response.ok) {
             throw new Error(`Ошибка сервера: ${response.status}`);
         }
 
         const json = await response.json();
+        this.logger?.debug?.(`[EXPORT] response keys=${Object.keys(json || {}).join(', ')}`);
         
         // Возвращаем данные (учитывая структуру ответа Laravel/Tabulator)
         return json.data || [];
     },
     buildWorkbook(columns, data) {
+        this.logger?.debug?.(`[EXPORT] buildWorkbook start: columns=${columns.length}, rows=${Array.isArray(data) ? data.length : 0}`);
 
         const header = columns.map(c => c.title || c.field);
         const rows = data.map(row =>
-            columns.map(c => this.formatCellValueForExport(this.getNestedValue(row, c.field)))
+            columns.map(c => {
+                const rawValue = this.getNestedValue(row, c.field);
+                const value = typeof c.exportFormatter === 'function'
+                    ? c.exportFormatter(rawValue, row)
+                    : rawValue;
+
+                let exportValue = value;
+
+                if (
+                    row?.__export_row_type === 'child' &&
+                    this.treeExport?.enabled &&
+                    c.field === this.treeExport.labelField
+                ) {
+                    const prefix = this.treeExport.childPrefix ?? '↳ ';
+                    exportValue = `${prefix}${value ?? ''}`;
+                }
+
+                return this.formatCellValueForExport(exportValue);
+            })
         );
 
         const worksheetData = [header, ...rows];
+        this.logger?.debug?.(`[EXPORT] worksheetData rows=${worksheetData.length}`);
 
         const wb = XLSX.utils.book_new();
         const ws = XLSX.utils.aoa_to_sheet(worksheetData);
 
+        if (this.treeExport?.enabled) {
+            this.applyChildRowsColor(ws, data, columns.length);
+        }
+
+        if (this.treeExport?.enabled) {
+            ws['!rows'] = this.buildOutlineRowsMeta(data);
+        }
+
         ws['!cols'] = this.calculateWidths(columns, data);
+        this.logger?.debug?.(`[EXPORT] calculated widths for ${ws['!cols']?.length || 0} columns`);
 
         XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
         XLSX.writeFile(wb, 'export.xlsx');
@@ -681,7 +749,11 @@ const excelExporter = {
             let max = this.visualLength(col.title || '');
 
             data.forEach(row => {
-                const value = this.formatCellValueForExport(this.getNestedValue(row, col.field));
+                const rawValue = this.getNestedValue(row, col.field);
+                const preparedValue = typeof col.exportFormatter === 'function'
+                    ? col.exportFormatter(rawValue, row)
+                    : rawValue;
+                const value = this.formatCellValueForExport(preparedValue);
                 if (value !== null && value !== undefined) {
                     const len = this.visualLength(String(value));
                     if (len > max) max = len;
@@ -713,6 +785,14 @@ const excelExporter = {
             return value;
         }
 
+        if (Array.isArray(value)) {
+            return value.map(item => this.formatCellValueForExport(item)).join(', ');
+        }
+
+        if (typeof value === 'object') {
+            return JSON.stringify(value);
+        }
+
         if (typeof value !== 'string') {
             return value;
         }
@@ -728,7 +808,80 @@ const excelExporter = {
         }
 
         return value;
-    }
+    },
+
+    groupTreeRowsForExport(data) {
+        const childField = this.treeExport.childField || '_children';
+
+        if (!Array.isArray(data)) {
+            return [];
+        }
+
+        const grouped = [];
+        const walk = (row, level = 0, parentId = null) => {
+            const children = Array.isArray(row?.[childField]) ? row[childField] : [];
+
+            grouped.push({
+                ...row,
+                __export_row_type: level === 0 ? 'parent' : 'child',
+                __export_parent_id: parentId,
+                __export_level: level,
+            });
+
+            children.forEach((childRow) => walk(childRow, level + 1, row?.id ?? null));
+        };
+
+        data.forEach((rootRow) => walk(rootRow, 0, null));
+
+        return grouped;
+    },
+
+    buildOutlineRowsMeta(data) {
+        const collapseChildren = !!this.treeExport?.collapseChildrenByDefault;
+        const rowsMeta = [{}]; // Header row
+
+        data.forEach((row) => {
+            const rawLevel = Number(row?.__export_level ?? 0);
+            const level = Number.isFinite(rawLevel) ? Math.max(0, Math.min(rawLevel, 7)) : 0;
+
+            rowsMeta.push({
+                level,
+                hidden: collapseChildren && level > 0,
+            });
+        });
+
+        return rowsMeta;
+    },
+
+    applyChildRowsColor(ws, data, columnCount) {
+        const fillColor = this.treeExport?.childRowFillColor || 'E7F1FF';
+
+        if (!Array.isArray(data) || !columnCount) {
+            return;
+        }
+
+        data.forEach((row, index) => {
+            if (row?.__export_row_type !== 'child') {
+                return;
+            }
+
+            const worksheetRowIndex = index + 1; // +1 because row 0 is header
+
+            for (let colIndex = 0; colIndex < columnCount; colIndex++) {
+                const cellAddress = XLSX.utils.encode_cell({ r: worksheetRowIndex, c: colIndex });
+                const cell = ws[cellAddress];
+                if (!cell) continue;
+
+                cell.s = cell.s || {};
+                cell.s.fill = {
+                    patternType: 'solid',
+                    fgColor: { rgb: fillColor },
+                    bgColor: { rgb: fillColor },
+                };
+            }
+        });
+    },
+
 };
 
 export function init_filter_panel_state(options = {}) {
@@ -1165,10 +1318,25 @@ export function create_smart_table(properties) {
 
     // Запускаем экспорт в Excel, если это указано в параметрах
     if  (properties.export_to_excel) {
+        const treeExportOptions = properties.treeExport || {};
+        const defaultTreeLabelField =
+            properties.columns?.find(col => col?.field)?.field || 'name';
+
+        const resolvedTreeExport = {
+            enabled: treeExportOptions.enabled ?? true,
+            childField: treeExportOptions.childField ?? properties.dataTreeChildField ?? 'dopolnitelnie_obekti',
+            labelField: treeExportOptions.labelField ?? defaultTreeLabelField,
+            childPrefix: treeExportOptions.childPrefix ?? '↳ ',
+            collapseChildrenByDefault: treeExportOptions.collapseChildrenByDefault ?? true,
+        };
+
+
         excelExporter.init(table, {
             logger: mainLogger,
             ajaxURL: properties.ajaxURL || null,
-            exportButtonId: properties.exportButtonId
+            exportButtonId: properties.exportButtonId,
+            extraExportColumns: properties.extraExportColumns || [],
+            treeExport: resolvedTreeExport
         });
     }
     
