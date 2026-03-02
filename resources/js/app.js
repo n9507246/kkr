@@ -855,6 +855,20 @@ export function create_smart_table(properties) {
     
     tableConfig.dependencies = properties.dependencies
 
+    //---------- DATA TREE НАСТРОЙКИ -------------
+    if (properties.dataTree !== undefined) tableConfig.dataTree = properties.dataTree;
+    if (properties.dataTreeChildField !== undefined) tableConfig.dataTreeChildField = properties.dataTreeChildField;
+    if (properties.dataTreeStartExpanded !== undefined) tableConfig.dataTreeStartExpanded = properties.dataTreeStartExpanded;
+    if (properties.dataTreeFilter !== undefined) tableConfig.dataTreeFilter = properties.dataTreeFilter;
+    if (properties.dataTreeSort !== undefined) tableConfig.dataTreeSort = properties.dataTreeSort;
+    if (properties.dataTreeExpandElement !== undefined) tableConfig.dataTreeExpandElement = properties.dataTreeExpandElement;
+    if (properties.dataTreeCollapseElement !== undefined) tableConfig.dataTreeCollapseElement = properties.dataTreeCollapseElement;
+    if (properties.dataTreeElementColumn !== undefined) tableConfig.dataTreeElementColumn = properties.dataTreeElementColumn;
+    if (properties.dataTreeBranchElement !== undefined) tableConfig.dataTreeBranchElement = properties.dataTreeBranchElement;
+    if (properties.dataTreeChildIndent !== undefined) tableConfig.dataTreeChildIndent = properties.dataTreeChildIndent;
+    if (properties.dataTreeSelectPropagate !== undefined) tableConfig.dataTreeSelectPropagate = properties.dataTreeSelectPropagate;
+    //---------------------------------------------
+
     //---------- AJAX НАСТРОЙКИ -------------
         
     // Проверяем параметр ajaxURL и устанавливаем адрес и тип ответа
@@ -869,7 +883,7 @@ export function create_smart_table(properties) {
             mainLogger.debug('Получен ответ от сервера');
             mainLogger.debug(`Параметры запроса: ${JSON.stringify(params)}`);
             mainLogger.debug(`Размер ответа: ${response.data?.length || 0} записей`);
-            
+            console.log(response)
             // Возвращаем данные и информацию о последней странице
             return { 
                 data: response.data, 
@@ -944,6 +958,14 @@ export function create_smart_table(properties) {
 
     // Добавляем колонки в конфигурацию таблицы
     tableConfig.columns = columnsList;
+
+    // Пользовательские обработчики Tabulator
+    if (typeof properties.rowClick === "function") {
+        tableConfig.rowClick = properties.rowClick;
+    }
+    if (typeof properties.rowFormatter === "function") {
+        tableConfig.rowFormatter = properties.rowFormatter;
+    }
     
     //-------- РУССКАЯ ЛОКАЛИЗАЦИЯ -----------------
 

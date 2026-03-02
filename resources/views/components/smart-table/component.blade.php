@@ -8,3 +8,9 @@
     </div>
     <div id="{{ $id }}" class=""></div>
 </div>
+
+@push('styles')
+    <style>
+       
+    </style>
+@endpush

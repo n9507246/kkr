@@ -214,3 +214,92 @@
     color: #0d6efd;
     background-color: transparent;
 }
+
+
+ /* Кнопки раскрытия/сворачивания вложенных строк */
+        .tree-toggle-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 14px;
+            height: 14px;
+            border-radius: 4px;
+            border: 1px solid var(--bs-border-color, #dee2e6);
+            background-color: var(--bs-light, #f8f9fa);
+            color: var(--bs-dark, #212529);
+            font-size: 10px;
+            line-height: 1;
+            transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+        }
+
+        .tabulator-data-tree-control:hover .tree-toggle-btn {
+            background-color: var(--bs-secondary-bg, #e9ecef);
+            border-color: var(--bs-secondary-border-subtle, #adb5bd);
+            color: var(--bs-dark, #212529);
+        }
+
+        .tree-toggle-expand {
+            background-color: var(--bs-primary, #0d6efd);
+            border-color: var(--bs-primary, #0d6efd);
+            color: var(--bs-white, #fff);
+            box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.18);
+        }
+
+        .tree-toggle-collapse {
+            background-color: var(--bs-primary-bg-subtle, #cfe2ff);
+            border-color: var(--bs-primary-border-subtle, #9ec5fe);
+            color: var(--bs-primary-text-emphasis, #052c65);
+            box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.18);
+        }
+
+        .tabulator-data-tree-control:hover .tree-toggle-expand {
+            background-color: var(--bs-primary-text-emphasis, #052c65);
+            border-color: var(--bs-primary-text-emphasis, #052c65);
+            color: var(--bs-white, #fff);
+        }
+
+        .tabulator-data-tree-control:hover .tree-toggle-collapse {
+            background-color: var(--bs-primary, #0d6efd);
+            border-color: var(--bs-primary, #0d6efd);
+            color: var(--bs-white, #fff);
+        }
+
+        /* Неактивная кнопка для строк без вложенных объектов */
+        .tabulator-row.tree-no-children .tabulator-data-tree-control {
+            pointer-events: none;
+            cursor: default;
+        }
+
+        .tabulator-row.tree-no-children .tree-toggle-btn {
+            opacity: .45;
+            border-color: #d1d5db;
+            background-color: #f3f4f6;
+            color: #9ca3af;
+        }
+
+        /* Обычные (невложенные) строки: единый цвет и без hover-эффекта */
+        .tabulator-row,
+        .tabulator-row.tabulator-row-even,
+        .tabulator-row.tabulator-row-odd,
+        .tabulator-row:hover,
+        .tabulator-row.tabulator-row-even:hover,
+        .tabulator-row.tabulator-row-odd:hover {
+            background-color: var(--bs-body-bg, #fff) !important;
+        }
+
+        /* Вложенные строки сохраняют свой отдельный цвет */
+        .tabulator-row.tabulator-tree-level-1,
+         .tabulator-row:hover.tabulator-tree-level-1 {
+            background-color: var(--bs-gray-200, #dee2e6) !important;
+        }
+
+        .tabulator-row.tabulator-tree-level-2,
+        .tabulator-row.tabulator-tree-level-3 {
+            background-color: var(--bs-primary-bg-subtle, #cfe2ff);
+        }
+
+
+        .tabulator-row.tabulator-tree-level-2:hover,
+        .tabulator-row.tabulator-tree-level-3:hover {
+            background-color: var(--bs-primary-bg-subtle, #cfe2ff) !important;
+        }

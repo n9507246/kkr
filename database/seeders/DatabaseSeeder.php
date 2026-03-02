@@ -68,13 +68,12 @@ class DatabaseSeeder extends Seeder
             for ($j = 0; $j < $objectsCount; $j++) {
                 $startDate = $createdAt->copy()->addDays(rand(1, 3));
 
-                KadastrovieObekti::create([
+                // Основной объект
+                $mainObject = KadastrovieObekti::create([
                     'poruchenie_id'          => $order->id,
+                    'roditelskiy_obekt_id'   => null,
                     'kadastroviy_nomer'      => rand(10, 99) . ':' . rand(10, 99) . ':' . rand(100000, 999999) . ':' . rand(100, 999),
-
-                    // Теперь будет выбирать только между ОКС и ЗУ
                     'tip_obekta_id'          => $tipyObektov->random()->id,
-
                     'vid_rabot_id'           => $vidiRabot->random()->id,
                     'data_nachala'           => $startDate->toDateString(),
                     'data_zaversheniya'      => $isCompleted ? $startDate->copy()->addDays(rand(3, 10)) : null,
@@ -84,6 +83,30 @@ class DatabaseSeeder extends Seeder
                     'created_at'             => $createdAt,
                     'updated_at'             => $isCompleted ? $createdAt->copy()->addDays(rand(10, 20)) : $createdAt,
                 ]);
+
+                // Для части объектов создаем дополнительные выявленные
+                if (rand(1, 100) <= 35) {
+                    $extraObjectsCount = rand(1, 4);
+
+                    for ($k = 0; $k < $extraObjectsCount; $k++) {
+                        $extraStartDate = $startDate->copy()->addDays(rand(0, 2));
+
+                        KadastrovieObekti::create([
+                            'poruchenie_id'          => $order->id,
+                            'roditelskiy_obekt_id'   => $mainObject->id,
+                            'kadastroviy_nomer'      => rand(10, 99) . ':' . rand(10, 99) . ':' . rand(100000, 999999) . ':' . rand(100, 999),
+                            'tip_obekta_id'          => $tipyObektov->random()->id,
+                            'vid_rabot_id'           => $vidiRabot->random()->id,
+                            'data_nachala'           => $extraStartDate->toDateString(),
+                            'data_zaversheniya'      => $isCompleted ? $extraStartDate->copy()->addDays(rand(2, 8)) : null,
+                            'data_okonchaniya_rabot' => $isCompleted ? $extraStartDate->copy()->addDays(rand(2, 8)) : null,
+                            'ispolnitel'             => $users->random()->name,
+                            'kommentariy'            => 'Дополнительно выявленный кадастровый объект',
+                            'created_at'             => $createdAt,
+                            'updated_at'             => $isCompleted ? $createdAt->copy()->addDays(rand(10, 20)) : $createdAt,
+                        ]);
+                    }
+                }
             }
         }
 

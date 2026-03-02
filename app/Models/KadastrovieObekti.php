@@ -15,6 +15,7 @@ class KadastrovieObekti extends Model
 
     protected $fillable = [
         'poruchenie_id',
+        'roditelskiy_obekt_id',
         'kadastroviy_nomer',
         'tip_obekta_id',
         'vid_rabot_id',
@@ -53,6 +54,22 @@ class KadastrovieObekti extends Model
     public function poruchenie()
     {
         return $this->belongsTo(VneshniePorucheniya::class, 'poruchenie_id');
+    }
+
+    /**
+     * Основной кадастровый объект (родитель)
+     */
+    public function roditelskiyObekt()
+    {
+        return $this->belongsTo(self::class, 'roditelskiy_obekt_id');
+    }
+
+    /**
+     * Дополнительно выявленные кадастровые объекты (дети)
+     */
+    public function dopolnitelnieObekti()
+    {
+        return $this->hasMany(self::class, 'roditelskiy_obekt_id');
     }
 
     /**

@@ -18,6 +18,7 @@
     <link href="https://unpkg.com/tabulator-tables@6.2.1/dist/css/tabulator_bootstrap5.min.css" rel="stylesheet">
     
     @vite(['resources/css/app.css'])
+    {{ $styles ?? '' }}
     @stack('styles')
 </head>
 <body>

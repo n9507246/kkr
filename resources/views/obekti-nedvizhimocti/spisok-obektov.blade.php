@@ -94,109 +94,126 @@
     </x-smart-table.component>
 
 
-    <x-slot:scripts>
-        <script type="module">
-            import { create_smart_table } from '{{ Vite::asset('resources/js/app.js') }}';
+@push('scripts')
+    <script type="module">
+        import { create_smart_table } from '{{ Vite::asset('resources/js/app.js') }}';
 
-            document.addEventListener('DOMContentLoaded', function() {
-                const table = create_smart_table({
-                    // debug: true,
-                    height: '80vh',
-                    id: '{{ $id_table }}',
-                    ajaxURL: "{{ route('obekti-nedvizhimosti.spisok-obektov') }}",
-                    export_to_excel: true,
-                    columns: [
-                        { title: "Кадастровый номер",
-                            field: "kadastroviy_nomer",
-                            minWidth: 200,
-                            frozen: true,
-                            sorter: "string",
-                            formatter: (cell) => {
-                                const d = cell.getData();
-                                return `<a href="/obekti-nedvizhimosti/${d.id}/redaktirovat-obekt" class="text-primary fw-bold text-decoration-none">${d.kadastroviy_nomer || '-'}</a>`;
-                            }
+        document.addEventListener('DOMContentLoaded', function() {
+            create_smart_table({
+                // debug: true,
+                height: '80vh',
+                id: '{{ $id_table }}',
+                ajaxURL: "{{ route('obekti-nedvizhimosti.spisok-obektov') }}",
+                export_to_excel: true,
+
+                // Настройки для дерева
+                dataTree: true,
+                dataTreeChildField: "dopolnitelnie_obekti",
+                dataTreeStartExpanded: true,
+                dataTreeExpandElement: '<span class="tree-toggle-btn tree-toggle-expand me-2"><i class="bi bi-plus"></i></span>',
+                dataTreeCollapseElement: '<span class="tree-toggle-btn tree-toggle-collapse me-2"><i class="bi bi-dash"></i></span>',
+                rowFormatter: (row) => {
+                    const rowData = row.getData();
+                    const hasChildren = Array.isArray(rowData.dopolnitelnie_obekti) && rowData.dopolnitelnie_obekti.length > 0;
+
+                    row.getElement().classList.toggle('tree-no-children', !hasChildren);
+                },
+
+                columns: [
+                    { title: "Кадастровый номер",
+                        field: "kadastroviy_nomer",
+                        minWidth: 200,
+                        frozen: true,
+                        sorter: "string",
+                        formatter: (cell) => {
+                            const d = cell.getData();
+                            return `<a href="/obekti-nedvizhimosti/${d.id}/redaktirovat-obekt" class=" text-primary fw-bold text-decoration-none">${d.kadastroviy_nomer || '-'}</a>`;
+                        }
+                    },
+                    { title: "Тип",
+                        field: "tip_obekta.abbreviatura",
+                        minWidth: 80,
+                        hozAlign: "center",
+                        sorter: "string",
+                        tooltip: (cell) => cell.getData().tip_obekta?.nazvanie || ""
+                    },
+                    { title: "Вх. номер",
+                        field: "poruchenie.vhod_nomer",
+                        minWidth: 120,
+                        sorter: "string",
+                        formatter: (cell) => cell.getValue() || "-"
+                    },
+                    { title: "Вх. дата",
+                        field: "poruchenie.vhod_data",
+                        minWidth: 120,
+                        sorter: "date",
+                        sorterParams: {
+                            format: "YYYY-MM-DD"
                         },
-                        { title: "Тип",
-                            field: "tip_obekta.abbreviatura",
-                            minWidth: 80,
-                            hozAlign: "center",
-                            sorter: "string",
-                            tooltip: (cell) => cell.getData().tip_obekta?.nazvanie || ""
+                        formatter: (cell) => {
+                            const val = cell.getValue();
+                            return val ? new Date(val).toLocaleDateString('ru-RU') : "-";
+                        }
+                    },
+                    { title: "Номер УРР",
+                        field: "poruchenie.urr_nomer",
+                        minWidth: 120,
+                        sorter: "string",
+                        formatter: function(cell) {
+                            const d = cell.getData();
+                            if (!d.poruchenie) return "-";
+                            return `<a href="/porucheniya-urr/${d.poruchenie.id}/redaktirovat-poruchenie" class="text-decoration-none">${d.poruchenie.urr_nomer || ' '}</a>`;
+                        }
+                    },
+                    { title: "Дата УРР",
+                        field: "poruchenie.urr_data",
+                        minWidth: 120,
+                        sorter: "date",
+                        sorterParams: {
+                            format: "YYYY-MM-DD"
                         },
-                        { title: "Вх. номер",
-                            field: "poruchenie.vhod_nomer",
-                            minWidth: 120,
-                            sorter: "string",
-                            formatter: (cell) => cell.getValue() || "-"
+                        formatter: (cell) => {
+                            const val = cell.getValue();
+                            return val ? new Date(val).toLocaleDateString('ru-RU') : "-";
+                        }
+                    },
+                    { title: "Тип работ",
+                        field: "vidi_rabot.nazvanie",
+                        minWidth: 150,
+                        sorter: "string",
+                        formatter: (cell) => cell.getValue() || "-"
+                    },
+                    { title: "Исполнитель",
+                        field: "ispolnitel",
+                        minWidth: 150,
+                        sorter: "string"
+                    },
+                    { title: "Дата заверш.",
+                        field: "data_zaversheniya",
+                        minWidth: 130,
+                        sorter: "date",
+                        sorterParams: {
+                            format: "YYYY-MM-DD"
                         },
-                        { title: "Вх. дата",
-                            field: "poruchenie.vhod_data",
-                            minWidth: 120,
-                            sorter: "date",
-                            sorterParams: {
-                                format: "YYYY-MM-DD"
-                            },
-                            formatter: (cell) => {
-                                const val = cell.getValue();
-                                return val ? new Date(val).toLocaleDateString('ru-RU') : "-";
-                            }
-                        },
-                        { title: "Номер УРР",
-                            field: "poruchenie.urr_nomer",
-                            minWidth: 120,
-                            sorter: "string",
-                            formatter: function(cell) {
-                                const d = cell.getData();
-                                if (!d.poruchenie) return "-";
-                                return `<a href="/porucheniya-urr/${d.poruchenie.id}/redaktirovat-poruchenie" class="text-decoration-none">${d.poruchenie.urr_nomer || ' '}</a>`;
-                            }
-                        },
-                        { title: "Дата УРР",
-                            field: "poruchenie.urr_data",
-                            minWidth: 120,
-                            sorter: "date",
-                            sorterParams: {
-                                format: "YYYY-MM-DD"
-                            },
-                            formatter: (cell) => {
-                                const val = cell.getValue();
-                                return val ? new Date(val).toLocaleDateString('ru-RU') : "-";
-                            }
-                        },
-                        { title: "Тип работ",
-                            field: "vidi_rabot.nazvanie",
-                            minWidth: 150,
-                            sorter: "string",
-                            formatter: (cell) => cell.getValue() || "-"
-                        },
-                        { title: "Исполнитель",
-                            field: "ispolnitel",
-                            minWidth: 150,
-                            sorter: "string"
-                        },
-                        { title: "Дата заверш.",
-                            field: "data_zaversheniya",
-                            minWidth: 130,
-                            sorter: "date",
-                            sorterParams: {
-                                format: "YYYY-MM-DD"
-                            },
-                            formatter: function(cell) {
-                                const val = cell.getValue();
-                                return val ? new Date(val).toLocaleDateString('ru-RU') : "-";
-                            }
-                        },
-                        { title: "Комментарии",
-                            field: "kommentariy",
-                            minWidth: 300,
-                            widthGrow: 2,
-                            sorter: "string"
-                        },
-                    ],
-                    controll_column_visiable: true,
-                    apply_filters: true,
-                });
+                        formatter: function(cell) {
+                            const val = cell.getValue();
+                            return val ? new Date(val).toLocaleDateString('ru-RU') : "-";
+                        }
+                    },
+                    { title: "Комментарии",
+                        field: "kommentariy",
+                        minWidth: 300,
+                        widthGrow: 2,
+                        sorter: "string"
+                    },
+                ],
+                controll_column_visiable: true,
+                apply_filters: true,
             });
-        </script>
-    </x-slot:scripts>
+        });
+    </script>
+@endpush
+
+
+
 </x-layout>
