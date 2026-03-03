@@ -239,26 +239,26 @@ document.addEventListener("DOMContentLoaded", function() {
                 minWidth: 200,
                 widthGrow: 2
             },
-            {
-                title: "Действия",
-                width: 100,
-                hozAlign: "center",
-                headerSort: false,
-                frozen: true,
-                formatter: function(cell) {
-                    const data = cell.getData();
-                    return `
-                        <div class="d-flex gap-2 justify-content-center">
-                            <a href="/porucheniya-urr/${data.id}/redaktirovat-poruchenie" class="btn btn-outline-warning btn-sm py-0 px-1" title="Редактировать">
-                                <i class="bi bi-pencil"></i>
-                            </a>
-                            <button type="button" class="btn btn-outline-danger btn-sm py-0 px-1" title="Удалить" onclick="confirmDelete(${data.id})">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </div>
-                    `;
-                }
-            }
+            // {
+            //     title: "Действия",
+            //     width: 100,
+            //     hozAlign: "center",
+            //     headerSort: false,
+            //     frozen: true,
+            //     formatter: function(cell) {
+            //         const data = cell.getData();
+            //         return `
+            //             <div class="d-flex gap-2 justify-content-center">
+            //                 <a href="/porucheniya-urr/${data.id}/redaktirovat-poruchenie" class="btn btn-outline-warning btn-sm py-0 px-1" title="Редактировать">
+            //                     <i class="bi bi-pencil"></i>
+            //                 </a>
+            //                 <button type="button" class="btn btn-outline-danger btn-sm py-0 px-1" title="Удалить" onclick="confirmDelete(${data.id})">
+            //                     <i class="bi bi-trash"></i>
+            //                 </button>
+            //             </div>
+            //         `;
+            //     }
+            // }
         ]
     });
 

@@ -25,6 +25,10 @@ Route::middleware(['auth'])->group(function () {
         // Сохранение нового объекта недвижимости
             Route::post('/obekti-nedvizhimosti/{id_obekta}/obnovit-obekt', ObektiNedvizhimocti\ObnovitObekt::class)
                 ->name('obekti-nedvizhimosti.obnovit-obekt');
+
+        // Удаление объекта недвижимости
+            Route::delete('/obekti-nedvizhimosti/{id_obekta}', ObektiNedvizhimocti\UdalitObekt::class)
+                ->name('obekti-nedvizhimosti.udalit-obekt');
     
     // dopolnitelno-vyyavlennye ---------------------------------------------------------------
         Route::get('/obekty-nedvizhimosti/{id_obekta}/dopolnitelno-vyyavlennye/sozdat-obekt',

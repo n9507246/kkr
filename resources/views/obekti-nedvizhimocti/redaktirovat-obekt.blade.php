@@ -122,7 +122,13 @@
                                 <i class="bi bi-arrow-left"></i> Назад
                             </a>
 
-                            <div class="btn-group">
+                            <div class="d-flex gap-2">
+                                <button type="button"
+                                        class="btn btn-danger"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#deleteObektModal">
+                                    <i class="bi bi-trash"></i> Удалить объект
+                                </button>
                                 <button type="submit" class="btn btn-primary" id="saveBtn">
                                     <i class="bi bi-save"></i> Сохранить изменения
                                 </button>
@@ -132,6 +138,32 @@
 
                     
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteObektModal" tabindex="-1" aria-labelledby="deleteObektModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteObektModalLabel">Подтверждение удаления</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body">
+                Вы действительно хотите удалить объект
+                <strong>{{ $obekt->kadastroviy_nomer }}</strong>?
+                Это действие нельзя отменить.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <form method="POST" action="{{ route('obekti-nedvizhimosti.udalit-obekt', ['id_obekta' => $obekt->id]) }}">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash"></i> Удалить
+                    </button>
+                </form>
             </div>
         </div>
     </div>
