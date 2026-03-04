@@ -1,6 +1,9 @@
 @props(['poruchenie' => null])
 <div class="tab-pane fade show active" id="main" role="tabpanel">
-    <form method="POST" action="{{ isset($poruchenie) ? route('porucheniya-urr.obnovit-poruchenie', $poruchenie['id'] ?? 1) : route('porucheniya-urr.sohranit-poruchenie') }}" id="mainForm">
+    @php
+        $poruchenieId = is_array($poruchenie) ? ($poruchenie['id'] ?? null) : ($poruchenie->id ?? null);
+    @endphp
+    <form method="POST" action="{{ isset($poruchenie) ? route('porucheniya-urr.obnovit-poruchenie', $poruchenieId ?? 1) : route('porucheniya-urr.sohranit-poruchenie') }}" id="mainForm">
         @csrf
         @if(isset($poruchenie))
             @method('PUT')
@@ -118,9 +121,47 @@
             <a class="btn btn-secondary" href="{{ route('porucheniya-urr.spisok-porucheniy')}}">
                 Выйти без сохранения
             </a>
-            <button type="submit" class="btn btn-primary" >
-                Сохранить
-            </button>
+            <div class="d-flex gap-2">
+                @if(isset($poruchenie) && $poruchenieId)
+                    <button type="button"
+                            class="btn btn-danger"
+                            data-bs-toggle="modal"
+                            data-bs-target="#deletePoruchenieModal">
+                        <i class="bi bi-trash"></i> Удалить поручение
+                    </button>
+                @endif
+                <button type="submit" class="btn btn-primary" >
+                    Сохранить
+                </button>
+            </div>
         </div>
     </form>
+
+    @if(isset($poruchenie) && $poruchenieId)
+        <div class="modal fade" id="deletePoruchenieModal" tabindex="-1" aria-labelledby="deletePoruchenieModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deletePoruchenieModalLabel">Подтверждение удаления</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                    </div>
+                    <div class="modal-body">
+                        Вы действительно хотите удалить поручение
+                        <strong>{{ is_array($poruchenie) ? ($poruchenie['incoming_number'] ?? '') : ($poruchenie->incoming_number ?? '') }}</strong>?
+                        Это действие нельзя отменить.
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                        <form method="POST" action="{{ route('porucheniya-urr.udalit-poruchenie', ['poruchenie_urr' => $poruchenieId]) }}">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-trash"></i> Удалить
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>
