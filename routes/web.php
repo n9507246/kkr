@@ -107,6 +107,14 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/users', Users\SohranitPolzovatelya::class)
                 ->name('users.store');
 
+        // Редактирование пользователя (форма)
+            Route::get('/users/{user}/redaktirovat-polzovatelya', Users\RedaktirovatPolzovatelya::class)
+                ->name('users.edit');
+
+        // Обновление пользователя
+            Route::put('/users/{user}', Users\ObnovitPolzovatelya::class)
+                ->name('users.update');
+
         // Список пользователей
             Route::get('/users', Users\SpisokPolzovateley::class)
                 ->name('users.index');

@@ -56,6 +56,10 @@
                         field: "name",
                         minWidth: 180,
                         sorter: "string",
+                        formatter: (cell) => {
+                            const d = cell.getData();
+                            return `<a href="/users/${d.id}/redaktirovat-polzovatelya" class="text-primary fw-bold text-decoration-none">${cell.getValue() || '-'}</a>`;
+                        }
                     },
                     {
                         title: "Email",
