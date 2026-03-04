@@ -25,6 +25,15 @@ class UdalitPolzovatelya extends Controller
             ->where('sozdal_id', $user->id)
             ->update(['sozdal_id' => null]);
 
+        $emailLocalPart = strtok($user->email, '@') ?: 'user';
+        $emailLocalPart = preg_replace('/[^a-zA-Z0-9._-]/', '', $emailLocalPart) ?: 'user';
+        $suffix = now()->format('YmdHis') . '_' . $user->id;
+        $maxLocalLength = 255 - strlen('+deleted_' . $suffix . '@example.com');
+        $emailLocalPart = substr($emailLocalPart, 0, max(1, $maxLocalLength));
+
+        $user->email = $emailLocalPart . '+deleted_' . $suffix . '@example.com';
+        $user->save();
+
         $user->delete();
 
         return redirect()
