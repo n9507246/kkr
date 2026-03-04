@@ -20,6 +20,9 @@
                 </x-smart-table.column-controller>
 
                 <x-smart-table.filter-panel-btn :id="$id_table"/>
+                <a href="{{ route('users.create') }}" class="btn btn-primary btn-sm ms-auto">
+                    <i class="bi bi-plus-circle"></i> Новый пользователь
+                </a>
             </div>
 
             <x-smart-table.filter-panel :id="$id_table">

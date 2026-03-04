@@ -99,6 +99,14 @@ Route::middleware(['auth'])->group(function () {
     // ----------------------------------------------------------------------------------------------------
 
     // users ----------------------------------------------------------------------------------------------
+        // Создание пользователя (форма)
+            Route::get('/users/sozdat-polzovatelya', Users\SozdatPolzovatelya::class)
+                ->name('users.create');
+
+        // Сохранение пользователя
+            Route::post('/users', Users\SohranitPolzovatelya::class)
+                ->name('users.store');
+
         // Список пользователей
             Route::get('/users', Users\SpisokPolzovateley::class)
                 ->name('users.index');
