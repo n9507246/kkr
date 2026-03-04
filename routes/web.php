@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ObektiNedvizhimocti;
 use App\Http\Controllers\PorucheniyaUrr;
+use App\Http\Controllers\Users;
 
 Route::get('/test', App\Http\Controllers\TestController::class)->name('test');
 
@@ -95,6 +96,12 @@ Route::middleware(['auth'])->group(function () {
             Route::delete('/porucheniya-urr/{poruchenie_urr}/obekty-nedvizhimosti/{obekt}',
                 PorucheniyaUrr\ObektiNedvizhimocti\UdalitObektNedvizhimosti::class)
                 ->name('porucheniya-urr.obekti-nedvizhimosti.udalit-obekt');
+    // ----------------------------------------------------------------------------------------------------
+
+    // users ----------------------------------------------------------------------------------------------
+        // Список пользователей
+            Route::get('/users', Users\SpisokPolzovateley::class)
+                ->name('users.index');
     // ----------------------------------------------------------------------------------------------------
 
     // ==================== ПРОФИЛЬ ====================
