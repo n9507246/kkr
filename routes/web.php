@@ -31,6 +31,14 @@ Route::middleware(['auth'])->group(function () {
                 ->name('obekti-nedvizhimosti.udalit-obekt');
     
     // dopolnitelno-vyyavlennye ---------------------------------------------------------------
+        Route::get('/obekti-nedvizhimosti/{id_obekta}/dopolnitelno-vyyavlennye/{id_dopolnitelnogo_obekta}/redaktirovat-obekt',
+            ObektiNedvizhimocti\DopolnitelnoVyyavlennye\RedactirovatObekt::class)
+            ->name('obekty-nedvizhimosti.dopolnitelno-vyyavlennye.redactirovat-obekt');
+
+        Route::delete('/obekti-nedvizhimosti/{id_obekta}/dopolnitelno-vyyavlennye/{id_dopolnitelnogo_obekta}',
+            ObektiNedvizhimocti\DopolnitelnoVyyavlennye\UdalitObekt::class)
+            ->name('obekty-nedvizhimosti.dopolnitelno-vyyavlennye.udalit-obekt');
+
         Route::get('/obekty-nedvizhimosti/{id_obekta}/dopolnitelno-vyyavlennye/sozdat-obekt',
             ObektiNedvizhimocti\DopolnitelnoVyyavlennye\SozdatObekt::class)
             ->name('obekty-nedvizhimosti.dopolnitelno-vyyavlennye.sozdat-obekt');
