@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\KadastrovieObekti;
 use App\Models\TipyObektov;
 use App\Rules\UniqueCadastralWithSoftDelete;
+use Illuminate\Support\Facades\Auth;
 
 class SohranitObektNedvizhimosti extends Controller
 {
@@ -34,6 +35,7 @@ class SohranitObektNedvizhimosti extends Controller
 
         $obekt['poruchenie_id'] = $poruchenie_urr;
         $obekt['tip_obekta_id'] = $tipObektaId;
+        $obekt['ispolnitel_id'] = Auth::id();
         unset($obekt['tip_obekta_nedvizhimosti'], $obekt['vid_rabot']);
 
         // Создание нового объекта

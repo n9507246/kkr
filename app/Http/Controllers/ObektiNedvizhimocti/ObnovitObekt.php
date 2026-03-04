@@ -23,7 +23,7 @@ class ObnovitObekt extends Controller
             'kommentariy' => 'nullable|string',
         ]);
         // Добавляем текущего пользователя как исполнителя
-        $validated['ispolnitel'] = Auth::user()->name;
+        $validated['ispolnitel_id'] = Auth::id();
         // dd($validated);
         // Обновляем объект
         $obekt->update($validated);

@@ -22,7 +22,7 @@ class KadastrovieObekti extends Model
         'data_nachala',
         'data_zaversheniya',
         'data_okonchaniya_rabot',
-        'ispolnitel',
+        'ispolnitel_id',
         'kommentariy',
     ];
 
@@ -73,6 +73,14 @@ class KadastrovieObekti extends Model
     }
 
     /**
+     * Исполнитель (пользователь)
+     */
+    public function ispolnitelUser()
+    {
+        return $this->belongsTo(User::class, 'ispolnitel_id');
+    }
+
+    /**
      * Применение сортировки к запросу
      */
     public function scopeSort(Builder $query, ?array $sortFields): Builder
@@ -103,9 +111,15 @@ class KadastrovieObekti extends Model
         match ($field) {
             // Поля из основной таблицы
             'kadastroviy_nomer',
-            'ispolnitel',
             'data_zaversheniya',
             'kommentariy' => $query->orderBy($field, $direction),
+
+            'ispolnitel' => $query->orderBy(
+                User::select('name')
+                    ->whereColumn('users.id', 'kadastrovie_obekti.ispolnitel_id')
+                    ->limit(1),
+                $direction
+            ),
 
             // Поле из связанной таблицы tipObekta
             'tip_obekta.abbreviatura' => $query->orderBy(
@@ -156,8 +170,9 @@ class KadastrovieObekti extends Model
         $query->when($filters['kadastroviy_nomer'] ?? null, fn($q, $value) => 
                 $q->where('kadastroviy_nomer', 'like', "%{$value}%"))
                 
-            ->when($filters['ispolnitel'] ?? null, fn($q, $value) => 
-                $q->where('ispolnitel', 'like', "%{$value}%"))
+            ->when($filters['ispolnitel'] ?? null, fn($q, $value) =>
+                $q->whereHas('ispolnitelUser', fn($subQ) =>
+                    $subQ->where('name', 'like', "%{$value}%")))
                 
             ->when($filters['tip_obekta_id'] ?? null, fn($q, $value) => 
                 $q->where('tip_obekta_id', $value))

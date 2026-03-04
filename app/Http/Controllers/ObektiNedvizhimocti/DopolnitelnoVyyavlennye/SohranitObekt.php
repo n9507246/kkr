@@ -34,7 +34,7 @@ class SohranitObekt extends Controller
             'tip_obekta_id' => $validated['tip_obekta_id'],
             'vid_rabot_id' => $validated['vid_rabot_id'] ?? null,
             'data_zaversheniya' => $validated['data_zaversheniya'] ?? null,
-            'ispolnitel' => Auth::user()?->name,
+            'ispolnitel_id' => Auth::id(),
             'kommentariy' => $validated['kommentariy'] ?? null,
         ]);
 

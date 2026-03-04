@@ -167,7 +167,8 @@
                         { title: "Исполнитель",
                             field: "ispolnitel",
                             minWidth: 150,
-                            sorter: "string"
+                            sorter: "string",
+                            formatter: (cell) => cell.getData().ispolnitel_user?.name || "-"
                         },
                         { title: "Дата заверш.",
                             field: "data_zaversheniya",
