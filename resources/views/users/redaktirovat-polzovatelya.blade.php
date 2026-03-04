@@ -64,12 +64,46 @@
                                 <a href="{{ route('users.index') }}" class="btn btn-secondary">
                                     <i class="bi bi-arrow-left"></i> Назад
                                 </a>
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="bi bi-save"></i> Сохранить изменения
-                                </button>
+                                <div class="d-flex gap-2">
+                                    <button type="button"
+                                            class="btn btn-danger"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#deleteUserModal">
+                                        <i class="bi bi-trash"></i> Удалить пользователя
+                                    </button>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-save"></i> Сохранить изменения
+                                    </button>
+                                </div>
                             </div>
                         </form>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteUserModalLabel">Подтверждение удаления</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                </div>
+                <div class="modal-body">
+                    Вы действительно хотите удалить пользователя
+                    <strong>{{ $userModel->name }}</strong>?
+                    Это действие нельзя отменить.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <form method="POST" action="{{ route('users.destroy', ['user' => $userModel->id]) }}">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Удалить
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>

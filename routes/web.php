@@ -115,6 +115,10 @@ Route::middleware(['auth'])->group(function () {
             Route::put('/users/{user}', Users\ObnovitPolzovatelya::class)
                 ->name('users.update');
 
+        // Удаление пользователя
+            Route::delete('/users/{user}', Users\UdalitPolzovatelya::class)
+                ->name('users.destroy');
+
         // Список пользователей
             Route::get('/users', Users\SpisokPolzovateley::class)
                 ->name('users.index');
