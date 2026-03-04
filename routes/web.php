@@ -72,9 +72,8 @@ Route::middleware(['auth'])->group(function () {
                 ->name('porucheniya-urr.redaktirovat-poruchenie');
 
         // Обновление поручения
-            Route::post('/porucheniya-urr/{poruchenie_urr}', function() {
-                return 'ok';
-            })->name('porucheniya-urr.obnovit-poruchenie');
+            Route::put('/porucheniya-urr/{poruchenie_urr}', PorucheniyaUrr\ObnovitPoruchenie::class)
+                ->name('porucheniya-urr.obnovit-poruchenie');
 
         // Удаление поручения
             Route::delete('/porucheniya-urr/{poruchenie_urr}', PorucheniyaUrr\UdalitPoruchenie::class)

@@ -1,7 +1,14 @@
 @props(['poruchenie' => null])
 <div class="tab-pane fade show active" id="main" role="tabpanel">
     @php
-        $poruchenieId = is_array($poruchenie) ? ($poruchenie['id'] ?? null) : ($poruchenie->id ?? null);
+        $poruchenieId = data_get($poruchenie, 'id');
+        $vhodNomer = data_get($poruchenie, 'vhod_nomer', '');
+        $vhodData = data_get($poruchenie, 'vhod_data', '');
+        $urrNomer = data_get($poruchenie, 'urr_nomer', '');
+        $urrData = data_get($poruchenie, 'urr_data', '');
+        $opisanie = data_get($poruchenie, 'opisanie', '');
+        $ishodNomer = data_get($poruchenie, 'ishod_nomer', '');
+        $ishodData = data_get($poruchenie, 'ishod_data', '');
     @endphp
     <form method="POST" action="{{ isset($poruchenie) ? route('porucheniya-urr.obnovit-poruchenie', $poruchenieId ?? 1) : route('porucheniya-urr.sohranit-poruchenie') }}" id="mainForm">
         @csrf
@@ -14,28 +21,28 @@
                 <h5 class="border-bottom pb-2 mb-3">Ваши реквизиты</h5>
 
                 <div class="mb-3">
-                    <label for="incoming_number" class="form-label">Входящий номер <span class="text-danger">*</span></label>
+                    <label for="vhod_nomer" class="form-label">Входящий номер <span class="text-danger">*</span></label>
                     <input type="text"
-                        class="form-control @error('incoming_number') is-invalid @enderror"
-                        id="incoming_number"
-                        name="incoming_number"
-                        value="{{ old('incoming_number', $poruchenie['incoming_number'] ?? '') }}"
+                        class="form-control @error('vhod_nomer') is-invalid @enderror"
+                        id="vhod_nomer"
+                        name="vhod_nomer"
+                        value="{{ old('vhod_nomer', $vhodNomer) }}"
                         placeholder="ВХ-123/2025"
                         required>
-                    @error('incoming_number')
+                    @error('vhod_nomer')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
 
                 <div class="mb-3">
-                    <label for="incoming_date" class="form-label">Дата регистрации <span class="text-danger">*</span></label>
+                    <label for="vhod_data" class="form-label">Дата регистрации <span class="text-danger">*</span></label>
                     <input type="date"
-                        class="form-control @error('incoming_date') is-invalid @enderror"
-                        id="incoming_date"
-                        name="incoming_date"
-                        value="{{ old('incoming_date', $poruchenie['incoming_date'] ?? '') }}"
+                        class="form-control @error('vhod_data') is-invalid @enderror"
+                        id="vhod_data"
+                        name="vhod_data"
+                        value="{{ old('vhod_data', $vhodData) }}"
                         required>
-                    @error('incoming_date')
+                    @error('vhod_data')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
@@ -45,28 +52,28 @@
                 <h5 class="border-bottom pb-2 mb-3">Реквизиты письма УРР</h5>
 
                 <div class="mb-3">
-                    <label for="urr_number" class="form-label">Номер письма УРР <span class="text-danger">*</span></label>
+                    <label for="urr_nomer" class="form-label">Номер письма УРР <span class="text-danger">*</span></label>
                     <input type="text"
-                        class="form-control @error('urr_number') is-invalid @enderror"
-                        id="urr_number"
-                        name="urr_number"
-                        value="{{ old('urr_number', $poruchenie['urr_number'] ?? '') }}"
+                        class="form-control @error('urr_nomer') is-invalid @enderror"
+                        id="urr_nomer"
+                        name="urr_nomer"
+                        value="{{ old('urr_nomer', $urrNomer) }}"
                         placeholder="12-3456/25"
                         required>
-                    @error('urr_number')
+                    @error('urr_nomer')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
 
                 <div class="mb-3">
-                    <label for="urr_date" class="form-label">Дата письма УРР <span class="text-danger">*</span></label>
+                    <label for="urr_data" class="form-label">Дата письма УРР <span class="text-danger">*</span></label>
                     <input type="date"
-                        class="form-control @error('urr_date') is-invalid @enderror"
-                        id="urr_date"
-                        name="urr_date"
-                        value="{{ old('urr_date', $poruchenie['urr_date'] ?? '') }}"
+                        class="form-control @error('urr_data') is-invalid @enderror"
+                        id="urr_data"
+                        name="urr_data"
+                        value="{{ old('urr_data', $urrData) }}"
                         required>
-                    @error('urr_date')
+                    @error('urr_data')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
@@ -76,13 +83,13 @@
         <div class="row mt-3">
             <div class="col-12">
                 <div class="mb-3">
-                    <label for="description" class="form-label">Описание поручения</label>
-                    <textarea class="form-control @error('description') is-invalid @enderror"
-                            id="description"
-                            name="description"
+                    <label for="opisanie" class="form-label">Описание поручения</label>
+                    <textarea class="form-control @error('opisanie') is-invalid @enderror"
+                            id="opisanie"
+                            name="opisanie"
                             rows="2"
-                            placeholder="Краткое описание работ...">{{ old('description', $poruchenie['description'] ?? '') }}</textarea>
-                    @error('description')
+                            placeholder="Краткое описание работ...">{{ old('opisanie', $opisanie) }}</textarea>
+                    @error('opisanie')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
@@ -96,30 +103,31 @@
             </div>
             <div class="col-md-6">
                 <div class="mb-3">
-                    <label for="outgoing_number" class="form-label">Исходящий номер</label>
+                    <label for="ishod_nomer" class="form-label">Исходящий номер</label>
                     <input type="text"
                         class="form-control"
-                        id="outgoing_number"
-                        name="outgoing_number"
-                        value="{{ old('outgoing_number', $poruchenie['outgoing_number'] ?? '') }}"
+                        id="ishod_nomer"
+                        name="ishod_nomer"
+                        value="{{ old('ishod_nomer', $ishodNomer) }}"
                         placeholder="ИСХ-456/2025">
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="mb-3">
-                    <label for="outgoing_date" class="form-label">Дата отправки</label>
+                    <label for="ishod_data" class="form-label">Дата отправки</label>
                     <input type="date"
                         class="form-control"
-                        id="outgoing_date"
-                        name="outgoing_date"
-                        value="{{ old('outgoing_date', $poruchenie['outgoing_date'] ?? '') }}">
+                        id="ishod_data"
+                        name="ishod_data"
+                        value="{{ old('ishod_data', $ishodData) }}">
                 </div>
             </div>
         </div>
 
         <div class="d-flex justify-content-between mt-4">
             <a class="btn btn-secondary" href="{{ route('porucheniya-urr.spisok-porucheniy')}}">
-                Выйти без сохранения
+                <i class="bi bi-arrow-left"></i>
+                Назад
             </a>
             <div class="d-flex gap-2">
                 @if(isset($poruchenie) && $poruchenieId)
@@ -147,7 +155,7 @@
                     </div>
                     <div class="modal-body">
                         Вы действительно хотите удалить поручение
-                        <strong>{{ is_array($poruchenie) ? ($poruchenie['incoming_number'] ?? '') : ($poruchenie->incoming_number ?? '') }}</strong>?
+                        <strong>{{ $vhodNomer }}</strong>?
                         Это действие нельзя отменить.
                     </div>
                     <div class="modal-footer">
