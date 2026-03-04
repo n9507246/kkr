@@ -14,28 +14,42 @@ class SpisokPorucheniy extends Controller
     {
         if ($request->ajax()) {
             $query = VneshniePorucheniya::query();
+            $filters = $request->input('filters', []);
 
             // Фильтрация
-            if ($request->filled('vhod_nomer')) {
-                $query->where('vhod_nomer', 'like', '%' . $request->vhod_nomer . '%');
+            $vhodNomer = $filters['vhod_nomer'] ?? $request->input('vhod_nomer');
+            if (!empty($vhodNomer)) {
+                $query->where('vhod_nomer', 'like', '%' . $vhodNomer . '%');
             }
-            if ($request->filled('vhod_data')) {
-                $query->whereDate('vhod_data', $request->vhod_data);
+
+            $vhodData = $filters['vhod_data'] ?? $request->input('vhod_data');
+            if (!empty($vhodData)) {
+                $query->whereDate('vhod_data', $vhodData);
             }
-            if ($request->filled('urr_nomer')) {
-                $query->where('urr_nomer', 'like', '%' . $request->urr_nomer . '%');
+
+            $urrNomer = $filters['urr_nomer'] ?? $request->input('urr_nomer');
+            if (!empty($urrNomer)) {
+                $query->where('urr_nomer', 'like', '%' . $urrNomer . '%');
             }
-            if ($request->filled('urr_data')) {
-                $query->whereDate('urr_data', $request->urr_data);
+
+            $urrData = $filters['urr_data'] ?? $request->input('urr_data');
+            if (!empty($urrData)) {
+                $query->whereDate('urr_data', $urrData);
             }
-            if ($request->filled('ishod_nomer')) {
-                $query->where('ishod_nomer', 'like', '%' . $request->ishod_nomer . '%');
+
+            $ishodNomer = $filters['ishod_nomer'] ?? $request->input('ishod_nomer');
+            if (!empty($ishodNomer)) {
+                $query->where('ishod_nomer', 'like', '%' . $ishodNomer . '%');
             }
-            if ($request->filled('ishod_data')) {
-                $query->whereDate('ishod_data', $request->ishod_data);
+
+            $ishodData = $filters['ishod_data'] ?? $request->input('ishod_data');
+            if (!empty($ishodData)) {
+                $query->whereDate('ishod_data', $ishodData);
             }
-            if ($request->filled('opisanie')) {
-                $query->where('opisanie', 'like', '%' . $request->opisanie . '%');
+
+            $opisanie = $filters['opisanie'] ?? $request->input('opisanie');
+            if (!empty($opisanie)) {
+                $query->where('opisanie', 'like', '%' . $opisanie . '%');
             }
 
             // Сортировка

@@ -1000,7 +1000,7 @@ export function create_smart_table(properties) {
 
     tableConfig.pagination = true,                              // Включаем пагинацию
     tableConfig.paginationMode = "remote"                       // Серверная пагинация
-    tableConfig.paginationSize = 10                             // Записей на странице
+    tableConfig.paginationSize = 20                             // Записей на странице
     tableConfig.paginationSizeSelector = [10, 20, 50, 100]      // Возможные варианты записей на странице
     tableConfig.paginationCounter = "rows"                      // Отображение счетчика записей
     tableConfig.sortMode = "remote"                             // Серверная сортировка
