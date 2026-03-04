@@ -36,6 +36,7 @@ class SpisokObektov extends Controller
             return response()->json([
                 'data' => $data->items(),
                 'last_page' => $data->lastPage(),
+                'total' => $data->total(),
             ]);
         }
 

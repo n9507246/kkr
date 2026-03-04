@@ -1038,9 +1038,11 @@ export function create_smart_table(properties) {
             mainLogger.debug(`Размер ответа: ${response.data?.length || 0} записей`);
             console.log(response)
             // Возвращаем данные и информацию о последней странице
+            const lastRow = response.last_row ?? response.total ?? null;
             return { 
                 data: response.data, 
-                last_page: response.last_page 
+                last_page: response.last_page,
+                ...(lastRow !== null ? { last_row: lastRow } : {})
             };
         }
     } else { 
