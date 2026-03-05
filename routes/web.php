@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ObektiNedvizhimocti;
 use App\Http\Controllers\PorucheniyaUrr;
+use App\Http\Controllers\Users;
 
 Route::get('/test', App\Http\Controllers\TestController::class)->name('test');
 
@@ -95,6 +96,32 @@ Route::middleware(['auth'])->group(function () {
             Route::delete('/porucheniya-urr/{poruchenie_urr}/obekty-nedvizhimosti/{obekt}',
                 PorucheniyaUrr\ObektiNedvizhimocti\UdalitObektNedvizhimosti::class)
                 ->name('porucheniya-urr.obekti-nedvizhimosti.udalit-obekt');
+    // ----------------------------------------------------------------------------------------------------
+
+    // users ----------------------------------------------------------------------------------------------
+        // Создание пользователя (форма)
+            Route::get('/users/sozdat-polzovatelya', Users\SozdatPolzovatelya::class)
+                ->name('users.create');
+
+        // Сохранение пользователя
+            Route::post('/users', Users\SohranitPolzovatelya::class)
+                ->name('users.store');
+
+        // Редактирование пользователя (форма)
+            Route::get('/users/{user}/redaktirovat-polzovatelya', Users\RedaktirovatPolzovatelya::class)
+                ->name('users.edit');
+
+        // Обновление пользователя
+            Route::put('/users/{user}', Users\ObnovitPolzovatelya::class)
+                ->name('users.update');
+
+        // Удаление пользователя
+            Route::delete('/users/{user}', Users\UdalitPolzovatelya::class)
+                ->name('users.destroy');
+
+        // Список пользователей
+            Route::get('/users', Users\SpisokPolzovateley::class)
+                ->name('users.index');
     // ----------------------------------------------------------------------------------------------------
 
     // ==================== ПРОФИЛЬ ====================

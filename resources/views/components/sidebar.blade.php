@@ -38,7 +38,7 @@
 
     <!-- MENU -->
     <div class="flex-grow-1 overflow-auto py-3">
-        <ul class="list-unstyled mb-0">
+        <ul class="list-unstyled mb-0 d-flex flex-column h-100">
 
             <li class="mb-1 px-2">
                 <a href="{{ route('home') }}"
@@ -54,6 +54,15 @@
                     <i class="bi bi-file-text fs-5"></i>
                     <span class="nav-text">Поручения УРР</span>
                 </a>
+            </li>
+
+            <li class="mt-auto mb-1 px-2">
+                <a href="{{ route('users.index') }}"
+                    class="d-flex align-items-center gap-3 px-3 py-2 text-white text-decoration-none rounded-3 {{ request()->routeIs('users.*') ? 'bg-white bg-opacity-25' : '' }} hover-class">
+                    <i class="bi bi-people fs-5"></i>
+                    <span class="nav-text">Пользователи</span>
+                </a>
+                
             </li>
 
         </ul>

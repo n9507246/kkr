@@ -22,9 +22,11 @@ class SpisokObektov extends Controller
                     'poruchenie',
                     'vidiRabot',
                     'tipObekta',
+                    'ispolnitelUser',
                     'dopolnitelnieObekti.poruchenie',
                     'dopolnitelnieObekti.vidiRabot',
                     'dopolnitelnieObekti.tipObekta',
+                    'dopolnitelnieObekti.ispolnitelUser',
                 ])
                 ->sort( $request->sort ?? [] )
                 ->filter( $request->filters ?? [] )
@@ -34,6 +36,7 @@ class SpisokObektov extends Controller
             return response()->json([
                 'data' => $data->items(),
                 'last_page' => $data->lastPage(),
+                'total' => $data->total(),
             ]);
         }
 
