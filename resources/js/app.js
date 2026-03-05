@@ -1,3 +1,13 @@
+import * as bootstrap from "bootstrap";
+import { TabulatorFull as Tabulator } from "tabulator-tables";
+import * as luxon from "luxon";
+import * as XLSX from "xlsx-js-style";
+
+window.bootstrap = bootstrap;
+window.Tabulator = Tabulator;
+window.luxon = luxon;
+window.XLSX = XLSX;
+
 /**
  * Логгер с гибкой настройкой вывода сообщений
  */

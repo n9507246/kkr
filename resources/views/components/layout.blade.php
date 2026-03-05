@@ -8,15 +8,6 @@
         @hasSection('title') - @yield('title') @endif
     </title>
 
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
-    <!-- Tabulator CSS (используем Bootstrap 5 тему) -->
-    <link href="https://unpkg.com/tabulator-tables@6.2.1/dist/css/tabulator_bootstrap5.min.css" rel="stylesheet">
-    
     @vite(['resources/css/app.css'])
     {{ $styles ?? '' }}
     @stack('styles')
@@ -55,15 +46,6 @@
         </div>
     </div>
 </div>
-
-<!-- Bootstrap JS + Popper (только ОДИН раз) -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-<!-- Luxon для Tabulator -->
-<script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4/build/global/luxon.min.js"></script>
-<script src="https://unpkg.com/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
-<!-- Tabulator JS -->
-<script src="https://unpkg.com/tabulator-tables@6.2.1/dist/js/tabulator.min.js"></script>
 
 <!-- Vite JS -->
 @vite(['resources/js/app.js'])
