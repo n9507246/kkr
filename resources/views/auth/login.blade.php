@@ -27,7 +27,8 @@
                                    id="email"
                                    name="email"
                                    value="{{ old('email') }}"
-                                   placeholder="email@example.com"
+                                   placeholder="Введите email"
+                                   autocomplete="username"
                                    required
                                    autofocus>
                             @error('email')
@@ -47,7 +48,8 @@
                                        class="form-control form-control-lg bg-light border-0 @error('password') is-invalid @enderror"
                                        id="password"
                                        name="password"
-                                       placeholder="••••••••"
+                                       placeholder="Введите пароль"
+                                       autocomplete="current-password"
                                        required>
                                 <button class="btn btn-light border-0" type="button" id="togglePassword">
                                     <i class="bi bi-eye"></i>
