@@ -31,17 +31,27 @@ cp .env.example .env
 #ОБЯЗАТЕЛЬНО МЕНЯЕМ ФАЙЛ ОКРУЖЕНИЯ ИНАЧЕ КОНТЕЙНЕРЫ ЗАПУСТЯТСЯ НЕ ПРАВИЛЬНО
 
 #Установите зависимости Composer (без локального PHP)
+```
 docker run --rm \
     -u "$(id -u):$(id -g)" \
     -v "$(pwd):/var/www/html" \
     -w /var/www/html \
     laravelsail/php83-composer:latest \
     composer install --ignore-platform-reqs
+```
 
+```
 ./vendor/bin/sail up -d
 ./vendor/bin/sail artisan key:generate
 ./vendor/bin/sail artisan migrate
 ./vendor/bin/sail npm install
-./vendor/bin/sail npm run dev
+./vendor/bin/sail npm run dev   #!ОБЯЗАТЕЛЬНО ЗАПУСТИТЬ ИНАЧЕ НЕ РАБОТАЕТ Vite
+```
 
+если забыли поменять конфил .env 
+```
+./vendor/bin/sail artisan config:clear
+./vendor/bin/sail down -v                  # остановить и удалить тома
+./vendor/bin/sail up -d 
 
+```
