@@ -85,6 +85,10 @@ class KadastrovieObekti extends Model
      */
     public function scopeSort(Builder $query, ?array $sortFields): Builder
     {
+        $query
+            ->orderByRaw('COALESCE(kadastrovie_obekti.roditelskiy_obekt_id, kadastrovie_obekti.id) DESC')
+            ->orderByRaw('CASE WHEN kadastrovie_obekti.roditelskiy_obekt_id IS NULL THEN 0 ELSE 1 END ASC');
+
         if (empty($sortFields)) {
             return $query->orderBy('kadastrovie_obekti.created_at', 'desc');
         }

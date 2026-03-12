@@ -94,6 +94,15 @@
     </x-smart-table.component>
 
 
+@push('styles')
+    <style>
+        #{{ $id_table }} .tabulator-row.is-dopolnitelniy-obekt {
+            background-color: #fff4cc;
+            border-left: 4px solid #d4a017;
+        }
+    </style>
+@endpush
+
 @push('scripts')
     <script type="module">
         import { create_smart_table } from '{{ Vite::asset('resources/js/app.js') }}';
@@ -105,18 +114,11 @@
                 id: '{{ $id_table }}',
                 ajaxURL: "{{ route('obekti-nedvizhimosti.spisok-obektov') }}",
                 export_to_excel: true,
-
-                // Настройки для дерева
-                dataTree: true,
-                dataTreeChildField: "dopolnitelnie_obekti",
-                dataTreeStartExpanded: true,
-                dataTreeExpandElement: '<span class="tree-toggle-btn tree-toggle-expand me-2"><i class="bi bi-plus"></i></span>',
-                dataTreeCollapseElement: '<span class="tree-toggle-btn tree-toggle-collapse me-2"><i class="bi bi-dash"></i></span>',
                 rowFormatter: (row) => {
                     const rowData = row.getData();
-                    const hasChildren = Array.isArray(rowData.dopolnitelnie_obekti) && rowData.dopolnitelnie_obekti.length > 0;
+                    const isChild = !!rowData.roditelskiy_obekt_id;
 
-                    row.getElement().classList.toggle('tree-no-children', !hasChildren);
+                    row.getElement().classList.toggle('is-dopolnitelniy-obekt', isChild);
                 },
 
                 columns: [
@@ -127,9 +129,6 @@
                         sorter: "string",
                         formatter: (cell) => {
                             const d = cell.getData();
-
-                            console.log(d)
-                            console.log(d.id)
                             const isChild = !!d.roditelskiy_obekt_id;
                             const url = isChild
                                 ? `/obekti-nedvizhimosti/${d.roditelskiy_obekt_id}/dopolnitelno-vyyavlennye/${d.id}/redaktirovat-obekt`

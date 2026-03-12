@@ -17,16 +17,12 @@ class SpisokObektov extends Controller
         if ($request->ajax()) {
             
             $data = \App\Models\KadastrovieObekti::query()
-                ->whereNull('roditelskiy_obekt_id')
                 ->with([
                     'poruchenie',
                     'vidiRabot',
                     'tipObekta',
                     'ispolnitelUser',
-                    'dopolnitelnieObekti.poruchenie',
-                    'dopolnitelnieObekti.vidiRabot',
-                    'dopolnitelnieObekti.tipObekta',
-                    'dopolnitelnieObekti.ispolnitelUser',
+                    'roditelskiyObekt',
                 ])
                 ->sort( $request->sort ?? [] )
                 ->filter( $request->filters ?? [] )
