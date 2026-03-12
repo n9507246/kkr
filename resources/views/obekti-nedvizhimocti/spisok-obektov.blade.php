@@ -198,6 +198,26 @@
                             return val ? new Date(val).toLocaleDateString('ru-RU') : "-";
                         }
                     },
+                    { title: "Исх. номер УРР",
+                        field: "poruchenie.ishod_nomer",
+                        minWidth: 170,
+                        visible: false,
+                        sorter: "string",
+                        formatter: (cell) => cell.getValue() || "-"
+                    },
+                    { title: "Исходящая дата УРР",
+                        field: "poruchenie.ishod_data",
+                        minWidth: 150,
+                        visible: false,
+                        sorter: "date",
+                        sorterParams: {
+                            format: "YYYY-MM-DD"
+                        },
+                        formatter: (cell) => {
+                            const val = cell.getValue();
+                            return val ? new Date(val).toLocaleDateString('ru-RU') : "-";
+                        }
+                    },
                     { title: "Тип работ",
                         field: "vidi_rabot.nazvanie",
                         minWidth: 150,
