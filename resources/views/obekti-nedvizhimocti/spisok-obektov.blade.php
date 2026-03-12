@@ -27,6 +27,12 @@
                 <x-smart-table.filter-panel-btn :id="$id_table"/>
                 
                 <x-smart-table.export-excel :id="$id_table"/>
+
+                <div
+                    to-smart-table="{{ $id_table }}"
+                    role="extended_pagination_summary"
+                    class="ms-auto small text-body-secondary d-flex align-items-center"
+                ></div>
             </div>
             <x-smart-table.filter-panel :id="$id_table">
                 <x-slot:filters>
@@ -104,6 +110,7 @@
                 id: '{{ $id_table }}',
                 ajaxURL: "{{ route('obekti-nedvizhimosti.spisok-obektov') }}",
                 export_to_excel: true,
+                extended_pagination_summary: true,
                 rowFormatter: (row) => {
                     const isChild = !!row.getData().roditelskiy_obekt_id;
                     const rowElement = row.getElement();

@@ -15,8 +15,7 @@ class SpisokObektov extends Controller
     {
         
         if ($request->ajax()) {
-            
-            $data = \App\Models\KadastrovieObekti::query()
+            $baseQuery = \App\Models\KadastrovieObekti::query()
                 ->with([
                     'poruchenie',
                     'vidiRabot',
@@ -24,8 +23,13 @@ class SpisokObektov extends Controller
                     'ispolnitelUser',
                     'roditelskiyObekt',
                 ])
+                ->filter( $request->filters ?? [] );
+
+            $totalMain = (clone $baseQuery)->whereNull('roditelskiy_obekt_id')->count();
+            $totalChild = (clone $baseQuery)->whereNotNull('roditelskiy_obekt_id')->count();
+
+            $data = $baseQuery
                 ->sort( $request->sort ?? [] )
-                ->filter( $request->filters ?? [] )
                 ->paginate( $request->size ?? 10);
                
                 
@@ -33,6 +37,8 @@ class SpisokObektov extends Controller
                 'data' => $data->items(),
                 'last_page' => $data->lastPage(),
                 'total' => $data->total(),
+                'total_main' => $totalMain,
+                'total_child' => $totalChild,
             ]);
         }
 

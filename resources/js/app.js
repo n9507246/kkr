@@ -991,6 +991,7 @@ export function create_smart_table(properties) {
     mainLogger.debug(`Элемент с id="${properties.id}" найден`);
     const storageKeyBase = properties.storageKey || properties.id;
     mainLogger.debug(`Базовый ключ localStorage: ${storageKeyBase}`);
+    let latestAjaxMeta = null;
 
     const shouldPersistFilterPanelState =
         properties.persist_filter_panel_state ?? properties.apply_filters ?? false;
@@ -1012,7 +1013,8 @@ export function create_smart_table(properties) {
     tableConfig.paginationMode = "remote"                       // Серверная пагинация
     tableConfig.paginationSize = 20                             // Записей на странице
     tableConfig.paginationSizeSelector = [10, 20, 50, 100]      // Возможные варианты записей на странице
-    tableConfig.paginationCounter = "rows"                      // Отображение счетчика записей
+    tableConfig.paginationCounter =
+        properties.pagination_counter ?? (properties.extended_pagination_summary ? false : "rows")
     tableConfig.sortMode = "remote"                             // Серверная сортировка
     tableConfig.filterMode = "remote"                           // Серверная фильтрация
     
@@ -1046,7 +1048,12 @@ export function create_smart_table(properties) {
             mainLogger.debug('Получен ответ от сервера');
             mainLogger.debug(`Параметры запроса: ${JSON.stringify(params)}`);
             mainLogger.debug(`Размер ответа: ${response.data?.length || 0} записей`);
-            console.log(response)
+            latestAjaxMeta = {
+                total: response.total ?? null,
+                totalMain: response.total_main ?? null,
+                totalChild: response.total_child ?? null,
+            };
+
             // Возвращаем данные и информацию о последней странице
             const lastRow = response.last_row ?? response.total ?? null;
             return { 
@@ -1322,8 +1329,55 @@ export function create_smart_table(properties) {
     
     // Создаем экземпляр таблицы Tabulator
     const table = new Tabulator(`#${properties.id}`, tableConfig);
+    const paginationSummaryElement = properties.extended_pagination_summary
+        ? (
+            document.querySelector(
+                `[to-smart-table="${properties.id}"][role="extended_pagination_summary"]`
+            ) || document.createElement('div')
+        )
+        : null;
+
+    if (paginationSummaryElement && !paginationSummaryElement.isConnected) {
+        paginationSummaryElement.className =
+            'small mt-2 text-body-secondary d-flex justify-content-between gap-3';
+        table.element.insertAdjacentElement('beforebegin', paginationSummaryElement);
+    }
 
     mainLogger.debug('Таблица Tabulator создана');
+
+    const updatePaginationSummary = () => {
+        if (!paginationSummaryElement) {
+            return;
+        }
+
+        if (!latestAjaxMeta?.total) {
+            paginationSummaryElement.textContent = '';
+            return;
+        }
+
+        const page = Number(table.getPage() || 1);
+        const pageSize = Number(table.getPageSize() || latestAjaxMeta.total);
+        const currentRowCount = table.getDataCount("active");
+
+        if (!currentRowCount) {
+            paginationSummaryElement.textContent = '';
+            return;
+        }
+
+        const startRow = ((page - 1) * pageSize) + 1;
+        const endRow = startRow + currentRowCount - 1;
+        const totalMain = latestAjaxMeta.totalMain ?? 0;
+        const totalChild = latestAjaxMeta.totalChild ?? 0;
+
+        paginationSummaryElement.textContent =
+            `Показано ${startRow}-${endRow} из ${latestAjaxMeta.total} объектов ` +
+            `(${totalMain} основных • ${totalChild} доп)`;
+    };
+
+    if (paginationSummaryElement) {
+        table.on('dataProcessed', updatePaginationSummary);
+        table.on('pageLoaded', updatePaginationSummary);
+    }
 
     // Запускаем управление видимостью колонок, если это указано в параметрах
     const isColumnVisibilityEnabled =
