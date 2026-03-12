@@ -138,7 +138,7 @@
                     { title: "Роль объекта",
                         field: "rol_obekta",
                         minWidth: 170,
-                        // visible: false,
+                        visible: false,
                         sorter: "string",
                         formatter: (cell) => {
                             const d = cell.getData();

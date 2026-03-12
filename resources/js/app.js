@@ -1066,22 +1066,33 @@ export function create_smart_table(properties) {
     let columnsList = [];
     
     // Загружаем сохраненное состояние видимости колонок из localStorage
-    const visiableStateColumns = JSON.parse(localStorage.getItem(`tabulator-${storageKeyBase}-columns`) || "{}");
+    const columnsStorageKey = `tabulator-${storageKeyBase}-columns`;
+    const visiableStateColumns = JSON.parse(localStorage.getItem(columnsStorageKey) || "{}");
     mainLogger.debug(`Загружено состояние видимости колонок: ${JSON.stringify(visiableStateColumns)}`);
+
 
     // Формируем колонки с указанием дополнительных параметров
     if (properties.columns) { 
-        columnsList = properties.columns.map(col => ({
-            // Минимальная ширина колонки
-            minWidth: 120,         
+        columnsList = properties.columns.map(col => {
+            const resolvedVisible = visiableStateColumns[col.field] !== undefined
+                ? visiableStateColumns[col.field]
+                : (col.visible ?? true);
 
-            // Устанавливаем видимость колонки (информация из localStorage)
-            // Если в localStorage есть значение - используем его, иначе true
-            visible: visiableStateColumns[col.field] !== undefined ? visiableStateColumns[col.field] : true, 
 
-            // Остальные параметры из переданной конфигурации колонки
-            ...col,
-        }));
+
+            return {
+                // Минимальная ширина колонки по умолчанию
+                minWidth: 120,
+
+                // Остальные параметры из переданной конфигурации колонки
+                ...col,
+
+                // Устанавливаем видимость колонки (информация из localStorage)
+                // Если в localStorage есть значение - используем его,
+                // иначе берем настройку колонки, а затем true по умолчанию
+                visible: resolvedVisible,
+            };
+        });
         
         mainLogger.debug(`Сформировано ${columnsList.length} колонок`);
     } else {
