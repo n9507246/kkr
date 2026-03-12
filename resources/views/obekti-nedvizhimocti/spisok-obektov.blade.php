@@ -93,16 +93,6 @@
         </x-slot:control-panel>
     </x-smart-table.component>
 
-
-@push('styles')
-    <style>
-        #{{ $id_table }} .tabulator-row.is-dopolnitelniy-obekt {
-            background-color: #fff4cc;
-            border-left: 4px solid #d4a017;
-        }
-    </style>
-@endpush
-
 @push('scripts')
     <script type="module">
         import { create_smart_table } from '{{ Vite::asset('resources/js/app.js') }}';
@@ -115,13 +105,19 @@
                 ajaxURL: "{{ route('obekti-nedvizhimosti.spisok-obektov') }}",
                 export_to_excel: true,
                 rowFormatter: (row) => {
-                    const rowData = row.getData();
-                    const isChild = !!rowData.roditelskiy_obekt_id;
+                    const isChild = !!row.getData().roditelskiy_obekt_id;
+                    const rowElement = row.getElement();
+                    const cellElements = rowElement.querySelectorAll('.tabulator-cell');
 
-                    row.getElement().classList.toggle('is-dopolnitelniy-obekt', isChild);
+                    rowElement.classList.toggle('bg-primary-subtle', isChild);
+                    cellElements.forEach((cellElement) => {
+                        cellElement.classList.toggle('bg-primary-subtle', isChild);
+                    });
                 },
+                
 
                 columns: [
+                    
                     { title: "Кадастровый номер",
                         field: "kadastroviy_nomer",
                         minWidth: 200,
@@ -134,10 +130,28 @@
                                 ? `/obekti-nedvizhimosti/${d.roditelskiy_obekt_id}/dopolnitelno-vyyavlennye/${d.id}/redaktirovat-obekt`
                                 : `/obekti-nedvizhimosti/${d.id}/redaktirovat-obekt`;
 
-                            return `<a href="${url}" class=" text-primary fw-bold text-decoration-none">${d.kadastroviy_nomer || '-'}</a>`;
+                            return `
+                                <a href="${url}" class="text-primary fw-bold ">${d.kadastroviy_nomer || '-'}</a>
+                            `;
                         }
                     },
-                    { title: "Тип",
+                    { title: "Роль объекта",
+                        field: "rol_obekta",
+                        minWidth: 170,
+                        // visible: false,
+                        sorter: "string",
+                        formatter: (cell) => {
+                            const d = cell.getData();
+                            const isChild = !!d.roditelskiy_obekt_id;
+                            const parentKadNumber = d.roditelskiy_obekt?.kadastroviy_nomer;
+                            const label = isChild && parentKadNumber
+                                ? `${parentKadNumber} [Доп.]`
+                                : 'Основной';
+
+                            return label;
+                        }
+                    },
+                    { title: "Тип объекта",
                         field: "tip_obekta.abbreviatura",
                         minWidth: 80,
                         hozAlign: "center",
